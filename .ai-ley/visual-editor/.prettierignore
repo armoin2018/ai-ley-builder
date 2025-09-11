@@ -1,0 +1,31 @@
+# Build outputs
+dist/
+build/
+node_modules/
+
+# Generated files
+*.min.js
+*.min.css
+coverage/
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Config files that shouldn't be formatted
+*.config.js
+*.config.ts
+vite.config.ts
+tailwind.config.ts
+eslint.config.js
+
+# Documentation
+CHANGELOG.md
+LICENSE

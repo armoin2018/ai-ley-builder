@@ -1,0 +1,260 @@
+@import 'tailwindcss';
+
+/* Base styles for the visual flow editor */
+@layer base {
+  :root {
+    /* Tailwind CSS v4 Custom Properties */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+
+    /* Custom CSS variables for dynamic theming */
+    --node-border-radius: 0.5rem;
+    --connection-width: 2px;
+    --grid-size: 20px;
+  }
+
+  html {
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    overflow: hidden;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* Component styles for the visual editor */
+@layer components {
+  /* App layout */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .app-header {
+    background-color: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .app-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Node styles */
+  .node-base {
+    background-color: white;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--node-border-radius);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    user-select: none;
+    min-width: 120px;
+    min-height: 60px;
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  .node-base:hover {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .node-selected {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  }
+
+  .node-command {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+  .node-logic {
+    border-color: #eab308;
+    background-color: #fefce8;
+  }
+  .node-output {
+    border-color: #10b981;
+    background-color: #ecfdf5;
+  }
+  .node-loop {
+    border-color: #f59e0b;
+    background-color: #fff7ed;
+  }
+  .node-custom {
+    border-color: #8b5cf6;
+    background-color: #faf5ff;
+  }
+  .node-persona {
+    border-color: #ec4899;
+    background-color: #fdf2f8;
+  }
+  .node-instruction {
+    border-color: #06b6d4;
+    background-color: #ecfeff;
+  }
+
+  /* Connection styles */
+  .connection-line {
+    stroke: #64748b;
+    stroke-width: var(--connection-width);
+    fill: none;
+    pointer-events: stroke;
+    cursor: pointer;
+  }
+
+  .connection-active {
+    stroke: #3b82f6;
+    stroke-width: 3px;
+  }
+
+  .connection-error {
+    stroke: #ef4444;
+    stroke-dasharray: 5, 5;
+  }
+
+  /* Canvas styles */
+  .canvas-grid {
+    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+  }
+
+  /* UI Panel styles */
+  .panel-base {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .palette-item {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--node-border-radius);
+    cursor: grab;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .palette-item:hover {
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.1),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border-color: #93c5fd;
+  }
+
+  .palette-item:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+  }
+
+  /* Status indicators */
+  .status-success {
+    color: #166534;
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+  .status-warning {
+    color: #92400e;
+    background-color: #fefce8;
+    border-color: #fde68a;
+  }
+  .status-error {
+    color: #991b1b;
+    background-color: #fef2f2;
+    border-color: #fecaca;
+  }
+  .status-info {
+    color: #1e40af;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+  }
+}
+
+/* Utility overrides */
+@layer utilities {
+  /* Canvas specific utilities */
+  .canvas-container {
+    position: relative;
+    overflow: hidden;
+    background-color: #f8fafc;
+  }
+
+  /* Node port styles */
+  .port-input {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #94a3b8;
+    border: 2px solid white;
+    border-radius: 50%;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .port-output {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #94a3b8;
+    border: 2px solid white;
+    border-radius: 50%;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .port-active {
+    background-color: var(--color-primary-500);
+  }
+
+  /* Drag and drop utilities */
+  .dragging {
+    opacity: 0.75;
+    transform: scale(1.05);
+    z-index: 50;
+  }
+
+  .drop-zone-active {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+    border-style: dashed;
+  }
+
+  /* Placeholder content utility */
+  .placeholder-content {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .placeholder-content > * + * {
+    margin-top: 1rem;
+  }
+}
