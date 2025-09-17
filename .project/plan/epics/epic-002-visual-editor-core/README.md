@@ -5,8 +5,8 @@
 **Epic ID**: EPIC-002  
 **Priority**: High  
 **Status**: Not Started  
-**Estimated Effort**: 32 Story Points  
-**Sprint Assignment**: Sprint 3-5  
+**Estimated Effort**: 42 Story Points  
+**Sprint Assignment**: Sprint 3-6  
 **Dependencies**: Epic 001 (Foundation Infrastructure)
 
 ## Business Value
@@ -28,6 +28,11 @@
 - [ ] Multi-tab interface enables concurrent editing of multiple workflows
 - [ ] Visual feedback system guides users through connection and editing operations
 - [ ] Keyboard accessibility enables complete workflow creation without mouse
+- [ ] Node styling uses white fonts for optimal contrast and accessibility (R18)
+- [ ] Connection points support flexible positioning (top/left inputs, bottom/right outputs) (R19)
+- [ ] AI Persona nodes validate successfully with clear error messaging (R20)
+- [ ] Persona dropdown populated dynamically from `.ai-ley/shared/personas/*` directory (R21)
+- [ ] Instructions dropdown populated dynamically from `.ai-ley/shared/instructions/*` directory (R22)
 
 **ROI Impact**: $180,000 in user productivity improvements through visual workflow creation
 
@@ -54,6 +59,9 @@
 - Node type system aligned with existing .ai-ley persona and instruction files
 - Property validation using existing .ai-ley schemas and validation patterns
 - Canvas state synchronization with browser localStorage for session persistence
+- Dynamic file system scanning for persona and instruction dropdown population (R21, R22)
+- Real-time file watcher integration for live updates when personas/instructions change
+- Enhanced connection routing system for flexible input/output positioning (R19)
 
 **Performance Requirements**:
 
@@ -66,8 +74,9 @@
 
 - [ ] [Story 1: Canvas Implementation](story-001-canvas/README.md) - 8 SP
 - [ ] [Story 2: Component Palette](story-002-palette/README.md) - 8 SP
-- [ ] [Story 3: Inspector Panel](story-003-inspector/README.md) - 8 SP
+- [ ] [Story 3: Inspector Panel](story-003-inspector/README.md) - 10 SP
 - [ ] [Story 4: Tab Management](story-004-tabs/README.md) - 8 SP
+- [ ] [Story 5: Node Styling & Connection Enhancement](story-005-styling/README.md) - 8 SP
 
 ## Risk Assessment
 

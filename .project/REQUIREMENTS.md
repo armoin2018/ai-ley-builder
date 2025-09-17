@@ -698,14 +698,134 @@ The system SHALL support keyboard shortcuts:
 ### R12.2 Quality Gates
 Each phase SHALL complete only after passing defined acceptance criteria and code review.
 
+---
+
+## R16. PlantUML Flow Auto-Loading
+
+**R16.1 Automatic Flow Loading**
+
+- **Description**: Automatically load and display existing flows from `.ai-ley/shared/uml-flows/user/*.puml` directory on application startup
+- **Acceptance Criteria**:
+  - [ ] Application scans `.ai-ley/shared/uml-flows/user/*.puml` on startup
+  - [ ] Each .puml file creates a corresponding tab in the visual editor  
+  - [ ] Flow nodes and connections are accurately reconstructed from PlantUML syntax
+  - [ ] File modification timestamps determine tab loading order
+  - [ ] Loading errors are gracefully handled with user notification
+- **Priority**: High
+- **Complexity**: High
+- **Dependencies**: R7.1.1 (PlantUML Export), file system access permissions, PlantUML parser library
+- **Source**: ASK-001 - 2025-09-11 - Auto-load flows from PlantUML files
+
+## R17. PlantUML Auto-Save Integration
+
+**R17.1 Automatic Flow Persistence**
+
+- **Description**: Automatically save new flows to `.ai-ley/shared/uml-flows/user/` directory as PlantUML files upon creation or modification
+- **Acceptance Criteria**:
+  - [ ] New flows trigger automatic .puml file creation in configured directory
+  - [ ] Flow modifications update corresponding .puml files within 2 seconds
+  - [ ] File naming follows pattern: `<flow-name>.puml` with conflict resolution
+  - [ ] Auto-save operations don't interrupt user workflow
+  - [ ] Save status indicators provide user feedback
+- **Priority**: High  
+- **Complexity**: Moderate
+- **Dependencies**: R3.2.2 (PlantUML Export), R2.6 (Configurable Export Path)
+- **Source**: ASK-001 - 2025-09-11 - Auto-save flows as PlantUML files
+
+## R18. Node Visual Styling Enhancement
+
+**R18.1 Node Text Styling**
+
+- **Description**: Set all font colors within node boxes to white for improved contrast and visual consistency
+- **Acceptance Criteria**:
+  - [ ] All node text displays in white font color (#FFFFFF)
+  - [ ] Text remains readable against all node background colors
+  - [ ] Styling applies consistently across all 7 node types
+  - [ ] High contrast ratios meet WCAG 2.1 AA accessibility standards (4.5:1 minimum)
+  - [ ] Font weight and size maintain readability
+- **Priority**: Medium
+- **Complexity**: Simple  
+- **Dependencies**: R4.1.1-R4.7.2 (Node Type Specifications), CSS styling system
+- **Source**: ASK-001 - 2025-09-11 - White font styling for nodes
+
+## R19. Enhanced Connection Point Configuration
+
+**R19.1 Flexible Connection Points**
+
+- **Description**: Configure connection points so input flows can originate from top or left of node boxes, and output flows can exit from bottom or right
+- **Acceptance Criteria**:
+  - [ ] Input ports accept connections from top edge or left edge of nodes
+  - [ ] Output ports allow connections from bottom edge or right edge of nodes  
+  - [ ] Connection routing automatically selects optimal path based on node positions
+  - [ ] Visual feedback shows available connection points during wiring operations
+  - [ ] Connection point selection is context-aware based on flow direction
+- **Priority**: Medium
+- **Complexity**: Moderate
+- **Dependencies**: R3.1.3 (Connection System), React Flow library capabilities
+- **Source**: ASK-001 - 2025-09-11 - Flexible connection point positioning
+
+## R20. AI Persona Node Property Validation Fix
+
+**R20.1 Persona Validation Resolution**
+
+- **Description**: Resolve missing required property validation errors for AI Persona nodes
+- **Acceptance Criteria**:
+  - [ ] AI Persona nodes validate successfully when all required properties are provided
+  - [ ] Clear error messages identify specific missing properties with field names
+  - [ ] Property requirements align with persona file specifications in `.ai-ley/shared/personas/`
+  - [ ] Validation occurs in real-time during property editing
+  - [ ] Validation rules are consistent with R4.6.1 persona node specifications
+- **Priority**: High
+- **Complexity**: Simple
+- **Dependencies**: R4.6.1 (Persona Node Properties), R3.3.2 (Flow Linting)
+- **Source**: ASK-001 - 2025-09-11 - Fix persona node validation errors
+
+## R21. Persona File Integration
+
+**R21.1 Dynamic Persona Selection**
+
+- **Description**: Provide dropdown list populated with available personas from `.ai-ley/shared/personas/*` directory
+- **Acceptance Criteria**:
+  - [ ] Persona property editor displays dropdown with all available persona files
+  - [ ] Dropdown options show persona names, descriptions, and file paths
+  - [ ] File selection automatically populates persona path property
+  - [ ] Dropdown refreshes when persona files are added/removed from directory
+  - [ ] Search/filter functionality available for large persona collections
+  - [ ] Error handling for missing or corrupted persona files
+- **Priority**: High
+- **Complexity**: Moderate
+- **Dependencies**: R4.6.1 (Persona Node Properties), file system scanning capabilities, file watcher integration
+- **Source**: ASK-001 - 2025-09-11 - Persona dropdown integration
+
+## R22. Instructions File Integration
+
+**R22.1 Dynamic Instructions Selection**
+
+- **Description**: Provide dropdown list populated with available instructions from `.ai-ley/shared/instructions/*` directory
+- **Acceptance Criteria**:
+  - [ ] Instruction property editor displays dropdown with all available instruction files
+  - [ ] Dropdown options show instruction titles, categories, and file paths
+  - [ ] File selection automatically populates instruction path property
+  - [ ] Dropdown supports search/filter functionality for large instruction sets
+  - [ ] Hierarchical display for nested instruction directories
+  - [ ] Real-time updates when instruction files are modified
+- **Priority**: High
+- **Complexity**: Moderate  
+- **Dependencies**: R4.7.1 (Instruction Node Properties), file system scanning capabilities, file watcher integration
+- **Source**: ASK-001 - 2025-09-11 - Instructions dropdown integration
+
+---
+
 ## R13. Project Assumptions
 
 ### R13.1 Technology Stack
 - React framework is available for UI development
 - Node.js/TypeScript environment available for CLI implementation
 - File system write permissions granted under `.ai-ley/shared/**`
+- PlantUML parser library available for bidirectional flow conversion
 
 ### R13.2 Scope Limitations  
 - PlantUML PNG/SVG rendering is out-of-scope for this implementation
 - Integration with external PlantUML renderers is handled by consuming applications
 - Multi-user collaboration features are not included in this release
+- Advanced PlantUML syntax features may not be fully supported in initial release

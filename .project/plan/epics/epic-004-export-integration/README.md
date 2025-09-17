@@ -4,9 +4,9 @@
 
 **Epic ID**: 004  
 **Epic Name**: Export & Integration  
-**Story Points**: 24  
-**Duration**: 2 weeks (Weeks 10-11)  
-**Sprint**: 6  
+**Story Points**: 34  
+**Duration**: 3 weeks (Weeks 10-12)  
+**Sprint**: 6-7  
 **Dependencies**: Epic 003 (Flow Logic & Validation)
 
 ## Description
@@ -29,6 +29,10 @@ Implement comprehensive export capabilities and integration points to enable flo
 - [ ] Exported content is machine-readable and human-readable
 - [ ] Integration with existing AI-Ley CLI ecosystem
 - [ ] Export validation ensures no data loss during round-trip operations
+- [ ] Automatic loading of existing flows from `.ai-ley/shared/uml-flows/user/*.puml` on startup (R16)
+- [ ] Automatic saving of new/modified flows to `.ai-ley/shared/uml-flows/user/` directory (R17)
+- [ ] PlantUML parser supports bidirectional conversion between visual editor and PlantUML format
+- [ ] Auto-save operations complete within 2 seconds without interrupting user workflow
 
 ## Technical Architecture
 
@@ -67,7 +71,7 @@ interface CLIIntegration {
 
 ## Stories and Tasks
 
-### Story 4.1: PlantUML Export System (10 Story Points)
+### Story 4.1: PlantUML Export System (8 Story Points)
 
 **Description**: Generate high-quality PlantUML diagrams from flow configurations
 
@@ -81,11 +85,49 @@ interface CLIIntegration {
 
 **Tasks**:
 
-- Task 4.1.1: Create PlantUML Engine (4 SP)
+- Task 4.1.1: Create PlantUML Engine (3 SP)
 - Task 4.1.2: Implement Diagram Templates (3 SP)
-- Task 4.1.3: Add Styling and Theming (3 SP)
+- Task 4.1.3: Add Styling and Theming (2 SP)
 
-### Story 4.2: JSON Serialization System (7 Story Points)
+### Story 4.2: PlantUML Auto-Loading & Parser (10 Story Points)
+
+**Description**: Implement bidirectional PlantUML parsing and automatic loading of existing flows (R16)
+
+**Acceptance Criteria**:
+
+- Parse existing PlantUML files from `.ai-ley/shared/uml-flows/user/*.puml` on startup
+- Reconstruct visual flow representation from PlantUML syntax
+- Handle PlantUML syntax variations and error recovery
+- Create corresponding tabs in visual editor for each loaded flow
+- Maintain file modification timestamp ordering for tab sequence
+
+**Tasks**:
+
+- Task 4.2.1: PlantUML Parser Implementation (4 SP)
+- Task 4.2.2: Flow Reconstruction Engine (3 SP)
+- Task 4.2.3: Startup Loading Integration (2 SP)
+- Task 4.2.4: Error Handling and Recovery (1 SP)
+
+### Story 4.3: Auto-Save Integration (8 Story Points)
+
+**Description**: Implement automatic saving of flows as PlantUML files (R17)
+
+**Acceptance Criteria**:
+
+- Auto-save new flows to `.ai-ley/shared/uml-flows/user/` directory
+- Update existing PlantUML files within 2 seconds of modifications
+- File naming follows pattern with conflict resolution
+- Non-intrusive save operations that don't interrupt workflow
+- Save status indicators provide user feedback
+
+**Tasks**:
+
+- Task 4.3.1: Auto-Save Engine (3 SP)
+- Task 4.3.2: File Naming and Conflict Resolution (2 SP)
+- Task 4.3.3: Save Status UI Integration (2 SP)
+- Task 4.3.4: Performance Optimization (1 SP)
+
+### Story 4.4: JSON Serialization System (4 Story Points)
 
 **Description**: Provide complete JSON export/import capability with validation
 
@@ -99,11 +141,11 @@ interface CLIIntegration {
 
 **Tasks**:
 
-- Task 4.2.1: Define JSON Schema (2 SP)
-- Task 4.2.2: Implement Serialization Engine (3 SP)
-- Task 4.2.3: Add Import Validation (2 SP)
+- Task 4.4.1: Define JSON Schema (1 SP)
+- Task 4.4.2: Implement Serialization Engine (2 SP)
+- Task 4.4.3: Add Import Validation (1 SP)
 
-### Story 4.3: CLI Integration (7 Story Points)
+### Story 4.5: CLI Integration (4 Story Points)
 
 **Description**: Extend AI-Ley CLI with flow export and processing commands
 
@@ -117,9 +159,9 @@ interface CLIIntegration {
 
 **Tasks**:
 
-- Task 4.3.1: Create CLI Commands (3 SP)
-- Task 4.3.2: Implement Batch Processing (2 SP)
-- Task 4.3.3: Add Progress and Error Handling (2 SP)
+- Task 4.5.1: Create CLI Commands (2 SP)
+- Task 4.5.2: Implement Batch Processing (1 SP)
+- Task 4.5.3: Add Progress and Error Handling (1 SP)
 
 ## Risk Assessment
 

@@ -1,6 +1,6 @@
 @startgantt
 !theme plain
-title AI-Ley Builder Visual Flow Editor - Project Timeline (12-Week Development Cycle)
+title AI-Ley Builder Visual Flow Editor - Project Timeline (14-Week Development Cycle)
 
 Project starts 2026-01-06
 
@@ -15,8 +15,8 @@ Project starts 2026-01-06
 [Story 1.3: Build Pipeline & CI/CD] lasts 4 days
 [Story 1.3: Build Pipeline & CI/CD] starts at [Story 1.2: Project Structure & Configuration]'s end
 
--- Phase 2: Visual Editor Core (Weeks 3-6) --
-[Epic 2: Visual Editor Core] lasts 20 days
+-- Phase 2: Visual Editor Core (Weeks 3-7) --
+[Epic 2: Visual Editor Core] lasts 25 days
 [Epic 2: Visual Editor Core] starts at [Story 1.3: Build Pipeline & CI/CD]'s end
 
 [Story 2.1: Canvas Implementation] lasts 5 days
@@ -27,10 +27,12 @@ Project starts 2026-01-06
 [Story 2.3: Inspector Panel] starts at [Story 2.2: Component Palette]'s end
 [Story 2.4: Tab Management] lasts 5 days
 [Story 2.4: Tab Management] starts at [Story 2.3: Inspector Panel]'s end
+[Story 2.5: Node Styling & Connection Enhancement] lasts 5 days
+[Story 2.5: Node Styling & Connection Enhancement] starts at [Story 2.4: Tab Management]'s end
 
--- Phase 3: Flow Logic & Validation (Weeks 7-9) --
+-- Phase 3: Flow Logic & Validation (Weeks 8-10) --
 [Epic 3: Flow Logic & Validation] lasts 15 days
-[Epic 3: Flow Logic & Validation] starts at [Story 2.4: Tab Management]'s end
+[Epic 3: Flow Logic & Validation] starts at [Story 2.5: Node Styling & Connection Enhancement]'s end
 
 [Story 3.1: Connection System] lasts 4 days
 [Story 3.1: Connection System] starts at [Epic 3: Flow Logic & Validation]'s start
@@ -41,20 +43,24 @@ Project starts 2026-01-06
 [Story 3.4: Flow Linting System] lasts 4 days
 [Story 3.4: Flow Linting System] starts at [Story 3.3: Cycle Detection]'s end
 
--- Phase 4: Export & Integration (Weeks 10-11) --
-[Epic 4: Export & Integration] lasts 10 days
+-- Phase 4: Export & Integration (Weeks 11-13) --
+[Epic 4: Export & Integration] lasts 15 days
 [Epic 4: Export & Integration] starts at [Story 3.4: Flow Linting System]'s end
 
 [Story 4.1: PlantUML Export] lasts 4 days
 [Story 4.1: PlantUML Export] starts at [Epic 4: Export & Integration]'s start
-[Story 4.2: JSON Serialization] lasts 3 days
-[Story 4.2: JSON Serialization] starts at [Story 4.1: PlantUML Export]'s end
-[Story 4.3: CLI Integration] lasts 3 days
-[Story 4.3: CLI Integration] starts at [Story 4.2: JSON Serialization]'s end
+[Story 4.2: PlantUML Auto-Loading] lasts 5 days
+[Story 4.2: PlantUML Auto-Loading] starts at [Story 4.1: PlantUML Export]'s end
+[Story 4.3: Auto-Save Integration] lasts 4 days
+[Story 4.3: Auto-Save Integration] starts at [Story 4.2: PlantUML Auto-Loading]'s end
+[Story 4.4: JSON Serialization] lasts 2 days
+[Story 4.4: JSON Serialization] starts at [Story 4.3: Auto-Save Integration]'s end
+[Story 4.5: CLI Integration] lasts 2 days
+[Story 4.5: CLI Integration] starts at [Story 4.4: JSON Serialization]'s end
 
--- Phase 5: Polish & Documentation (Weeks 12-13) --
+-- Phase 5: Polish & Documentation (Weeks 14-15) --
 [Epic 5: Polish & Documentation] lasts 10 days
-[Epic 5: Polish & Documentation] starts at [Story 4.3: CLI Integration]'s end
+[Epic 5: Polish & Documentation] starts at [Story 4.5: CLI Integration]'s end
 
 [Story 5.1: Testing Suite] lasts 4 days
 [Story 5.1: Testing Suite] starts at [Epic 5: Polish & Documentation]'s start

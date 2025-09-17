@@ -11,9 +11,9 @@
 
 **Objective**: Transform the .ai-ley Builder into a visual, Node-RED-style workflow editor enabling drag-and-drop construction of AI prompt chains with seamless PlantUML export capabilities.
 
-**Timeline**: 12-week development cycle (Q4 2025 - Q1 2026)  
+**Timeline**: 14-week development cycle (Q4 2025 - Q1 2026)  
 **Team Size**: 4-5 full-time developers plus supporting roles  
-**Budget**: $450K total project cost across development, testing, and documentation phases
+**Budget**: $520K total project cost across development, testing, and documentation phases
 
 ## Epic Overview
 
@@ -26,51 +26,51 @@
 - **Dependencies**: None
 - **Timeline**: Weeks 1-2
 
-### Epic 2: Visual Editor Core (32 Story Points)
+### Epic 2: Visual Editor Core (42 Story Points)
 
 - **Status**: Not Started
-- **Stories**: 4 stories, 12 tasks
-- **Sprint**: Sprint 3-5
-- **Key Deliverables**: Canvas interface, component palette, drag-and-drop functionality, inspector panel
+- **Stories**: 5 stories, 18 tasks
+- **Sprint**: Sprint 3-6
+- **Key Deliverables**: Canvas interface, component palette, drag-and-drop functionality, inspector panel, node styling, file system integration
 - **Dependencies**: Epic 1 completion
-- **Timeline**: Weeks 3-6
+- **Timeline**: Weeks 3-7
 
 ### Epic 3: Flow Logic & Validation (28 Story Points)
 
 - **Status**: Not Started
 - **Stories**: 4 stories, 11 tasks
-- **Sprint**: Sprint 6-8
+- **Sprint**: Sprint 7-9
 - **Key Deliverables**: Connection system, validation engine, business rules, cycle detection
 - **Dependencies**: Epic 2 completion
-- **Timeline**: Weeks 7-9
+- **Timeline**: Weeks 8-10
 
-### Epic 4: Export & Integration (24 Story Points)
+### Epic 4: Export & Integration (34 Story Points)
 
 - **Status**: Not Started
-- **Stories**: 3 stories, 9 tasks
-- **Sprint**: Sprint 9-10
-- **Key Deliverables**: PlantUML export, JSON serialization, CLI integration, file persistence
+- **Stories**: 5 stories, 15 tasks
+- **Sprint**: Sprint 10-12
+- **Key Deliverables**: PlantUML export, auto-loading, auto-save, JSON serialization, CLI integration
 - **Dependencies**: Epic 3 completion
-- **Timeline**: Weeks 10-11
+- **Timeline**: Weeks 11-13
 
 ### Epic 5: Polish & Documentation (20 Story Points)
 
 - **Status**: Not Started
 - **Stories**: 3 stories, 8 tasks
-- **Sprint**: Sprint 11-12
+- **Sprint**: Sprint 13-14
 - **Key Deliverables**: Testing suite, accessibility compliance, performance optimization, documentation
 - **Dependencies**: Epic 4 completion
-- **Timeline**: Weeks 12-13
+- **Timeline**: Weeks 14-15
 
-**Total Effort**: 120 Story Points across 17 stories and 48 tasks
+**Total Effort**: 140 Story Points across 21 stories and 64 tasks
 
 ## Key Milestones
 
 - **M1**: Foundation Complete - January 15, 2026
-- **M2**: Visual Editor Core Complete - February 12, 2026
-- **M3**: Flow Logic Complete - March 5, 2026
-- **M4**: Export System Complete - March 19, 2026
-- **M5**: Project Complete - April 2, 2026
+- **M2**: Visual Editor Core Complete - February 26, 2026
+- **M3**: Flow Logic Complete - March 19, 2026
+- **M4**: Export System Complete - April 9, 2026
+- **M5**: Project Complete - April 23, 2026
 
 ## Resource Requirements
 
