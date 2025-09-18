@@ -1,5 +1,7 @@
 // File system services for personas and instructions
-// Handles scanning and loading files from .ai-ley/shared directories
+// Handles scanning and loading files from AI-LEY shared directories using dynamic git root
+
+import { AI_LEY_PATHS } from '../utils/paths';
 
 export interface PersonaFile {
   id: string;
@@ -18,8 +20,12 @@ export interface InstructionFile {
 }
 
 export class FileSystemService {
-  private static PERSONAS_DIR = '.ai-ley/shared/personas/';
-  private static INSTRUCTIONS_DIR = '.ai-ley/shared/instructions/';
+  private static get PERSONAS_DIR() {
+    return AI_LEY_PATHS.PERSONAS;
+  }
+  private static get INSTRUCTIONS_DIR() {
+    return AI_LEY_PATHS.INSTRUCTIONS;
+  }
 
   /**
    * Get all available persona files

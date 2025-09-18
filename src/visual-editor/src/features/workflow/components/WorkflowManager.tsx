@@ -8,6 +8,8 @@ import { getAvailablePUMLFiles } from '../../../utils/export';
 import type { UMLFile } from '../../../utils/export';
 import { parsePlantUMLToFlow } from '../../../utils/plantuml-parser';
 import { cn } from '../../../utils';
+import { getGitRoot, AI_LEY_DISPLAY_PATHS } from '../../../utils/paths';
+import { SettingsService } from '../../../services/settingsService';
 
 interface WorkflowManagerProps {
   isOpen: boolean;
@@ -39,6 +41,22 @@ export function WorkflowManager({ isOpen, onClose }: WorkflowManagerProps) {
   const [pumlFiles, setPumlFiles] = useState<UMLFile[]>([]);
   const [loadingPuml, setLoadingPuml] = useState(false);
 
+  // Get root directory information
+  const getRootDirectoryInfo = () => {
+    const gitRoot = getGitRoot();
+    const settings = SettingsService.loadSettings();
+    const umlFlowsPath = settings.umlFlows.storageFolder;
+
+    return {
+      gitRoot: gitRoot === '../../' ? 'ai-ley-builder' : gitRoot.replace(/\/$/, '').split('/').pop() || 'Unknown',
+      flows: umlFlowsPath,
+      personas: AI_LEY_DISPLAY_PATHS.PERSONAS,
+      instructions: AI_LEY_DISPLAY_PATHS.INSTRUCTIONS,
+    };
+  };
+
+  const rootInfo = getRootDirectoryInfo();
+
   useEffect(() => {
     if (isOpen) {
       refreshWorkflows();
@@ -49,9 +67,6 @@ export function WorkflowManager({ isOpen, onClose }: WorkflowManagerProps) {
   const loadPumlFiles = async () => {
     setLoadingPuml(true);
     try {
-      // First, ensure we have some demo PlantUML files available
-      await ensureDemoPlantUMLFiles();
-
       const files = await getAvailablePUMLFiles();
       setPumlFiles(files);
       console.log(`Loaded ${files.length} PlantUML files for workflow manager`);
@@ -62,113 +77,6 @@ export function WorkflowManager({ isOpen, onClose }: WorkflowManagerProps) {
     }
   };
 
-  const ensureDemoPlantUMLFiles = async () => {
-    try {
-      // Check if we already have files
-      const existing = localStorage.getItem('ai-ley-puml-files');
-      if (existing && JSON.parse(existing).length > 0) {
-        return; // Already have files
-      }
-
-      // Create demo PlantUML files
-      const demoFiles = [
-        {
-          name: 'customer-onboarding.puml',
-          path: '.ai-ley/shared/uml-flows/user/customer-onboarding.puml',
-          lastModified: new Date()
-        },
-        {
-          name: 'data-processing.puml',
-          path: '.ai-ley/shared/uml-flows/user/data-processing.puml',
-          lastModified: new Date()
-        },
-        {
-          name: 'user-authentication.puml',
-          path: '.ai-ley/shared/uml-flows/user/user-authentication.puml',
-          lastModified: new Date()
-        }
-      ];
-
-      // Store the file list
-      localStorage.setItem('ai-ley-puml-files', JSON.stringify(demoFiles));
-
-      // Create sample content for each file
-      const sampleContents = {
-        'customer-onboarding.puml': `@startuml Customer Onboarding
-!theme plain
-
-title Customer Onboarding Process
-
-rectangle "Welcome" as welcome #lightblue
-rectangle "Collect Info" as collect #lightgreen
-rectangle "Verify Email" as verify #yellow
-rectangle "Setup Account" as setup #orange
-rectangle "Send Welcome Email" as email #lightgreen
-rectangle "Complete" as complete #lightgray
-
-welcome --> collect
-collect --> verify
-verify --> setup : Valid
-verify --> collect : Invalid
-setup --> email
-email --> complete
-
-@enduml`,
-        'data-processing.puml': `@startuml Data Processing
-!theme plain
-
-title Data Processing Workflow
-
-rectangle "Input Data" as input #lightblue
-rectangle "Validate" as validate #yellow
-rectangle "Transform" as transform #lightgreen
-rectangle "Store" as store #orange
-rectangle "Notify" as notify #pink
-rectangle "Error Handler" as error #red
-
-input --> validate
-validate --> transform : Valid
-validate --> error : Invalid
-transform --> store
-store --> notify
-error --> notify
-
-@enduml`,
-        'user-authentication.puml': `@startuml User Authentication
-!theme plain
-
-title User Authentication Flow
-
-rectangle "Login Request" as login #lightblue
-rectangle "Check Credentials" as check #yellow
-rectangle "Generate Token" as token #lightgreen
-rectangle "Access Granted" as granted #lightgreen
-rectangle "Access Denied" as denied #red
-rectangle "Logout" as logout #orange
-
-login --> check
-check --> token : Valid
-check --> denied : Invalid
-token --> granted
-granted --> logout
-logout --> login
-
-@enduml`
-      };
-
-      // Store content for each demo file
-      demoFiles.forEach(file => {
-        const content = sampleContents[file.name as keyof typeof sampleContents];
-        if (content) {
-          localStorage.setItem(`puml-content-${file.path}`, content);
-        }
-      });
-
-      console.log('✅ Created demo PlantUML files');
-    } catch (error) {
-      console.error('Failed to create demo PlantUML files:', error);
-    }
-  };
 
   const filteredWorkflows = workflows.filter(
     workflow =>
@@ -235,50 +143,33 @@ logout --> login
     try {
       console.log(`🚀 Loading PlantUML workflow: ${file.name}`);
 
-      // 1. First try to get the PlantUML content from localStorage
+      // 1. Get the PlantUML content (should already be cached by getAvailablePUMLFiles)
       let plantumlContent = localStorage.getItem(`puml-content-${file.path}`);
 
-      // 2. If not found in localStorage, try to load the actual file content
       if (!plantumlContent) {
-        console.log(`📂 No cached content found, attempting to load file content for: ${file.path}`);
-
-        // For demo purposes, create sample PlantUML content based on the file name
-        // In a real implementation, this would read from the actual file system
-        const workflowName = file.name.replace('.puml', '');
-        plantumlContent = `@startuml ${workflowName}
-!theme plain
-
-title ${workflowName}
-
-' Sample workflow structure
-rectangle "Start" as start #lightblue
-rectangle "Process Data" as process #lightgreen
-rectangle "Decision Point" as decision #pink
-rectangle "Output Result" as output #lightgray
-rectangle "End" as end #lightblue
-
-start --> process
-process --> decision
-decision --> output : Yes
-decision --> end : No
-output --> end
-
-@enduml`;
-
-        // Store the generated content for future use
-        localStorage.setItem(`puml-content-${file.path}`, plantumlContent);
-        console.log(`📝 Generated sample PlantUML content for ${file.name}`);
+        throw new Error(`No PlantUML content found for ${file.path}. The file may not have been loaded properly.`);
       }
 
       console.log(`📄 Using PlantUML content (${plantumlContent.length} characters)`);
 
-      // 3. Create a new tab with the file name
+      // 2. Create a new tab with the file name and link it to the original file
       const workflowName = file.name.replace('.puml', '');
-      const newTabId = await createNewTab(workflowName);
+      const newTabId = await createNewTab(workflowName, file.path);
 
-      console.log(`📝 Created new tab: "${workflowName}" (ID: ${newTabId})`);
+      console.log(`📝 Created new tab: "${workflowName}" (ID: ${newTabId}) linked to path: ${file.path}`);
 
-      // 4. Parse PlantUML content to visual flow
+      // 3. Store the original PlantUML content with multiple keys for accessibility
+      localStorage.setItem(`puml-content-${file.path}`, plantumlContent);
+      localStorage.setItem(`puml-content-tab-plantuml-${newTabId}`, plantumlContent);
+      localStorage.setItem(`puml-content-tab-${newTabId}`, plantumlContent);
+
+      console.log(`💾 Stored original PlantUML content with keys:`, {
+        filePath: `puml-content-${file.path}`,
+        tabKey: `puml-content-tab-plantuml-${newTabId}`,
+        alternateKey: `puml-content-tab-${newTabId}`
+      });
+
+      // 5. Parse PlantUML content to visual flow
       const { nodes: parsedNodes, edges: parsedEdges } = parsePlantUMLToFlow(plantumlContent);
 
       console.log(`🔄 Parsed PlantUML to visual flow:`, {
@@ -286,18 +177,14 @@ output --> end
         edges: parsedEdges.length
       });
 
-      // 5. Update the canvas with the parsed visual elements
+      // 6. Update the canvas with the parsed visual elements
       setNodes(parsedNodes);
       setEdges(parsedEdges);
       setViewport({ x: 0, y: 0, zoom: 1 });
 
-      // 6. Store the PlantUML content for this new tab
-      const storageKey = `tab-plantuml-${newTabId}`;
-      localStorage.setItem(`puml-content-${storageKey}`, plantumlContent);
-
       console.log(`✅ Successfully loaded "${workflowName}" into new tab with visual conversion`);
 
-      // 7. Close the dialog
+      // 6. Close the dialog
       onClose();
 
     } catch (error) {
@@ -328,13 +215,41 @@ output --> end
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-3/4 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-semibold text-slate-900">
               Workflow Manager
             </h2>
             <p className="text-sm text-slate-600 mt-1">
               Manage your saved workflows ({workflows.length + pumlFiles.length} total: {workflows.length} legacy, {pumlFiles.length} PlantUML)
             </p>
+
+            {/* Root Directory Information */}
+            <div className="mt-3 p-3 bg-slate-50 rounded-md border">
+              <h3 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 1v6m8-6v6" />
+                </svg>
+                Project: {rootInfo.gitRoot}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="text-slate-600">Flows:</span>
+                  <code className="bg-white px-1 py-0.5 rounded text-slate-800">{rootInfo.flows}</code>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span className="text-slate-600">Personas:</span>
+                  <code className="bg-white px-1 py-0.5 rounded text-slate-800">{rootInfo.personas}</code>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="text-slate-600">Instructions:</span>
+                  <code className="bg-white px-1 py-0.5 rounded text-slate-800">{rootInfo.instructions}</code>
+                </div>
+              </div>
+            </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             ×

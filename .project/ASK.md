@@ -1,10 +1,43 @@
 # Project Ask Items
 
-_Last Updated: 2025-09-11_
+_Last Updated: 2025-09-17_
 
 ## Active Ask Items
 
 ### High Priority - Immediate Attention Required
+
+#### ASK-005: Auto-Arrangement of Visual Dialog Boxes
+
+- **Date**: 2025-09-17
+- **Requestor**: User
+- **Description**: the visual dialog boxes should be able to be auto arranged based on the connection points
+- **Business Impact**: Essential UX improvement that will significantly reduce manual layout work and improve workflow readability through intelligent automatic positioning
+- **Status**: New - ready for requirements integration
+- **Integration Status**:
+  - [ ] Requirements analysis needed for auto-layout algorithms
+  - [ ] Technical research required for React Flow layout integration
+  - [ ] UI/UX design needed for layout controls and options
+  - [ ] Performance considerations for large workflow graphs
+  - [ ] User preference handling for manual vs automatic positioning
+
+#### ASK-004: AI Integration Node Modules - INTEGRATED ✅
+
+- **Date**: 2025-09-17
+- **Requestor**: User
+- **Description**: create node modules for calling AI CLI tools that includes a selection of the configured AI CLI tools. create a node module for calling AI APIs that include a selection of the configured AI APIs.
+- **Business Impact**: Essential functionality that enables users to execute AI tools and API endpoints directly from the visual editor, bridging the settings configuration with actual execution capabilities
+- **Status**: COMPLETE - All components integrated into application
+- **Integration Status**:
+  - [x] Added to requirements as R23 (AI CLI Integration Service)
+  - [x] Added to requirements as R24 (AI API Integration Service)
+  - [x] Added to requirements as R25 (AI Tool Selection Components)
+  - [x] Created AICliService for local AI tool execution
+  - [x] Created AIApiService for REST API communication
+  - [x] Built AICliToolSelector UI component
+  - [x] Built AIApiSelector UI component
+  - [x] Created AIDemo for testing and demonstration
+  - [x] Integrated with command palette (⌘⇧A)
+  - [x] Connected to existing settings system
 
 #### ASK-001: Visual Flow Editor Enhancement Suite - INTEGRATED ✅
 
@@ -47,6 +80,12 @@ _Last Updated: 2025-09-11_
 ## Processed Ask Items (Reference)
 
 ### Recently Integrated
+
+#### ASK-004: AI Integration Node Modules - INTEGRATED
+
+- **Integration Date**: 2025-09-17
+- **Requirements Created**: R23, R24, R25
+- **Status**: Complete - integrated into requirements and implemented
 
 #### ASK-001: Visual Flow Editor Enhancement Suite - INTEGRATED
 

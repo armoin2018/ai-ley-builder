@@ -15,9 +15,9 @@ export function LogicConditionNode(props: NodeProps) {
   const { data, id } = props;
   const { setNodes } = useReactFlow();
   const nodeData = data as unknown as LogicConditionNodeData;
-  const condition = nodeData.properties.condition as string;
-  const trueLabel = (nodeData.properties.trueLabel as string) || 'True';
-  const falseLabel = (nodeData.properties.falseLabel as string) || 'False';
+  const condition = nodeData.properties?.condition || '';
+  const trueLabel = (nodeData.properties?.trueLabel as string) || 'True';
+  const falseLabel = (nodeData.properties?.falseLabel as string) || 'False';
 
   const handleLabelChange = (newLabel: string) => {
     setNodes(nodes =>

@@ -13,8 +13,8 @@ export interface OutputTypeNodeData extends BaseNodeData {
 export function OutputTypeNode(props: NodeProps) {
   const { data } = props;
   const nodeData = data as unknown as OutputTypeNodeData;
-  const outputType = (nodeData.properties.outputType as string) || 'text';
-  const format = nodeData.properties.format as string;
+  const outputType = (nodeData.properties?.outputType as string) || 'text';
+  const format = nodeData.properties?.format || '';
 
   const getTypeColor = (type: string) => {
     switch (type) {

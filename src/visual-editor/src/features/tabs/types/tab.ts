@@ -21,7 +21,7 @@ export interface TabState {
 
 export interface TabOperations {
   // Tab management
-  createNewTab: (name?: string) => Promise<string>;
+  createNewTab: (name?: string, path?: string) => Promise<string>;
   switchTab: (tabId: string) => void;
   closeTab: (tabId: string, forceDelete?: boolean) => Promise<void>;
   

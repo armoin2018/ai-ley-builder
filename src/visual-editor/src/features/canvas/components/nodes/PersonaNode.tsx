@@ -14,9 +14,9 @@ export interface PersonaNodeData extends BaseNodeData {
 export function PersonaNode(props: NodeProps) {
   const { data } = props;
   const nodeData = data as unknown as PersonaNodeData;
-  const personaType = nodeData.properties.personaType as string;
-  const expertise = (nodeData.properties.expertise as string[]) || [];
-  const tone = nodeData.properties.tone as string;
+  const personaType = nodeData.properties?.personaType || '';
+  const expertise = (nodeData.properties?.expertise as string[]) || [];
+  const tone = nodeData.properties?.tone || 'professional';
 
   const getToneColor = (toneValue: string) => {
     switch (toneValue) {

@@ -15,12 +15,12 @@ export interface ExportResult {
 }
 
 // Simple localStorage-based file system simulation
-// Pre-populate with actual PlantUML files from .ai-ley/shared/uml-flows/user/
+// Pre-populate with actual PlantUML files from ../../.ai-ley/shared/uml-flows/user/
 const initializeActualPUMLFiles = (): void => {
   const actualFiles = [
     {
       name: 'build-project.puml',
-      path: '.ai-ley/shared/uml-flows/user/build-project.puml',
+      path: '../../.ai-ley/shared/uml-flows/user/build-project.puml',
       lastModified: new Date('2024-09-09T06:41:00.000Z'), // From file system timestamp
     }
   ];
@@ -215,7 +215,7 @@ caption Generated on September 7, 2025 for AI-LEY Project Automation System
 
 @enduml`;
 
-    localStorage.setItem(`puml-content-.ai-ley/shared/uml-flows/user/build-project.puml`, buildProjectContent);
+    localStorage.setItem(`puml-content-../../.ai-ley/shared/uml-flows/user/build-project.puml`, buildProjectContent);
     console.log('✅ Loaded actual build-project.puml from file system');
   }
 };
@@ -304,7 +304,7 @@ export const exportWorkflowToPUML = async (workflow: SerializedWorkflow): Promis
 
     // Generate file path
     const fileName = `${workflow.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.puml`;
-    const filePath = `.ai-ley/shared/uml-flows/user/${fileName}`;
+    const filePath = `../../.ai-ley/shared/uml-flows/user/${fileName}`;
 
     // Store content in localStorage
     localStorage.setItem(`puml-content-${filePath}`, content);

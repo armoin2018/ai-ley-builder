@@ -40,8 +40,34 @@ export class PlantUMLExporter {
     puml += '!define OUTPUT_TYPE #lightgray\n';
     puml += '\n';
 
+    // Get nodes from various possible workflow structures
+    // Handle different possible workflow formats
+    let nodes = [];
+    let edges = [];
+
+    try {
+      if (workflow.nodes) {
+        // Direct nodes/edges format (SerializedWorkflow)
+        nodes = workflow.nodes || [];
+        edges = workflow.edges || [];
+      } else if (workflow.canvas?.nodes) {
+        // Canvas format
+        nodes = workflow.canvas.nodes || [];
+        edges = workflow.canvas.edges || [];
+      } else {
+        // Empty workflow
+        console.warn('Workflow has no nodes or canvas structure:', workflow);
+        nodes = [];
+        edges = [];
+      }
+    } catch (error) {
+      console.error('Error extracting nodes/edges from workflow:', error, workflow);
+      nodes = [];
+      edges = [];
+    }
+
     // Add nodes
-    workflow.nodes.forEach(node => {
+    nodes.forEach(node => {
       const nodeId = this.sanitizeId(node.id);
       const label = (node.data.label as string) || node.id;
       const nodeType = node.type || 'unknown';
@@ -67,7 +93,7 @@ export class PlantUMLExporter {
     puml += '\n';
 
     // Add edges
-    workflow.edges.forEach(edge => {
+    edges.forEach(edge => {
       const sourceId = this.sanitizeId(edge.source);
       const targetId = this.sanitizeId(edge.target);
       
@@ -111,7 +137,7 @@ export class PlantUMLExporter {
    * Get default export path
    */
   static getDefaultExportPath(): string {
-    return '.ai-ley/shared/uml-flows/user/';
+    return '../../.ai-ley/shared/uml-flows/user/';
   }
 
   /**
@@ -159,13 +185,72 @@ export class PlantUMLExporter {
    */
   static async getAvailablePUMLFiles(): Promise<Array<{ name: string; path: string; lastModified: Date }>> {
     try {
-      // In browser environment, simulate with localStorage
+      // Try to fetch real files from the filesystem via a backend endpoint
+      // If that fails, fall back to localStorage simulation
+
+      try {
+        // First try to fetch real files through the development server
+        const response = await fetch('/api/puml-files');
+        if (response.ok) {
+          const files = await response.json();
+          console.log('✅ Loaded real PlantUML files from filesystem:', files);
+          return files;
+        }
+      } catch (fetchError) {
+        console.log('📁 No backend API available, using local file discovery...');
+      }
+
+      // Fallback: Use known file paths and try to load them
+      const knownFilePaths = [
+        '../../.ai-ley/shared/uml-flows/user/build-project.puml',
+        '../../.ai-ley/shared/uml-flows/examples/simple-website-deploy.puml',
+        '../../.ai-ley/shared/uml-flows/templates/deployment-pipeline.puml',
+        '../../.ai-ley/shared/uml-flows/templates/data-backup.puml'
+      ];
+
+      const discoveredFiles: Array<{ name: string; path: string; lastModified: Date }> = [];
+
+      for (const filePath of knownFilePaths) {
+        try {
+          // Try to fetch the file content directly
+          const fullPath = `/${filePath}`;
+          const fileResponse = await fetch(fullPath);
+
+          if (fileResponse.ok) {
+            const content = await fileResponse.text();
+            const fileName = filePath.split('/').pop() || 'unknown.puml';
+
+            // Store the content in localStorage for later access
+            localStorage.setItem(`puml-content-${filePath}`, content);
+
+            discoveredFiles.push({
+              name: fileName,
+              path: filePath,
+              lastModified: new Date()
+            });
+
+            console.log(`✅ Discovered and cached: ${fileName}`);
+          }
+        } catch (error) {
+          console.log(`⚠️ Could not load ${filePath}:`, error);
+        }
+      }
+
+      if (discoveredFiles.length > 0) {
+        // Store the discovered files list
+        localStorage.setItem('ai-ley-puml-files', JSON.stringify(discoveredFiles));
+        console.log(`📁 Discovered ${discoveredFiles.length} PlantUML files`);
+        return discoveredFiles;
+      }
+
+      // Final fallback: check localStorage for previously stored files
       const stored = localStorage.getItem('ai-ley-puml-files');
       if (stored) {
+        console.log('📦 Using cached PlantUML files from localStorage');
         return JSON.parse(stored);
       }
 
-      // Return empty array if no files found
+      console.log('❌ No PlantUML files found');
       return [];
     } catch (error) {
       console.error('Error loading PUML files:', error);

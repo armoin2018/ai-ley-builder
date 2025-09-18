@@ -14,9 +14,9 @@ export interface LoopNodeData extends BaseNodeData {
 export function LoopNode(props: NodeProps) {
   const { data } = props;
   const nodeData = data as unknown as LoopNodeData;
-  const loopType = (nodeData.properties.loopType as string) || 'for';
-  const maxIterations = nodeData.properties.maxIterations as number;
-  const iteratorVariable = nodeData.properties.iteratorVariable as string;
+  const loopType = (nodeData.properties?.loopType as string) || 'for';
+  const maxIterations = nodeData.properties?.maxIterations || 10;
+  const iteratorVariable = nodeData.properties?.iteratorVariable || 'i';
 
   return (
     <>

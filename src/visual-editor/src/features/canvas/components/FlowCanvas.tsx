@@ -69,6 +69,30 @@ const getDefaultNodeProperties = (nodeType: NodeType) => {
         format: 'markdown',
         template: '',
       };
+    case NodeType.SHELL_SCRIPT:
+      return {
+        scriptType: 'shell',
+        script: '#!/bin/bash\necho "Hello from shell!"',
+        timeout: 30,
+      };
+    case NodeType.PYTHON_SCRIPT:
+      return {
+        scriptType: 'python',
+        script: 'print("Hello from Python!")',
+        timeout: 30,
+      };
+    case NodeType.PHP_SCRIPT:
+      return {
+        scriptType: 'php',
+        script: 'echo "Hello from PHP!";',
+        timeout: 30,
+      };
+    case NodeType.NODEJS_SCRIPT:
+      return {
+        scriptType: 'nodejs',
+        script: 'console.log("Hello from Node.js!")',
+        timeout: 30,
+      };
     default:
       return {};
   }
@@ -82,6 +106,10 @@ import { LoopNode } from './nodes/LoopNode';
 import { CustomPromptTextNode } from './nodes/CustomPromptTextNode';
 import { PersonaNode } from './nodes/PersonaNode';
 import { InstructionNode } from './nodes/InstructionNode';
+import { ShellScriptNode } from './nodes/ShellScriptNode';
+import { PythonScriptNode } from './nodes/PythonScriptNode';
+import { PhpScriptNode } from './nodes/PhpScriptNode';
+import { NodejsScriptNode } from './nodes/NodejsScriptNode';
 import { CanvasControls } from './CanvasControls';
 
 // Node type mapping
@@ -93,6 +121,11 @@ const nodeTypes = {
   [NodeType.CUSTOM_PROMPT_TEXT]: CustomPromptTextNode,
   [NodeType.PERSONA]: PersonaNode,
   [NodeType.INSTRUCTION]: InstructionNode,
+  // Script execution nodes
+  [NodeType.SHELL_SCRIPT]: ShellScriptNode,
+  [NodeType.PYTHON_SCRIPT]: PythonScriptNode,
+  [NodeType.PHP_SCRIPT]: PhpScriptNode,
+  [NodeType.NODEJS_SCRIPT]: NodejsScriptNode,
   // Additional types for PlantUML compatibility - using existing components as fallbacks
   [NodeType.CUSTOM_PROMPT]: CustomPromptTextNode,
   [NodeType.INPUT]: CommandPromptFileNode,

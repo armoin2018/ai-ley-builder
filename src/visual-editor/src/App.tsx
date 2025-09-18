@@ -1,6 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { Button, ThemeProvider } from '@shared/components';
+import { X } from 'lucide-react';
 import {
   ContentArea,
   Header,
@@ -18,18 +19,23 @@ import { WorkflowControls } from '@features/workflow';
 import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { ExecutionPanel } from '@features/execution/components/ExecutionPanel';
 import { CommandPalette, QuickActions, StatusBar } from '@features/ui-advanced';
-import { WorkflowTabs, WorkflowTabsProvider, SourceEditor } from '@features/tabs';
+import { WorkflowTabs, WorkflowTabsProvider, SourceEditor, useWorkflowTabsContext } from '@features/tabs';
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import { PromptService } from './services/promptService';
-import { parsePlantUMLToFlow } from './utils/plantuml-parser';
+import { parsePlantUMLToFlow, flowToPlantUML } from './utils/plantuml-parser';
+import { Settings } from './features/settings';
+import { AIDemo } from './components/ai';
 
 function AppContent() {
   const [showValidation, setShowValidation] = useState(false);
   const [showExecution, setShowExecution] = useState(false);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showAIDemo, setShowAIDemo] = useState(false);
   const [isSourceView, setIsSourceView] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   const { getNodes, getEdges, setNodes, setEdges, setViewport } = useReactFlow();
+  const { activeTab } = useWorkflowTabsContext();
 
 
   const nodes = getNodes();
@@ -50,6 +56,12 @@ function AppContent() {
         break;
       case 'search':
         setShowCommandPalette(true);
+        break;
+      case 'settings':
+        setShowSettings(true);
+        break;
+      case 'ai-demo':
+        setShowAIDemo(true);
         break;
       default:
         console.log('Quick action:', action);
@@ -85,16 +97,41 @@ function AppContent() {
       
       // Reset viewport to center the new content
       setViewport({ x: 0, y: 0, zoom: 1 });
-      
-      // Switch back to visual view to see the result
-      setIsSourceView(false);
-      
+
       console.log('Visual flow updated successfully from PlantUML');
     } catch (error) {
       console.error('Failed to parse PlantUML content:', error);
       alert(`Failed to parse PlantUML content: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
+
+  // Automatic visual-to-PlantUML synchronization
+  useEffect(() => {
+    if (!isSourceView && activeTab) {
+      // Only update PlantUML when in visual mode to avoid circular updates
+      const currentNodes = getNodes();
+      const currentEdges = getEdges();
+
+      // Debounce updates to avoid too frequent regeneration
+      const timeoutId = setTimeout(() => {
+        if (currentNodes.length > 0 || currentEdges.length > 0) {
+          console.log('🔄 Auto-updating PlantUML from visual changes');
+
+          const plantumlContent = flowToPlantUML(currentNodes, currentEdges, activeTab.name);
+
+          // Store updated PlantUML content in localStorage for the active tab
+          if (activeTab.path) {
+            localStorage.setItem(`puml-content-${activeTab.path}`, plantumlContent);
+          }
+          localStorage.setItem(`puml-content-tab-plantuml-${activeTab.id}`, plantumlContent);
+
+          console.log('✅ PlantUML content updated automatically from visual changes');
+        }
+      }, 1000); // 1 second debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [nodes, edges, isSourceView, activeTab, getNodes, getEdges]);
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -116,13 +153,17 @@ function AppContent() {
             event.preventDefault();
             setShowExecution(!showExecution);
             break;
+          case ',':
+            event.preventDefault();
+            setShowSettings(!showSettings);
+            break;
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showValidation, showExecution]);
+  }, [showValidation, showExecution, showSettings]);
 
   const commandPaletteCommands = [
     {
@@ -163,6 +204,24 @@ function AppContent() {
       shortcut: '⌘⇧P',
       action: () => setShowCommandPalette(true),
       keywords: ['command', 'palette', 'search'],
+    },
+    {
+      id: 'toggle-settings',
+      title: 'Settings',
+      description: 'Open application settings',
+      category: 'Preferences',
+      shortcut: '⌘⇧,',
+      action: () => setShowSettings(!showSettings),
+      keywords: ['settings', 'preferences', 'config'],
+    },
+    {
+      id: 'ai-demo',
+      title: 'AI Tools Demo',
+      description: 'Test AI CLI tools and API endpoints',
+      category: 'AI Tools',
+      shortcut: '⌘⇧A',
+      action: () => setShowAIDemo(!showAIDemo),
+      keywords: ['ai', 'demo', 'cli', 'api', 'tools', 'test'],
     },
     // Add prompt commands dynamically from PromptService
     ...PromptService.getCommandPaletteEntries(),
@@ -251,6 +310,27 @@ function AppContent() {
         onClose={() => setShowCommandPalette(false)}
         commands={commandPaletteCommands}
       />
+
+      <Settings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
+
+      {showAIDemo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-5/6 overflow-auto">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200">
+              <h2 className="text-xl font-semibold text-slate-900">AI Tools Demo</h2>
+              <Button variant="ghost" size="sm" onClick={() => setShowAIDemo(false)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="p-4">
+              <AIDemo />
+            </div>
+          </div>
+        </div>
+      )}
 
       <StatusBar
         nodeCount={nodes.length}

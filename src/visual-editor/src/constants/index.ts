@@ -2,6 +2,7 @@
 // Global constants for the visual flow editor
 
 import { NodeType } from '../types/nodes';
+import { AI_LEY_PATHS } from '../utils/paths';
 
 // Node type configurations
 export const NODE_TYPES = {
@@ -60,9 +61,15 @@ export const CANVAS_CONFIG = {
   ZOOM_STEP: 0.1,
 };
 
-// File paths
+// File paths - using dynamic git root detection
 export const FILE_PATHS = {
-  FLOWS_DIR: '.ai-ley/shared/flows/',
-  UML_EXPORT_DIR: '.ai-ley/shared/uml-flows/user/',
-  BACKUP_DIR: '.ai-ley/shared/flows/backup/',
+  get FLOWS_DIR() {
+    return AI_LEY_PATHS.FLOWS;
+  },
+  get UML_EXPORT_DIR() {
+    return AI_LEY_PATHS.UML_FLOWS_USER;
+  },
+  get BACKUP_DIR() {
+    return AI_LEY_PATHS.FLOWS_BACKUP;
+  },
 };

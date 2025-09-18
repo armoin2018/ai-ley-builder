@@ -10,7 +10,7 @@ export interface PromptFile {
   category: string;
 }
 
-// Actual prompt files from .ai-ley/shared/prompts directory
+// Actual prompt files from ../../.ai-ley/shared/prompts directory
 const ACTUAL_PROMPT_FILES = [
   'alias', 'ask', 'audit', 'bench', 'build-architecture', 'build-business-development',
   'build-design', 'build-flow', 'build-launch-plan', 'build-market-research',

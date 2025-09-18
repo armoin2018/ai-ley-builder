@@ -125,6 +125,18 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
       if (!updatedTab?.workflow) return;
 
       // Export to PlantUML file
+      console.log('🔍 Attempting to export workflow:', {
+        tabId,
+        tabName: updatedTab.name,
+        hasWorkflow: !!updatedTab.workflow,
+        workflowStructure: updatedTab.workflow ? {
+          hasName: !!updatedTab.workflow.name,
+          hasNodes: !!updatedTab.workflow.nodes,
+          hasCanvas: !!updatedTab.workflow.canvas,
+          nodeCount: updatedTab.workflow.nodes?.length || updatedTab.workflow.canvas?.nodes?.length || 0
+        } : null
+      });
+
       const result = await exportWorkflowToPUML(updatedTab.workflow);
       
       if (result.success && result.filePath) {
@@ -147,8 +159,9 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
           const fileExists = currentFiles.some(f => f.path === result.filePath);
           
           if (!fileExists) {
+            const workflowName = updatedTab.workflow?.name || updatedTab.name || 'workflow';
             const newFile = {
-              name: `${updatedTab.workflow.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.puml`,
+              name: `${workflowName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.puml`,
               path: result.filePath,
               lastModified: new Date(),
             };
@@ -171,13 +184,14 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
   }, [state.tabs, saveCurrentCanvasToTab]);
 
   // Create new tab
-  const createNewTab = useCallback(async (name?: string): Promise<string> => {
+  const createNewTab = useCallback(async (name?: string, path?: string): Promise<string> => {
     const tabId = generateTabId();
     const tabName = name || generateWorkflowName();
-    
+
     const newTab: WorkflowTab = {
       id: tabId,
       name: tabName,
+      path,
       workflow: null,
       modified: false,
       saved: false,
@@ -497,7 +511,7 @@ stop
     const newFiles = [...currentFiles];
 
     for (const sample of sampleFiles) {
-      const filePath = `.ai-ley/shared/uml-flows/user/${sample.fileName}`;
+      const filePath = `../../.ai-ley/shared/uml-flows/user/${sample.fileName}`;
       
       // Store content in localStorage
       localStorage.setItem(`puml-content-${filePath}`, sample.content);
@@ -529,7 +543,7 @@ stop
     console.log('  - ai-ley-puml-files:', localStorage.getItem('ai-ley-puml-files'));
     
     // Check if our specific PlantUML content exists
-    const buildProjectContent = localStorage.getItem('puml-content-.ai-ley/shared/uml-flows/user/build-project.puml');
+    const buildProjectContent = localStorage.getItem('puml-content-../../.ai-ley/shared/uml-flows/user/build-project.puml');
     console.log('  - build-project.puml content length:', buildProjectContent?.length || 'NOT FOUND');
     if (buildProjectContent) {
       console.log('  - build-project.puml preview:', buildProjectContent.substring(0, 200) + '...');
@@ -540,7 +554,7 @@ stop
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      console.log('📂 Step 1: Loading UML files from .ai-ley/shared/uml-flows/user/');
+      console.log('📂 Step 1: Loading UML files from ../../.ai-ley/shared/uml-flows/user/');
       
       let umlFiles = await loadUMLFiles();
       

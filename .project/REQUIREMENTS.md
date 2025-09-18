@@ -569,31 +569,165 @@ The system SHALL support keyboard shortcuts:
 - [ ] Enter key opens property editing for selected nodes
 - [ ] All functionality has keyboard shortcuts with discoverable help
 
-**Priority**: Medium  
-**Complexity**: High  
+**Priority**: Medium
+**Complexity**: High
 **Related Requirements**: R2.5, R8.5.1, R10.1.5
 
-## R13. Success Metrics and KPIs
+---
 
-### R13.1 Business Metrics
+## R23. AI CLI Integration Service
+
+**R23.1 Local AI Tool Execution**
+The system SHALL provide a service layer that interfaces with configured local AI CLI tools, enabling users to execute prompts through tools like Ollama, Llama.cpp, or other command-line AI interfaces.
+
+**R23.2 Tool Configuration Integration**
+The service SHALL automatically discover and utilize AI CLI tools configured in the settings system, respecting tool enablement status, timeout settings, and custom arguments.
+
+**R23.3 Command Execution Management**
+The system SHALL support:
+- Asynchronous command execution with progress callbacks
+- Configurable timeout handling per tool
+- Process cancellation and cleanup
+- Error handling and reporting
+- Usage statistics tracking
+
+**R23.4 Cross-Platform Compatibility**
+The service SHALL provide browser simulation mode for development while maintaining actual CLI execution capabilities in Node.js environments.
+
+**Priority**: High
+**Complexity**: Moderate
+**Related Requirements**: R2.1, R2.3
+
+---
+
+## R24. AI API Integration Service
+
+**R24.1 Multi-Provider API Support**
+The system SHALL provide a unified service layer for communicating with various AI API providers including OpenAI, Anthropic, Google, Azure, and custom endpoints.
+
+**R24.2 Provider-Specific Handling**
+The service SHALL implement provider-specific request formatting, authentication, and response parsing while presenting a consistent interface to consumers.
+
+**R24.3 Advanced API Features**
+The system SHALL support:
+- Streaming responses for real-time interaction
+- Token usage tracking and reporting
+- Retry logic with exponential backoff
+- Request/response validation
+- Usage analytics and performance metrics
+
+**R24.4 Security and Authentication**
+The service SHALL securely handle API keys from the settings system and provide proper error handling for authentication failures.
+
+**Priority**: High
+**Complexity**: High
+**Related Requirements**: R2.1, R2.3
+
+---
+
+## R25. AI Tool Selection Components
+
+**R25.1 CLI Tool Selector Interface**
+The system SHALL provide a React component that allows users to:
+- Select from available AI CLI tools
+- Configure tool-specific parameters
+- Execute prompts with real-time feedback
+- View execution results and error messages
+- Test tool availability and connectivity
+
+**R25.2 API Endpoint Selector Interface**
+The system SHALL provide a React component that enables users to:
+- Choose from configured AI API endpoints
+- Build multi-message conversations
+- Configure request parameters (model, temperature, tokens)
+- Send both standard and streaming requests
+- Monitor token usage and response times
+
+**R25.3 Integration and Accessibility**
+Both components SHALL:
+- Integrate seamlessly with the existing settings system
+- Provide accessible keyboard navigation
+- Display usage statistics and tool status
+- Support both modal and embedded usage patterns
+- Offer comprehensive error handling and user feedback
+
+**R25.4 Demonstration Interface**
+The system SHALL include a demonstration interface accessible via command palette that showcases both CLI and API integration capabilities.
+
+**Priority**: Medium
+**Complexity**: Moderate
+**Related Requirements**: R23.1, R24.1, R2.5
+
+---
+
+## R26. Automatic Layout and Arrangement System
+
+**R26.1 Connection-Based Auto-Layout Engine**
+The system SHALL provide an intelligent auto-layout engine that analyzes node connections and dependencies to automatically arrange visual dialog boxes (nodes) in optimal positions based on their input/output relationships.
+
+**R26.2 Multi-Algorithm Layout Support**
+The system SHALL support multiple layout algorithms including:
+- Hierarchical layout (top-to-bottom, left-to-right)
+- Force-directed layout for complex interconnected workflows
+- Layered layout for sequential processing chains
+- Grid-based layout for structured arrangements
+
+**R26.3 Smart Spacing and Alignment**
+The auto-layout engine SHALL provide:
+- Automatic spacing calculation based on node content size
+- Alignment of nodes with similar functions or types
+- Collision detection and resolution for overlapping nodes
+- Consistent spacing ratios across the entire workflow
+
+**R26.4 Layout Trigger Mechanisms**
+The system SHALL offer multiple ways to trigger auto-arrangement:
+- Manual trigger via toolbar button or keyboard shortcut
+- Optional automatic arrangement on node addition/removal
+- Batch arrangement for imported or pasted node groups
+- Layout suggestions when workflow becomes cluttered
+
+**R26.5 User Control and Preferences**
+The auto-layout system SHALL respect user preferences by:
+- Preserving manually positioned nodes when requested
+- Allowing selective auto-arrangement of specific node groups
+- Providing undo/redo for layout operations
+- Maintaining layout history for comparison
+- Offering layout preview before application
+
+**R26.6 Performance Optimization**
+The layout engine SHALL maintain responsive performance by:
+- Processing layouts asynchronously for large workflows (>50 nodes)
+- Using incremental layout updates for minor changes
+- Implementing layout caching for repeated operations
+- Providing progress feedback for lengthy layout calculations
+
+**Priority**: High
+**Complexity**: High
+**Related Requirements**: R3.1.2, R3.1.3, R8.2.1
+
+---
+
+## R27. Success Metrics and KPIs
+
+### R27.1 Business Metrics
 - **User Adoption Rate**: Percentage of AI Engineers using visual editor for new workflows (Target: 90% within 6 months)
 - **Workflow Development Time**: Average time to create and deploy AI workflows (Target: 70% reduction from baseline)
 - **User Satisfaction Score**: Net Promoter Score for visual editor experience (Target: >50)
 - **Support Ticket Reduction**: Decrease in workflow-related support requests (Target: 40% reduction)
 
-### R13.2 Technical Metrics
+### R27.2 Technical Metrics
 - **System Performance**: Canvas response time for drag/zoom operations (Target: <100ms)
 - **Export Performance**: PlantUML generation time for 100-node flows (Target: <2 seconds)
 - **Memory Efficiency**: Application memory usage for typical workflows (Target: <200MB)
 - **Error Rate**: Frequency of application crashes or data loss (Target: <0.1% of operations)
 
-### R13.3 User Experience Metrics
+### R27.3 User Experience Metrics
 - **Task Completion Rate**: Percentage of users completing first workflow within 10 minutes (Target: 80%)
 - **Feature Discovery**: Average time to discover key features like export and validation (Target: <5 minutes)
 - **Accessibility Compliance**: Percentage of WCAG 2.1 AA criteria met (Target: 100%)
 - **Mobile Responsiveness**: Usability score on tablet devices (Target: >4.0/5.0)
 
-### R13.4 Quality Metrics
+### R27.4 Quality Metrics
 - **Test Coverage**: Code coverage for new visual editor components (Target: >90%)
 - **Bug Density**: Defects per thousand lines of code (Target: <2.0)
 - **Documentation Coverage**: Percentage of features documented with examples (Target: 100%)
@@ -601,9 +735,9 @@ The system SHALL support keyboard shortcuts:
 
 ---
 
-## R14. Technical Considerations
+## R28. Technical Considerations
 
-### R14.1 Architecture Constraints
+### R28.1 Architecture Constraints
 - **Frontend Framework**: React 18+ with React Flow library for graph editing capabilities
 - **State Management**: Redux Toolkit for complex state management with undo/redo support
 - **Build System**: Vite for fast development and optimized production builds

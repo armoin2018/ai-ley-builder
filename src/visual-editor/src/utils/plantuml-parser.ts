@@ -150,13 +150,17 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
       
       // Merge metadata with default properties
       const nodeData = {
-        ...defaultProps,
         label: activityName,
         alias,
         shape: 'activity',
         activityType: activityName,
-        // Override with metadata if present
-        ...(currentNodeMetadata || {}),
+        properties: {
+          ...defaultProps,
+          // Override with metadata properties if present
+          ...(currentNodeMetadata?.properties || {}),
+        },
+        // Override with other metadata if present (position, etc.)
+        ...(currentNodeMetadata ? { ...currentNodeMetadata, properties: undefined } : {}),
       };
       
       // Use metadata position or calculate grid position
@@ -189,11 +193,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: 'input',
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label: 'Start',
           alias,
-          shape: 'start'
+          shape: 'start',
+          properties: defaultProps
         },
       });
       continue;
@@ -211,11 +215,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: 'output',
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label: 'Stop',
           alias,
-          shape: 'stop'
+          shape: 'stop',
+          properties: defaultProps
         },
       });
       continue;
@@ -235,14 +239,19 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: 'conditional',
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label: condition,
           alias,
           shape: 'diamond',
           condition,
           trueLabel: yesLabel,
-          falseLabel: 'no'
+          falseLabel: 'no',
+          properties: {
+            ...defaultProps,
+            condition,
+            trueLabel: yesLabel,
+            falseLabel: 'no'
+          }
         },
       });
       continue;
@@ -262,11 +271,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: 'default',
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label: labelName,
           alias,
-          shape: 'label'
+          shape: 'label',
+          properties: defaultProps
         },
       });
       continue;
@@ -291,11 +300,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: nodeType,
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label,
           alias,
-          shape
+          shape,
+          properties: defaultProps
         },
       });
       continue;
@@ -318,11 +327,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: nodeType,
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label,
           alias,
-          shape
+          shape,
+          properties: defaultProps
         },
       });
       continue;
@@ -389,11 +398,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         id: nodeId,
         type: nodeType,
         position: { x: (nodeCounter - 1) * 200, y: Math.floor((nodeCounter - 1) / 4) * 150 },
-        data: { 
-          ...defaultProps,
+        data: {
           label: alias,
           alias,
-          shape: 'rectangle'
+          shape: 'rectangle',
+          properties: defaultProps
         },
       });
     }
@@ -546,7 +555,29 @@ export function flowToPlantUML(nodes: Node[], edges: Edge[], workflowName: strin
     const alias = node.id.replace(/[^a-z0-9]/gi, '');
     const label = node.data?.label || node.id;
     const nodeType = node.type || 'default';
-    
+
+    // Add metadata comment for complete roundtrip preservation
+    const nodeMetadata = {
+      id: node.id,
+      type: nodeType,
+      position: node.position,
+      data: node.data,
+      width: node.width,
+      height: node.height,
+      selected: node.selected,
+      dragging: node.dragging,
+    };
+
+    // Only include metadata that has meaningful values
+    const cleanMetadata = Object.fromEntries(
+      Object.entries(nodeMetadata).filter(([key, value]) =>
+        value !== undefined && value !== null &&
+        !(typeof value === 'object' && Object.keys(value).length === 0)
+      )
+    );
+
+    lines.push(`'@node-meta ${JSON.stringify(cleanMetadata)}`);
+
     // Create the basic node
     lines.push(`${shape} "${label}" as ${alias}`);
     

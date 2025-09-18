@@ -13,9 +13,9 @@ export interface CustomPromptTextNodeData extends BaseNodeData {
 export function CustomPromptTextNode(props: NodeProps) {
   const { data } = props;
   const nodeData = data as unknown as CustomPromptTextNodeData;
-  const promptText = nodeData.properties.promptText as string;
-  const temperature = nodeData.properties.temperature as number;
-  const maxTokens = nodeData.properties.maxTokens as number;
+  const promptText = nodeData.properties?.promptText || '';
+  const temperature = nodeData.properties?.temperature || 0.7;
+  const maxTokens = nodeData.properties?.maxTokens || 2000;
 
   return (
     <BaseNode {...props} variant="custom">

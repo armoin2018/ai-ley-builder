@@ -18,6 +18,11 @@ export const NodeType = {
   CUSTOM_PROMPT_TEXT: 'custom-prompt-text',
   PERSONA: 'persona',
   INSTRUCTION: 'instruction',
+  // Script execution nodes
+  SHELL_SCRIPT: 'shell-script',
+  PYTHON_SCRIPT: 'python-script',
+  PHP_SCRIPT: 'php-script',
+  NODEJS_SCRIPT: 'nodejs-script',
   // Additional types for PlantUML compatibility
   CUSTOM_PROMPT: 'custom-prompt',
   INPUT: 'input',

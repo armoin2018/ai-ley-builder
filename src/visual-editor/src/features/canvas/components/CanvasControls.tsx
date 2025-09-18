@@ -2,13 +2,15 @@ import { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
+import { useSettings } from '../../../hooks/useSettings';
 
 interface CanvasControlsProps {
   className?: string;
 }
 
 export function CanvasControls({ className }: CanvasControlsProps) {
-  const { zoomIn, zoomOut, zoomTo, fitView, getZoom } = useReactFlow();
+  const { zoomIn, zoomOut, zoomTo, fitView, getZoom, getNodes, getEdges, setNodes } = useReactFlow();
+  const { settings } = useSettings();
 
   const handleZoomIn = useCallback(() => {
     zoomIn({ duration: 300 });
@@ -31,6 +33,44 @@ export function CanvasControls({ className }: CanvasControlsProps) {
   const handleZoomReset = useCallback(() => {
     zoomTo(1, { duration: 300 });
   }, [zoomTo]);
+
+  const handleAutoArrange = useCallback(() => {
+    try {
+      const currentNodes = getNodes();
+      const currentEdges = getEdges();
+
+      if (currentNodes.length === 0) {
+        console.log('No nodes to arrange');
+        return;
+      }
+
+      // Import the auto-arrange utility dynamically
+      import('../../../utils/autoArrange').then(({ autoArrangeNodesWithAnimation }) => {
+        const { autoArrange } = settings.umlFlows;
+        const arrangedNodes = autoArrangeNodesWithAnimation(currentNodes, currentEdges, {
+          horizontalSpacing: autoArrange.horizontalSpacing,
+          verticalSpacing: autoArrange.verticalSpacing,
+          connectionSpacing: autoArrange.connectionSpacing,
+          enableConnectionAwareSpacing: autoArrange.enableConnectionAwareSpacing,
+          minSpacing: autoArrange.minSpacing,
+          enableCollisionDetection: autoArrange.enableCollisionDetection,
+          startX: 200,
+          startY: 100,
+          direction: 'top-to-bottom',
+        });
+
+        // Apply the new positions
+        setNodes(arrangedNodes);
+
+        console.log(`Auto arranged ${arrangedNodes.length} nodes`);
+      }).catch(error => {
+        console.error('Failed to load auto-arrange utility:', error);
+      });
+
+    } catch (error) {
+      console.error('Auto arrange failed:', error);
+    }
+  }, [getNodes, getEdges, setNodes, settings.umlFlows.autoArrange]);
 
   const currentZoom = Math.round(getZoom() * 100);
 
@@ -128,6 +168,34 @@ export function CanvasControls({ className }: CanvasControlsProps) {
           <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
           <path d="M3 16v3a2 2 0 0 0 2 2h3" />
           <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+        </svg>
+      </Button>
+
+      {/* Divider */}
+      <div className="h-px bg-slate-200 my-1" />
+
+      {/* Auto Arrange */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleAutoArrange}
+        className="w-10 h-10 p-0 hover:bg-green-50"
+        title="Auto Arrange Nodes"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
         </svg>
       </Button>
     </div>

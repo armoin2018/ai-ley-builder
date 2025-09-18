@@ -7,3 +7,9 @@ export * from './LoopNode';
 export * from './CustomPromptTextNode';
 export * from './PersonaNode';
 export * from './InstructionNode';
+// Script execution nodes
+export * from './ScriptNode';
+export * from './ShellScriptNode';
+export * from './PythonScriptNode';
+export * from './PhpScriptNode';
+export * from './NodejsScriptNode';

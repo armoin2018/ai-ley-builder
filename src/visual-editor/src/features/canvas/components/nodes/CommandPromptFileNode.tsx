@@ -15,8 +15,8 @@ export function CommandPromptFileNode(props: NodeProps) {
   const { data, id } = props;
   const { setNodes } = useReactFlow();
   const nodeData = data as unknown as CommandPromptFileNodeData;
-  const fileName = nodeData.properties.fileName as string;
-  const variables = (nodeData.properties.variables as string[]) || [];
+  const fileName = nodeData.properties?.fileName || '';
+  const variables = (nodeData.properties?.variables as string[]) || [];
 
   const handleLabelChange = (newLabel: string) => {
     setNodes(nodes =>
