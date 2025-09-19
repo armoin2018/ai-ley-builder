@@ -39,7 +39,9 @@ export class AIApiService {
    */
   static getAvailableEndpoints(): AIEndpoint[] {
     const settings = SettingsService.loadSettings();
-    return settings.aiRest.endpoints.filter(endpoint => endpoint.enabled && endpoint.apiKey);
+    return settings.aiRest.endpoints.filter(
+      endpoint => endpoint.enabled && endpoint.apiKey
+    );
   }
 
   /**
@@ -76,11 +78,15 @@ export class AIApiService {
       // Validate endpoint exists and is enabled
       const endpoint = this.getEndpoint(request.endpointId);
       if (!endpoint) {
-        throw new Error(`AI API endpoint '${request.endpointId}' not found or not enabled`);
+        throw new Error(
+          `AI API endpoint '${request.endpointId}' not found or not enabled`
+        );
       }
 
       if (!endpoint.apiKey) {
-        throw new Error(`AI API endpoint '${request.endpointId}' requires an API key`);
+        throw new Error(
+          `AI API endpoint '${request.endpointId}' requires an API key`
+        );
       }
 
       // Build request payload based on provider
@@ -102,15 +108,20 @@ export class AIApiService {
         executionTime,
         endpointUsed: endpoint.name,
       };
-
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      this.recordUsage(request.endpointId, request.endpointId, false, executionTime);
+      this.recordUsage(
+        request.endpointId,
+        request.endpointId,
+        false,
+        executionTime
+      );
 
       return {
         success: false,
         content: '',
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
         executionTime,
         endpointUsed: request.endpointId,
       };
@@ -127,14 +138,21 @@ export class AIApiService {
     try {
       const endpoint = this.getEndpoint(request.endpointId);
       if (!endpoint) {
-        throw new Error(`AI API endpoint '${request.endpointId}' not found or not enabled`);
+        throw new Error(
+          `AI API endpoint '${request.endpointId}' not found or not enabled`
+        );
       }
 
       if (!endpoint.apiKey) {
-        throw new Error(`AI API endpoint '${request.endpointId}' requires an API key`);
+        throw new Error(
+          `AI API endpoint '${request.endpointId}' requires an API key`
+        );
       }
 
-      const payload = this.buildRequestPayload(endpoint, { ...request, stream: true });
+      const payload = this.buildRequestPayload(endpoint, {
+        ...request,
+        stream: true,
+      });
 
       const response = await fetch(endpoint.url, {
         method: 'POST',
@@ -191,13 +209,13 @@ export class AIApiService {
       } finally {
         reader.releaseLock();
       }
-
     } catch (error) {
       onChunk({
         success: false,
         content: '',
         finished: true,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       });
     }
   }
@@ -231,10 +249,13 @@ export class AIApiService {
       // Send a simple test request
       const testRequest: AIApiRequest = {
         endpointId,
-        messages: [{
-          role: 'user',
-          content: 'Hello, this is a test message. Please respond with "Test successful".',
-        }],
+        messages: [
+          {
+            role: 'user',
+            content:
+              'Hello, this is a test message. Please respond with "Test successful".',
+          },
+        ],
         maxTokens: 10,
         temperature: 0.1,
       };
@@ -255,7 +276,6 @@ export class AIApiService {
           responseTime,
         };
       }
-
     } catch (error) {
       return {
         success: false,
@@ -282,15 +302,17 @@ export class AIApiService {
 
     try {
       const parsed = JSON.parse(stats);
-      return Object.entries(parsed).map(([endpointId, data]: [string, any]) => ({
-        endpointId,
-        endpointName: data.endpointName || endpointId,
-        totalRequests: data.totalRequests || 0,
-        successfulRequests: data.successfulRequests || 0,
-        averageResponseTime: data.averageResponseTime || 0,
-        totalTokensUsed: data.totalTokensUsed || 0,
-        lastUsed: data.lastUsed ? new Date(data.lastUsed) : null,
-      }));
+      return Object.entries(parsed).map(
+        ([endpointId, data]: [string, any]) => ({
+          endpointId,
+          endpointName: data.endpointName || endpointId,
+          totalRequests: data.totalRequests || 0,
+          successfulRequests: data.successfulRequests || 0,
+          averageResponseTime: data.averageResponseTime || 0,
+          totalTokensUsed: data.totalTokensUsed || 0,
+          lastUsed: data.lastUsed ? new Date(data.lastUsed) : null,
+        })
+      );
     } catch {
       return [];
     }
@@ -299,11 +321,17 @@ export class AIApiService {
   /**
    * Build request payload based on provider
    */
-  private static buildRequestPayload(endpoint: AIEndpoint, request: AIApiRequest): any {
+  private static buildRequestPayload(
+    endpoint: AIEndpoint,
+    request: AIApiRequest
+  ): any {
     const basePayload = {
       model: request.model || endpoint.model || 'gpt-3.5-turbo',
       max_tokens: request.maxTokens || endpoint.maxTokens || 4096,
-      temperature: request.temperature !== undefined ? request.temperature : endpoint.temperature || 0.7,
+      temperature:
+        request.temperature !== undefined
+          ? request.temperature
+          : endpoint.temperature || 0.7,
     };
 
     switch (endpoint.provider) {
@@ -326,11 +354,17 @@ export class AIApiService {
       case 'google':
         // Convert to Google's format
         return {
-          contents: [{
-            parts: [{
-              text: request.messages.map(m => `${m.role}: ${m.content}`).join('\n'),
-            }],
-          }],
+          contents: [
+            {
+              parts: [
+                {
+                  text: request.messages
+                    .map(m => `${m.role}: ${m.content}`)
+                    .join('\n'),
+                },
+              ],
+            },
+          ],
           generationConfig: {
             maxOutputTokens: basePayload.max_tokens,
             temperature: basePayload.temperature,
@@ -385,7 +419,10 @@ export class AIApiService {
   /**
    * Make the actual API call
    */
-  private static async makeApiCall(endpoint: AIEndpoint, payload: any): Promise<any> {
+  private static async makeApiCall(
+    endpoint: AIEndpoint,
+    payload: any
+  ): Promise<any> {
     const settings = SettingsService.loadSettings();
     const timeout = settings.aiRest.timeout * 1000;
 
@@ -417,51 +454,66 @@ export class AIApiService {
   /**
    * Parse response based on provider
    */
-  private static parseResponse(endpoint: AIEndpoint, response: any): {
+  private static parseResponse(
+    endpoint: AIEndpoint,
+    response: any
+  ): {
     content: string;
-    usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
+    usage?: {
+      promptTokens: number;
+      completionTokens: number;
+      totalTokens: number;
+    };
   } {
     switch (endpoint.provider) {
       case 'openai':
       case 'azure':
         return {
           content: response.choices?.[0]?.message?.content || '',
-          usage: response.usage ? {
-            promptTokens: response.usage.prompt_tokens,
-            completionTokens: response.usage.completion_tokens,
-            totalTokens: response.usage.total_tokens,
-          } : undefined,
+          usage: response.usage
+            ? {
+                promptTokens: response.usage.prompt_tokens,
+                completionTokens: response.usage.completion_tokens,
+                totalTokens: response.usage.total_tokens,
+              }
+            : undefined,
         };
 
       case 'anthropic':
         return {
           content: response.content?.[0]?.text || '',
-          usage: response.usage ? {
-            promptTokens: response.usage.input_tokens,
-            completionTokens: response.usage.output_tokens,
-            totalTokens: response.usage.input_tokens + response.usage.output_tokens,
-          } : undefined,
+          usage: response.usage
+            ? {
+                promptTokens: response.usage.input_tokens,
+                completionTokens: response.usage.output_tokens,
+                totalTokens:
+                  response.usage.input_tokens + response.usage.output_tokens,
+              }
+            : undefined,
         };
 
       case 'google':
         return {
           content: response.candidates?.[0]?.content?.parts?.[0]?.text || '',
-          usage: response.usageMetadata ? {
-            promptTokens: response.usageMetadata.promptTokenCount,
-            completionTokens: response.usageMetadata.candidatesTokenCount,
-            totalTokens: response.usageMetadata.totalTokenCount,
-          } : undefined,
+          usage: response.usageMetadata
+            ? {
+                promptTokens: response.usageMetadata.promptTokenCount,
+                completionTokens: response.usageMetadata.candidatesTokenCount,
+                totalTokens: response.usageMetadata.totalTokenCount,
+              }
+            : undefined,
         };
 
       case 'custom':
       default:
         // Try to parse common formats
         return {
-          content: response.choices?.[0]?.message?.content ||
-                   response.content?.[0]?.text ||
-                   response.text ||
-                   response.output ||
-                   JSON.stringify(response),
+          content:
+            response.choices?.[0]?.message?.content ||
+            response.content?.[0]?.text ||
+            response.text ||
+            response.output ||
+            JSON.stringify(response),
         };
     }
   }
@@ -469,7 +521,10 @@ export class AIApiService {
   /**
    * Parse streaming chunk based on provider
    */
-  private static parseStreamingChunk(endpoint: AIEndpoint, chunk: string): string | null {
+  private static parseStreamingChunk(
+    endpoint: AIEndpoint,
+    chunk: string
+  ): string | null {
     try {
       // Remove SSE prefix if present
       const cleanChunk = chunk.replace(/^data: /, '');
@@ -493,10 +548,12 @@ export class AIApiService {
 
         case 'custom':
         default:
-          return parsed.choices?.[0]?.delta?.content ||
-                 parsed.delta?.text ||
-                 parsed.content ||
-                 null;
+          return (
+            parsed.choices?.[0]?.delta?.content ||
+            parsed.delta?.text ||
+            parsed.content ||
+            null
+          );
       }
     } catch {
       return null;
@@ -531,7 +588,8 @@ export class AIApiService {
         endpointStats.successfulRequests += 1;
       }
       endpointStats.totalResponseTime += responseTime;
-      endpointStats.averageResponseTime = endpointStats.totalResponseTime / endpointStats.totalRequests;
+      endpointStats.averageResponseTime =
+        endpointStats.totalResponseTime / endpointStats.totalRequests;
       endpointStats.totalTokensUsed += tokensUsed;
       endpointStats.lastUsed = new Date().toISOString();
 

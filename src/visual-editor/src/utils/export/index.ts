@@ -1,12 +1,12 @@
 // PlantUML export utilities
 
-import type { Node, Edge } from '@xyflow/react';
-import type { 
-  PlantUMLWorkflow, 
-  PlantUMLNode, 
-  PlantUMLEdge, 
+import type { Edge, Node } from '@xyflow/react';
+import type {
+  ExportResult,
+  PlantUMLEdge,
   PlantUMLExportOptions,
-  ExportResult 
+  PlantUMLNode,
+  PlantUMLWorkflow,
 } from '../../types/export';
 import type { SerializedWorkflow } from '../../features/workflow/utils/serialization';
 
@@ -15,7 +15,9 @@ export class PlantUMLExporter {
    * Convert workflow to PlantUML format
    */
   static convertWorkflowToPlantUML(
-    workflow: SerializedWorkflow | { nodes: Node[]; edges: Edge[]; name: string; description?: string },
+    workflow:
+      | SerializedWorkflow
+      | { nodes: Node[]; edges: Edge[]; name: string; description?: string },
     options: PlantUMLExportOptions = {}
   ): string {
     const { includeNodeProperties = false, formatStyle = 'simple' } = options;
@@ -23,11 +25,11 @@ export class PlantUMLExporter {
     let puml = '@startuml\n';
     puml += `!define TITLE ${workflow.name.replace(/[^a-zA-Z0-9]/g, '_')}\n`;
     puml += `title ${workflow.name}\n`;
-    
+
     if (workflow.description) {
       puml += `note top : ${workflow.description}\n`;
     }
-    
+
     puml += '\n';
 
     // Define node types with colors
@@ -61,7 +63,11 @@ export class PlantUMLExporter {
         edges = [];
       }
     } catch (error) {
-      console.error('Error extracting nodes/edges from workflow:', error, workflow);
+      console.error(
+        'Error extracting nodes/edges from workflow:',
+        error,
+        workflow
+      );
       nodes = [];
       edges = [];
     }
@@ -71,10 +77,10 @@ export class PlantUMLExporter {
       const nodeId = this.sanitizeId(node.id);
       const label = (node.data.label as string) || node.id;
       const nodeType = node.type || 'unknown';
-      
+
       if (formatStyle === 'detailed') {
         puml += `rectangle "${label}\\n[${nodeType}]" as ${nodeId} ${this.getNodeColor(nodeType)}\n`;
-        
+
         if (includeNodeProperties && node.data.properties) {
           const properties = node.data.properties as Record<string, any>;
           puml += `note right of ${nodeId}\n`;
@@ -96,9 +102,9 @@ export class PlantUMLExporter {
     edges.forEach(edge => {
       const sourceId = this.sanitizeId(edge.source);
       const targetId = this.sanitizeId(edge.target);
-      
+
       let connection = `${sourceId} --> ${targetId}`;
-      
+
       // Add handle labels if available
       const handleLabels: string[] = [];
       if (edge.sourceHandle) {
@@ -107,11 +113,11 @@ export class PlantUMLExporter {
       if (edge.targetHandle) {
         handleLabels.push(`to: ${edge.targetHandle}`);
       }
-      
+
       if (handleLabels.length > 0) {
         connection += ` : ${handleLabels.join(', ')}`;
       }
-      
+
       puml += `${connection}\n`;
     });
 
@@ -128,8 +134,11 @@ export class PlantUMLExporter {
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
-    
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+
+    const timestamp = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[T:]/g, '-');
     return `${sanitized}-${timestamp}.puml`;
   }
 
@@ -144,13 +153,15 @@ export class PlantUMLExporter {
    * Export workflow to PlantUML file
    */
   static async exportWorkflowToPUML(
-    workflow: SerializedWorkflow | { nodes: Node[]; edges: Edge[]; name: string; description?: string },
+    workflow:
+      | SerializedWorkflow
+      | { nodes: Node[]; edges: Edge[]; name: string; description?: string },
     options: PlantUMLExportOptions = {}
   ): Promise<ExportResult> {
     try {
       const content = this.convertWorkflowToPlantUML(workflow, options);
       const fileName = this.generateFileName(workflow.name);
-      const fullPath = options.outputPath 
+      const fullPath = options.outputPath
         ? `${options.outputPath}/${fileName}`
         : `${this.getDefaultExportPath()}${fileName}`;
 
@@ -175,7 +186,8 @@ export class PlantUMLExporter {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -183,7 +195,9 @@ export class PlantUMLExporter {
   /**
    * Get all available PlantUML files in the user directory
    */
-  static async getAvailablePUMLFiles(): Promise<Array<{ name: string; path: string; lastModified: Date }>> {
+  static async getAvailablePUMLFiles(): Promise<
+    Array<{ name: string; path: string; lastModified: Date }>
+  > {
     try {
       // Try to fetch real files from the filesystem via a backend endpoint
       // If that fails, fall back to localStorage simulation
@@ -197,7 +211,9 @@ export class PlantUMLExporter {
           return files;
         }
       } catch (fetchError) {
-        console.log('📁 No backend API available, using local file discovery...');
+        console.log(
+          '📁 No backend API available, using local file discovery...'
+        );
       }
 
       // Fallback: Use known file paths and try to load them
@@ -205,10 +221,14 @@ export class PlantUMLExporter {
         '../../.ai-ley/shared/uml-flows/user/build-project.puml',
         '../../.ai-ley/shared/uml-flows/examples/simple-website-deploy.puml',
         '../../.ai-ley/shared/uml-flows/templates/deployment-pipeline.puml',
-        '../../.ai-ley/shared/uml-flows/templates/data-backup.puml'
+        '../../.ai-ley/shared/uml-flows/templates/data-backup.puml',
       ];
 
-      const discoveredFiles: Array<{ name: string; path: string; lastModified: Date }> = [];
+      const discoveredFiles: Array<{
+        name: string;
+        path: string;
+        lastModified: Date;
+      }> = [];
 
       for (const filePath of knownFilePaths) {
         try {
@@ -226,7 +246,7 @@ export class PlantUMLExporter {
             discoveredFiles.push({
               name: fileName,
               path: filePath,
-              lastModified: new Date()
+              lastModified: new Date(),
             });
 
             console.log(`✅ Discovered and cached: ${fileName}`);
@@ -238,7 +258,10 @@ export class PlantUMLExporter {
 
       if (discoveredFiles.length > 0) {
         // Store the discovered files list
-        localStorage.setItem('ai-ley-puml-files', JSON.stringify(discoveredFiles));
+        localStorage.setItem(
+          'ai-ley-puml-files',
+          JSON.stringify(discoveredFiles)
+        );
         console.log(`📁 Discovered ${discoveredFiles.length} PlantUML files`);
         return discoveredFiles;
       }
@@ -261,15 +284,19 @@ export class PlantUMLExporter {
   /**
    * Import PlantUML file and convert to workflow format
    */
-  static async importFromPUML(filePath?: string): Promise<SerializedWorkflow | null> {
+  static async importFromPUML(
+    filePath?: string
+  ): Promise<SerializedWorkflow | null> {
     try {
       if (!filePath) {
         // If no file path provided, get the most recent one
         const files = await this.getAvailablePUMLFiles();
         if (files.length === 0) return null;
-        
+
         // Sort by lastModified and get the most recent
-        files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+        files.sort(
+          (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
+        );
         filePath = files[0].path;
       }
 
@@ -290,11 +317,17 @@ export class PlantUMLExporter {
   /**
    * Parse PlantUML content and convert to workflow format
    */
-  static parsePUMLContent(content: string, filePath: string): SerializedWorkflow | null {
+  static parsePUMLContent(
+    content: string,
+    filePath: string
+  ): SerializedWorkflow | null {
     try {
       // Extract workflow name from file path or content
-      const fileName = filePath.split('/').pop()?.replace('.puml', '') || 'Imported Workflow';
-      const workflowName = fileName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const fileName =
+        filePath.split('/').pop()?.replace('.puml', '') || 'Imported Workflow';
+      const workflowName = fileName
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
 
       // Extract title from PlantUML content
       const titleMatch = content.match(/title\s+(.+)/i);
@@ -305,17 +338,20 @@ export class PlantUMLExporter {
       const description = noteMatch ? noteMatch[1] : undefined;
 
       // Parse rectangles (nodes)
-      const rectanglePattern = /rectangle\s+"([^"]+)(?:\\\\n\[([^\]]+)\])?"(?:\s+as\s+(\w+))?\s*(\w+)?/gi;
+      const rectanglePattern =
+        /rectangle\s+"([^"]+)(?:\\\\n\[([^\]]+)\])?"(?:\s+as\s+(\w+))?\s*(\w+)?/gi;
       const nodes: any[] = [];
       let rectangleMatch;
 
       while ((rectangleMatch = rectanglePattern.exec(content)) !== null) {
         const [, label, nodeType, nodeId, color] = rectangleMatch;
         const id = nodeId || this.generateNodeId();
-        
+
         // Map color back to node type
-        const type = this.mapColorToNodeType(color || '') || this.mapLabelToNodeType(nodeType || label);
-        
+        const type =
+          this.mapColorToNodeType(color || '') ||
+          this.mapLabelToNodeType(nodeType || label);
+
         nodes.push({
           id,
           type,
@@ -335,7 +371,7 @@ export class PlantUMLExporter {
 
       while ((connectionMatch = connectionPattern.exec(content)) !== null) {
         const [, source, target, label] = connectionMatch;
-        
+
         edges.push({
           id: `e${source}-${target}`,
           source,
@@ -374,7 +410,7 @@ export class PlantUMLExporter {
 
       // Sort by lastModified and get the most recent
       files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-      
+
       console.log(`Auto-loading latest PUML file: ${files[0].name}`);
       return await this.importFromPUML(files[0].path);
     } catch (error) {
@@ -438,11 +474,14 @@ export class PlantUMLExporter {
 
   private static mapLabelToNodeType(label: string): string {
     const lowerLabel = label.toLowerCase();
-    if (lowerLabel.includes('command') || lowerLabel.includes('prompt')) return 'command-prompt-file';
-    if (lowerLabel.includes('custom') || lowerLabel.includes('text')) return 'custom-prompt-text';
+    if (lowerLabel.includes('command') || lowerLabel.includes('prompt'))
+      return 'command-prompt-file';
+    if (lowerLabel.includes('custom') || lowerLabel.includes('text'))
+      return 'custom-prompt-text';
     if (lowerLabel.includes('persona')) return 'persona';
     if (lowerLabel.includes('instruction')) return 'instruction';
-    if (lowerLabel.includes('logic') || lowerLabel.includes('condition')) return 'logic-condition';
+    if (lowerLabel.includes('logic') || lowerLabel.includes('condition'))
+      return 'logic-condition';
     if (lowerLabel.includes('loop')) return 'loop';
     if (lowerLabel.includes('output')) return 'output-type';
     return 'command-prompt-file'; // Default fallback
@@ -456,20 +495,32 @@ export class PlantUMLExporter {
     return `workflow_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private static getDefaultPropertiesForType(nodeType: string): Record<string, any> {
+  private static getDefaultPropertiesForType(
+    nodeType: string
+  ): Record<string, any> {
     switch (nodeType) {
       case 'command-prompt-file':
         return { fileName: '', content: '', variables: [] };
       case 'custom-prompt-text':
         return { promptText: '', variables: [] };
       case 'persona':
-        return { personaType: '', tone: 'professional', expertise: [], characteristics: [] };
+        return {
+          personaType: '',
+          tone: 'professional',
+          expertise: [],
+          characteristics: [],
+        };
       case 'instruction':
         return { instructionText: '', priority: 'medium' };
       case 'logic-condition':
         return { condition: '', trueLabel: 'True', falseLabel: 'False' };
       case 'loop':
-        return { loopType: 'for', maxIterations: 10, iteratorVariable: 'i', condition: '' };
+        return {
+          loopType: 'for',
+          maxIterations: 10,
+          iteratorVariable: 'i',
+          condition: '',
+        };
       case 'output-type':
         return { outputType: 'text', format: 'structured', template: '' };
       default:
@@ -479,13 +530,13 @@ export class PlantUMLExporter {
 }
 
 // Convenience exports
-export const { 
-  convertWorkflowToPlantUML, 
-  exportWorkflowToPUML, 
+export const {
+  convertWorkflowToPlantUML,
+  exportWorkflowToPUML,
   generateFileName,
   getDefaultExportPath,
   importFromPUML,
   getAvailablePUMLFiles,
   autoLoadLatestPUML,
-  parsePUMLContent
+  parsePUMLContent,
 } = PlantUMLExporter;

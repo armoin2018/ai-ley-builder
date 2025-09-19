@@ -9,7 +9,10 @@ import {
   type WorkflowMetadata,
   workflowStorage,
 } from '../services/workflowStorage';
-import { autoLoadLatestPUML, exportWorkflowToPUML } from '../../../utils/export';
+import {
+  autoLoadLatestPUML,
+  exportWorkflowToPUML,
+} from '../../../utils/export';
 
 export interface WorkflowState {
   currentWorkflow: SerializedWorkflow | null;
@@ -148,7 +151,9 @@ export function useWorkflow(): UseWorkflowReturn {
         if (state.pumlAutoSaveEnabled) {
           try {
             await exportWorkflowToPUML(serialized);
-            console.log(`Auto-saved PlantUML file for workflow: ${serialized.name}`);
+            console.log(
+              `Auto-saved PlantUML file for workflow: ${serialized.name}`
+            );
           } catch (pumlError) {
             console.warn('Failed to auto-save PlantUML file:', pumlError);
             // Don't fail the entire save operation for PlantUML export issues
@@ -271,7 +276,7 @@ export function useWorkflow(): UseWorkflowReturn {
 
     try {
       const pumlWorkflow = await autoLoadLatestPUML();
-      
+
       if (!pumlWorkflow) {
         console.log('No PlantUML files found to auto-load');
         setState(prev => ({ ...prev, isLoading: false }));
@@ -291,7 +296,9 @@ export function useWorkflow(): UseWorkflowReturn {
         currentWorkflow: pumlWorkflow,
         isModified: false,
         isLoading: false,
-        lastSaved: pumlWorkflow.metadata?.createdAt ? new Date(pumlWorkflow.metadata.createdAt) : new Date(),
+        lastSaved: pumlWorkflow.metadata?.createdAt
+          ? new Date(pumlWorkflow.metadata.createdAt)
+          : new Date(),
       }));
 
       console.log(`Auto-loaded PlantUML workflow: ${pumlWorkflow.name}`);
@@ -300,7 +307,10 @@ export function useWorkflow(): UseWorkflowReturn {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to auto-load PlantUML workflow',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to auto-load PlantUML workflow',
       }));
       console.error('Error auto-loading PlantUML workflow:', error);
       return false;

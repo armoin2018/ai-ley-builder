@@ -12,15 +12,47 @@ export interface PromptFile {
 
 // Actual prompt files from ../../.ai-ley/shared/prompts directory
 const ACTUAL_PROMPT_FILES = [
-  'alias', 'ask', 'audit', 'bench', 'build-architecture', 'build-business-development',
-  'build-design', 'build-flow', 'build-launch-plan', 'build-market-research',
-  'build-marketing-strategy', 'build-plan', 'build-plan-run', 'build-registry',
-  'build-requirements', 'build-revenue-projections', 'build-test-plan',
-  'business-plan', 'document', 'evolve', 'extract-requirements', 'git-commit',
-  'go-to-market', 'health-check', 'innovate', 'launch-builder', 'lean-canvas',
-  'learn', 'new-feature', 'new-prompt', 'optimize', 'pitch-deck', 'plan',
-  'repair-prompts', 'requirements', 'run', 'run-flow', 'run-next', 'run-plan',
-  'update-instructions', 'update-personas'
+  'alias',
+  'ask',
+  'audit',
+  'bench',
+  'build-architecture',
+  'build-business-development',
+  'build-design',
+  'build-flow',
+  'build-launch-plan',
+  'build-market-research',
+  'build-marketing-strategy',
+  'build-plan',
+  'build-plan-run',
+  'build-registry',
+  'build-requirements',
+  'build-revenue-projections',
+  'build-test-plan',
+  'business-plan',
+  'document',
+  'evolve',
+  'extract-requirements',
+  'git-commit',
+  'go-to-market',
+  'health-check',
+  'innovate',
+  'launch-builder',
+  'lean-canvas',
+  'learn',
+  'new-feature',
+  'new-prompt',
+  'optimize',
+  'pitch-deck',
+  'plan',
+  'repair-prompts',
+  'requirements',
+  'run',
+  'run-flow',
+  'run-next',
+  'run-plan',
+  'update-instructions',
+  'update-personas',
 ];
 
 // Auto-generate prompt metadata based on file names
@@ -28,21 +60,41 @@ const AVAILABLE_PROMPTS: PromptFile[] = ACTUAL_PROMPT_FILES.map(fileName => {
   // Categorize based on filename patterns
   let category = 'General';
   let description = `Execute the ${fileName.replace(/-/g, ' ')} prompt`;
-  
+
   if (fileName.startsWith('build-')) {
     category = 'Building';
     description = `Build ${fileName.replace('build-', '').replace(/-/g, ' ')}`;
-  } else if (['business-plan', 'lean-canvas', 'pitch-deck', 'go-to-market'].includes(fileName)) {
+  } else if (
+    ['business-plan', 'lean-canvas', 'pitch-deck', 'go-to-market'].includes(
+      fileName
+    )
+  ) {
     category = 'Business';
   } else if (['audit', 'bench', 'health-check'].includes(fileName)) {
     category = 'Quality';
-  } else if (['document', 'requirements', 'extract-requirements'].includes(fileName)) {
+  } else if (
+    ['document', 'requirements', 'extract-requirements'].includes(fileName)
+  ) {
     category = 'Documentation';
-  } else if (['new-feature', 'innovate', 'optimize', 'evolve'].includes(fileName)) {
+  } else if (
+    ['new-feature', 'innovate', 'optimize', 'evolve'].includes(fileName)
+  ) {
     category = 'Development';
-  } else if (['run', 'run-flow', 'run-next', 'run-plan', 'launch-builder'].includes(fileName)) {
+  } else if (
+    ['run', 'run-flow', 'run-next', 'run-plan', 'launch-builder'].includes(
+      fileName
+    )
+  ) {
     category = 'Execution';
-  } else if (['new-prompt', 'update-personas', 'update-instructions', 'repair-prompts', 'alias'].includes(fileName)) {
+  } else if (
+    [
+      'new-prompt',
+      'update-personas',
+      'update-instructions',
+      'repair-prompts',
+      'alias',
+    ].includes(fileName)
+  ) {
     category = 'Utilities';
   } else if (['ask', 'plan'].includes(fileName)) {
     category = 'Core';
@@ -56,9 +108,12 @@ const AVAILABLE_PROMPTS: PromptFile[] = ACTUAL_PROMPT_FILES.map(fileName => {
   return {
     id: fileName,
     name: fileName,
-    displayName: fileName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+    displayName: fileName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '),
     description,
-    category
+    category,
   };
 });
 
@@ -81,7 +136,9 @@ export class PromptService {
    * Get all unique categories
    */
   static getCategories(): string[] {
-    const categories = new Set(AVAILABLE_PROMPTS.map(prompt => prompt.category));
+    const categories = new Set(
+      AVAILABLE_PROMPTS.map(prompt => prompt.category)
+    );
     return Array.from(categories).sort();
   }
 
@@ -90,10 +147,11 @@ export class PromptService {
    */
   static searchPrompts(query: string): PromptFile[] {
     const lowerQuery = query.toLowerCase();
-    return AVAILABLE_PROMPTS.filter(prompt => 
-      prompt.name.toLowerCase().includes(lowerQuery) ||
-      prompt.displayName.toLowerCase().includes(lowerQuery) ||
-      prompt.description.toLowerCase().includes(lowerQuery)
+    return AVAILABLE_PROMPTS.filter(
+      prompt =>
+        prompt.name.toLowerCase().includes(lowerQuery) ||
+        prompt.displayName.toLowerCase().includes(lowerQuery) ||
+        prompt.description.toLowerCase().includes(lowerQuery)
     );
   }
 
@@ -117,7 +175,13 @@ export class PromptService {
         console.log(`Adding ${prompt.displayName} prompt node`);
         // This would create a new command prompt file node with the selected prompt
       },
-      keywords: ['prompt', 'add', 'node', ...prompt.name.split('-'), prompt.displayName.toLowerCase()],
+      keywords: [
+        'prompt',
+        'add',
+        'node',
+        ...prompt.name.split('-'),
+        prompt.displayName.toLowerCase(),
+      ],
     }));
   }
 }

@@ -22,15 +22,17 @@ const initializeActualPUMLFiles = (): void => {
       name: 'build-project.puml',
       path: '../../.ai-ley/shared/uml-flows/user/build-project.puml',
       lastModified: new Date('2024-09-09T06:41:00.000Z'), // From file system timestamp
-    }
+    },
   ];
-  
+
   // Check if localStorage is empty or doesn't contain actual files
   const existingFiles = localStorage.getItem('ai-ley-puml-files');
   if (!existingFiles || existingFiles === '[]') {
-    console.log('🔄 Initializing with actual PlantUML files from file system...');
+    console.log(
+      '🔄 Initializing with actual PlantUML files from file system...'
+    );
     localStorage.setItem('ai-ley-puml-files', JSON.stringify(actualFiles));
-    
+
     // Store the actual file content with enhanced metadata for visual editor
     const buildProjectContent = `@startuml build-project
 !theme plain
@@ -215,7 +217,10 @@ caption Generated on September 7, 2025 for AI-LEY Project Automation System
 
 @enduml`;
 
-    localStorage.setItem(`puml-content-../../.ai-ley/shared/uml-flows/user/build-project.puml`, buildProjectContent);
+    localStorage.setItem(
+      `puml-content-../../.ai-ley/shared/uml-flows/user/build-project.puml`,
+      buildProjectContent
+    );
     console.log('✅ Loaded actual build-project.puml from file system');
   }
 };
@@ -224,12 +229,12 @@ export const getAvailablePUMLFiles = async (): Promise<UMLFile[]> => {
   try {
     // Initialize with actual files on first run
     initializeActualPUMLFiles();
-    
+
     const files = localStorage.getItem('ai-ley-puml-files');
     if (!files) {
       return [];
     }
-    
+
     const parsed = JSON.parse(files);
     return parsed.map((file: any) => ({
       ...file,
@@ -241,7 +246,9 @@ export const getAvailablePUMLFiles = async (): Promise<UMLFile[]> => {
   }
 };
 
-export const importFromPUML = async (filePath: string): Promise<SerializedWorkflow | null> => {
+export const importFromPUML = async (
+  filePath: string
+): Promise<SerializedWorkflow | null> => {
   try {
     const content = localStorage.getItem(`puml-content-${filePath}`);
     if (!content) {
@@ -254,19 +261,21 @@ export const importFromPUML = async (filePath: string): Promise<SerializedWorkfl
 
     // Parse the PlantUML content to extract nodes and edges
     const { nodes, edges } = parsePlantUMLToFlow(content);
-    
+
     console.log(`✅ Parsed PlantUML to visual elements:`, {
       filePath,
       nodeCount: nodes.length,
       edgeCount: edges.length,
       nodes: nodes.map(n => ({ id: n.id, type: n.type, label: n.data?.label })),
-      edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target }))
+      edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target })),
     });
-    
+
     // Extract workflow name from content or file path
     const titleMatch = content.match(/title\s+(.+)/i);
-    const workflowName = titleMatch ? titleMatch[1] : filePath.replace('.puml', '').replace(/^.*\//, '');
-    
+    const workflowName = titleMatch
+      ? titleMatch[1]
+      : filePath.replace('.puml', '').replace(/^.*\//, '');
+
     const workflow: SerializedWorkflow = {
       id: `workflow_${Date.now()}`,
       name: workflowName,
@@ -285,7 +294,9 @@ export const importFromPUML = async (filePath: string): Promise<SerializedWorkfl
       },
     };
 
-    console.log(`Successfully parsed PUML: ${nodes.length} nodes, ${edges.length} edges`);
+    console.log(
+      `Successfully parsed PUML: ${nodes.length} nodes, ${edges.length} edges`
+    );
     return workflow;
   } catch (error) {
     console.error(`Failed to import PUML file: ${filePath}`, error);
@@ -293,12 +304,14 @@ export const importFromPUML = async (filePath: string): Promise<SerializedWorkfl
   }
 };
 
-export const exportWorkflowToPUML = async (workflow: SerializedWorkflow): Promise<ExportResult> => {
+export const exportWorkflowToPUML = async (
+  workflow: SerializedWorkflow
+): Promise<ExportResult> => {
   try {
     // Generate PlantUML content using the parser
     const content = flowToPlantUML(
-      workflow.canvas.nodes, 
-      workflow.canvas.edges, 
+      workflow.canvas.nodes,
+      workflow.canvas.edges,
       workflow.name
     );
 
@@ -312,7 +325,7 @@ export const exportWorkflowToPUML = async (workflow: SerializedWorkflow): Promis
     // Update file list
     const currentFiles = await getAvailablePUMLFiles();
     const existingFileIndex = currentFiles.findIndex(f => f.path === filePath);
-    
+
     const fileInfo = {
       name: fileName,
       path: filePath,
@@ -344,24 +357,28 @@ export const exportWorkflowToPUML = async (workflow: SerializedWorkflow): Promis
 
 // PlantUMLExporter class for compatibility with existing code
 // Auto-load the most recent PlantUML file
-export const autoLoadLatestPUML = async (): Promise<SerializedWorkflow | null> => {
-  try {
-    const files = await getAvailablePUMLFiles();
-    if (files.length === 0) return null;
+export const autoLoadLatestPUML =
+  async (): Promise<SerializedWorkflow | null> => {
+    try {
+      const files = await getAvailablePUMLFiles();
+      if (files.length === 0) return null;
 
-    // Sort by lastModified and get the most recent
-    files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-    
-    console.log(`Auto-loading latest PUML file: ${files[0].name}`);
-    return await importFromPUML(files[0].path);
-  } catch (error) {
-    console.error('Error auto-loading PUML file:', error);
-    return null;
-  }
-};
+      // Sort by lastModified and get the most recent
+      files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+
+      console.log(`Auto-loading latest PUML file: ${files[0].name}`);
+      return await importFromPUML(files[0].path);
+    } catch (error) {
+      console.error('Error auto-loading PUML file:', error);
+      return null;
+    }
+  };
 
 export class PlantUMLExporter {
-  static async exportWorkflowToPUML(workflow: any, options?: any): Promise<ExportResult> {
+  static async exportWorkflowToPUML(
+    workflow: any,
+    options?: any
+  ): Promise<ExportResult> {
     const serializedWorkflow: SerializedWorkflow = {
       id: workflow.id || `workflow_${Date.now()}`,
       name: workflow.name || 'Untitled Workflow',

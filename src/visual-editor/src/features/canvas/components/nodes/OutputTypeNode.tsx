@@ -1,6 +1,6 @@
 import { type NodeProps } from '@xyflow/react';
-import { BaseNode, type BaseNodeData } from './BaseNode';
 import { Badge } from '../../../../shared/components';
+import { BaseNode, type BaseNodeData } from './BaseNode';
 
 export interface OutputTypeNodeData extends BaseNodeData {
   properties: {
@@ -16,28 +16,18 @@ export function OutputTypeNode(props: NodeProps) {
   const outputType = (nodeData.properties?.outputType as string) || 'text';
   const format = nodeData.properties?.format || '';
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'json':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'xml':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'yaml':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'markdown':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-      default:
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    }
+  const getTypeColor = () => {
+    // All badges should use white text for consistency
+    return 'text-white border-white/20';
   };
 
   return (
     <BaseNode {...props} variant="output">
       <div className="space-y-2">
         <div className="flex items-center gap-1">
-          <span className="text-xs font-medium">Type:</span>
+          <span className="text-xs font-medium text-white">Type:</span>
           <Badge
-            className={`text-xs py-0 ${getTypeColor(outputType)}`}
+            className={`text-xs py-0 ${getTypeColor()}`}
             variant="outline"
           >
             {outputType.toUpperCase()}
@@ -46,14 +36,14 @@ export function OutputTypeNode(props: NodeProps) {
 
         {format && (
           <div className="space-y-1">
-            <span className="text-xs font-medium">Format:</span>
-            <div className="text-xs text-muted-foreground truncate">
+            <span className="text-xs font-medium text-white">Format:</span>
+            <div className="text-xs text-white truncate">
               {format}
             </div>
           </div>
         )}
 
-        <div className="flex items-center text-xs text-muted-foreground">
+        <div className="flex items-center text-xs text-white">
           <span>📄 Final Output</span>
         </div>
       </div>

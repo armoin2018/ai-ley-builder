@@ -1,10 +1,106 @@
 # Project Ask Items
 
-_Last Updated: 2025-09-17_
+_Last Updated: 2025-09-18_
 
 ## Active Ask Items
 
 ### High Priority - Immediate Attention Required
+
+#### ASK-011: Panel Management System
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: Panel Management - View / hide toggles on panels, add show-hide checkboxes. Allow drag and drop of the panels like VSCode to snap into zones, have template zones like VSCode
+- **Business Impact**: Critical UX enhancement that provides VSCode-like workspace customization, dramatically improving user experience and workflow efficiency through flexible panel management and layout optimization
+- **Status**: Complete - integrated into requirements
+- **Integration Status**:
+  - [x] Added to requirements as R33 (Panel Management System)
+  - [x] Requirements analysis completed for four panel management components
+  - [x] Sub-requirements defined for visibility controls, drag-and-drop, template zones, and state persistence
+  - [ ] Technical implementation needed for panel layout engine and drag-and-drop library integration
+  - [ ] UI component development for toggle controls and zone indicators
+  - [ ] Layout template system design and configuration management
+  - [ ] Testing required for cross-browser drag-and-drop and state persistence
+
+#### ASK-010: Core Workflow Node Types Extension
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: Create six essential node types: Log Node, Debug Node, Parallel Executor, Split based on regex pattern, Join, and Optimize nodes
+- **Business Impact**: Fundamental expansion of workflow capabilities enabling debugging, logging, parallel processing, data manipulation, and optimization - essential building blocks for professional workflow development
+- **Status**: Complete - integrated into requirements
+- **Integration Status**:
+  - [x] Added to requirements as R31 (Core Workflow Node Types Extension)
+  - [x] Requirements analysis completed for six node type categories
+  - [x] Sub-requirements defined for debug/logging, parallel processing, data processing, and optimization nodes
+  - [ ] Technical implementation needed for node type architecture and execution logic
+  - [ ] UI component development for node property panels and configuration
+  - [ ] Integration with workflow execution engine and performance monitoring
+  - [ ] Testing required for node functionality and performance impact
+
+#### ASK-009: Scoped Storage System
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: Add support for scoped storage: node, flow, global - structure access to the storage similar to node-red - create a storage structure under .ai-ley/state - create nodes to get/set the stored memory
+- **Business Impact**: Critical workflow capability enhancement that enables stateful operations, complex data sharing patterns, and advanced workflow modularity similar to Node-RED's proven context system
+- **Status**: Complete - integrated into requirements
+- **Integration Status**:
+  - [x] Added to requirements as R30 (Scoped Storage System)
+  - [x] Requirements analysis completed for three-tier storage architecture
+  - [x] Sub-requirements defined for storage architecture, node types, and management
+  - [ ] Technical implementation needed for storage scoping and persistence
+  - [ ] Node type development for storage get/set operations
+  - [ ] Storage management interface and monitoring system
+  - [ ] Testing required for storage lifecycle and data integrity
+
+#### ASK-008: Codex CLI Integration Support
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: Add support for Codex CLI to enable advanced code generation, analysis, and refactoring capabilities within the visual flow editor
+- **Business Impact**: Significant developer productivity enhancement through AI-powered code assistance, expands platform capabilities with specialized code-focused AI, and strengthens competitive position in AI development tools market
+- **Status**: Complete - integrated into requirements
+- **Integration Status**:
+  - [x] Added to requirements as R29 (Codex CLI Integration Support)
+  - [x] Requirements analysis completed for Codex CLI integration
+  - [x] Sub-requirements defined for tool integration, workflow support, and multi-AI comparison
+  - [ ] Technical implementation needed for CLI wrapper and node types
+  - [ ] UI integration required for settings and command palette
+  - [ ] Authentication and rate limiting implementation
+  - [ ] Testing required for code generation workflows
+
+#### ASK-007: GitHub Node Repository Import System
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: The ability to import nodes from a github repo, repo should be defined in the settings
+- **Business Impact**: Critical extensibility feature that enables community-driven node ecosystem, accelerates workflow development through reusable components, and provides platform for innovation
+- **Status**: Complete - integrated into requirements
+- **Integration Status**:
+  - [x] Added to requirements as R28 (GitHub Node Repository Import System)
+  - [x] Requirements analysis completed for GitHub API integration
+  - [x] Settings system enhancement design completed
+  - [x] Node validation and security framework designed
+  - [x] Import mechanism and node registration system planned
+  - [x] Version control and dependency management specified
+  - [ ] Technical implementation needed for GitHub API integration
+  - [ ] Settings UI updates required for repository configuration
+  - [ ] Node security validation implementation
+
+#### ASK-006: TinyMCE to Trumbowyg Editor Migration
+
+- **Date**: 2025-09-18
+- **Requestor**: User
+- **Description**: Update the TinyMCE editor to Trumbowyg for better performance, smaller bundle size, and improved user experience
+- **Business Impact**: Significant performance improvement (~25x smaller bundle), better mobile responsiveness, improved accessibility, and enhanced developer experience
+- **Status**: New - ready for requirements integration
+- **Integration Status**:
+  - [x] Added to requirements as R27 (Trumbowyg Rich Text Editor Integration)
+  - [ ] Technical implementation needed for component migration
+  - [ ] Dependency updates required in package.json
+  - [ ] Settings component references need updating
+  - [ ] Testing required for functionality preservation
 
 #### ASK-005: Auto-Arrangement of Visual Dialog Boxes
 
@@ -43,7 +139,7 @@ _Last Updated: 2025-09-17_
 
 - **Date**: 2025-09-11
 - **Requestor**: User
-- **Description**: flows should be automatically loaded into the interface from .ai-ley/shared/uml-flows/user/*.puml, when new flows are created they are automatically created in .ai-ley/shared/uml-flows/user/ as a puml file. set all the fonts within the node boxes as white. in flows can come from the top of the box or left of the box. out flows can come from the bottom or right of the box. AI persona nodes are coming up with required property is missing. AI personas should provide a dropdown list of personas available in .ai-ley/shared/personas/*. Instructions should provide a dropdown list of instructions available in .ai-ley/shared/instructions/*.
+- **Description**: flows should be automatically loaded into the interface from .ai-ley/shared/uml-flows/user/_.puml, when new flows are created they are automatically created in .ai-ley/shared/uml-flows/user/ as a puml file. set all the fonts within the node boxes as white. in flows can come from the top of the box or left of the box. out flows can come from the bottom or right of the box. AI persona nodes are coming up with required property is missing. AI personas should provide a dropdown list of personas available in .ai-ley/shared/personas/_. Instructions should provide a dropdown list of instructions available in .ai-ley/shared/instructions/\*.
 - **Business Impact**: Critical workflow improvements that will enhance user experience and resolve blocking validation issues
 - **Status**: COMPLETE - All items integrated into requirements
 - **Integration Status**:

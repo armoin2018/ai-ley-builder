@@ -135,7 +135,6 @@ const nodeTypes = {
   [NodeType.DEFAULT]: InstructionNode,
 };
 
-
 // Initial nodes for demo
 const initialNodes: Node[] = [
   {

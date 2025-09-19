@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { NodeType } from '../../../types/nodes';
 import { cn } from '../../../utils';
 import { useSettings } from '../../../hooks/useSettings';
-import { Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { Input } from '../../../shared/components';
 
 interface NodePaletteItem {
@@ -10,7 +10,7 @@ interface NodePaletteItem {
   label: string;
   description: string;
   icon: string;
-  category: 'input' | 'logic' | 'output' | 'control' | 'custom';
+  category: 'input' | 'logic' | 'output' | 'control' | 'custom' | 'ai-local' | 'ai-rest';
   color: string;
 }
 
@@ -79,6 +79,8 @@ const categoryLabels = {
   output: 'Output Nodes',
   control: 'Control Nodes',
   custom: 'Custom Nodes',
+  'ai-local': 'Local AI Tools',
+  'ai-rest': 'AI REST APIs',
 };
 
 interface NodePaletteProps {
@@ -88,7 +90,9 @@ interface NodePaletteProps {
 export function NodePalette({ className }: NodePaletteProps) {
   const { settings } = useSettings();
   const [searchTerm, setSearchTerm] = useState('');
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(
+    new Set()
+  );
 
   const onDragStart = (
     event: React.DragEvent,
@@ -111,17 +115,23 @@ export function NodePalette({ className }: NodePaletteProps) {
   };
 
   // Create script node items from settings
-  const scriptNodeItems: NodePaletteItem[] = settings.umlFlows.scriptNodes.enablePalette
+  const scriptNodeItems: NodePaletteItem[] = settings.umlFlows.scriptNodes
+    .enablePalette
     ? settings.umlFlows.scriptNodes.executors
         .filter(executor => executor.enabled)
         .map(executor => {
           const getNodeType = (id: string): NodeType => {
             switch (id) {
-              case 'shell': return NodeType.SHELL_SCRIPT;
-              case 'python': return NodeType.PYTHON_SCRIPT;
-              case 'php': return NodeType.PHP_SCRIPT;
-              case 'nodejs': return NodeType.NODEJS_SCRIPT;
-              default: return NodeType.SHELL_SCRIPT;
+              case 'shell':
+                return NodeType.SHELL_SCRIPT;
+              case 'python':
+                return NodeType.PYTHON_SCRIPT;
+              case 'php':
+                return NodeType.PHP_SCRIPT;
+              case 'nodejs':
+                return NodeType.NODEJS_SCRIPT;
+              default:
+                return NodeType.SHELL_SCRIPT;
             }
           };
 
@@ -136,15 +146,104 @@ export function NodePalette({ className }: NodePaletteProps) {
         })
     : [];
 
-  // Combine static nodes with dynamic script nodes
-  const allNodeItems = [...nodeItems, ...scriptNodeItems];
+  // Create local AI tool node items from settings
+  const localAINodeItems: NodePaletteItem[] = settings.localAI.tools
+    .filter(tool => tool.enabled)
+    .map(tool => {
+      const getNodeType = (toolId: string): NodeType => {
+        switch (toolId) {
+          case 'ollama':
+            return NodeType.AI_LOCAL_OLLAMA;
+          case 'llamacpp':
+            return NodeType.AI_LOCAL_LLAMACPP;
+          case 'claude-code-cli':
+            return NodeType.AI_LOCAL_CLAUDE_CODE_CLI;
+          case 'github-copilot-cli':
+            return NodeType.AI_LOCAL_GITHUB_COPILOT_CLI;
+          case 'gemini-code-cli':
+            return NodeType.AI_LOCAL_GEMINI_CODE_CLI;
+          default:
+            return NodeType.AI_LOCAL_OLLAMA; // fallback
+        }
+      };
+
+      const getIcon = (toolId: string): string => {
+        switch (toolId) {
+          case 'ollama':
+            return '🦙';
+          case 'llamacpp':
+            return '🤖';
+          case 'claude-code-cli':
+            return '🤖';
+          case 'github-copilot-cli':
+            return '🐙';
+          case 'gemini-code-cli':
+            return '✨';
+          default:
+            return '🤖';
+        }
+      };
+
+      return {
+        type: getNodeType(tool.id),
+        label: tool.name,
+        description: tool.description || `${tool.name} AI tool`,
+        icon: getIcon(tool.id),
+        category: 'ai-local' as const,
+        color: 'bg-emerald-50/50 border-emerald-100 hover:border-emerald-200',
+      };
+    });
+
+  // Create AI REST endpoint node items from settings
+  const aiRestNodeItems: NodePaletteItem[] = settings.aiRest.endpoints
+    .filter(endpoint => endpoint.enabled)
+    .map(endpoint => {
+      const getNodeType = (provider: string): NodeType => {
+        switch (provider) {
+          case 'openai':
+            return NodeType.AI_REST_OPENAI;
+          case 'anthropic':
+            return NodeType.AI_REST_ANTHROPIC;
+          default:
+            return NodeType.AI_REST_OPENAI; // fallback
+        }
+      };
+
+      const getIcon = (provider: string): string => {
+        switch (provider) {
+          case 'openai':
+            return '🚀';
+          case 'anthropic':
+            return '🤖';
+          case 'google':
+            return '🌟';
+          case 'azure':
+            return '☁️';
+          default:
+            return '🔗';
+        }
+      };
+
+      return {
+        type: getNodeType(endpoint.provider),
+        label: endpoint.name,
+        description: `${endpoint.provider.toUpperCase()} AI API - ${endpoint.model || 'Default model'}`,
+        icon: getIcon(endpoint.provider),
+        category: 'ai-rest' as const,
+        color: 'bg-cyan-50/50 border-cyan-100 hover:border-cyan-200',
+      };
+    });
+
+  // Combine static nodes with dynamic nodes
+  const allNodeItems = [...nodeItems, ...scriptNodeItems, ...localAINodeItems, ...aiRestNodeItems];
 
   // Filter nodes based on search term and group by category
   const filteredAndGroupedNodes = useMemo(() => {
     const filtered = searchTerm.trim()
-      ? allNodeItems.filter(item =>
-          item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ? allNodeItems.filter(
+          item =>
+            item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchTerm.toLowerCase())
         )
       : allNodeItems;
 
@@ -182,7 +281,7 @@ export function NodePalette({ className }: NodePaletteProps) {
             type="text"
             placeholder="Search nodes..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="pl-9 text-sm bg-white border-slate-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
@@ -192,7 +291,8 @@ export function NodePalette({ className }: NodePaletteProps) {
       <div className="flex-1 p-4 space-y-4">
         {Object.entries(filteredAndGroupedNodes).map(([category, items]) => {
           const isCollapsed = collapsedCategories.has(category);
-          const categoryLabel = categoryLabels[category as keyof typeof categoryLabels];
+          const categoryLabel =
+            categoryLabels[category as keyof typeof categoryLabels];
 
           return (
             <div key={category} className="space-y-2">
@@ -267,13 +367,14 @@ export function NodePalette({ className }: NodePaletteProps) {
         })}
 
         {/* No Results Message */}
-        {searchTerm.trim() && Object.keys(filteredAndGroupedNodes).length === 0 && (
-          <div className="text-center py-8 text-slate-500">
-            <Search className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-            <p className="text-sm">No nodes found matching "{searchTerm}"</p>
-            <p className="text-xs mt-1">Try adjusting your search terms</p>
-          </div>
-        )}
+        {searchTerm.trim() &&
+          Object.keys(filteredAndGroupedNodes).length === 0 && (
+            <div className="text-center py-8 text-slate-500">
+              <Search className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <p className="text-sm">No nodes found matching "{searchTerm}"</p>
+              <p className="text-xs mt-1">Try adjusting your search terms</p>
+            </div>
+          )}
       </div>
 
       {/* Footer */}
@@ -284,7 +385,18 @@ export function NodePalette({ className }: NodePaletteProps) {
               <div className="flex items-center gap-2">
                 <Search className="w-3 h-3" />
                 <span>
-                  Showing {Object.values(filteredAndGroupedNodes).reduce((sum, items) => sum + items.length, 0)} matching node{Object.values(filteredAndGroupedNodes).reduce((sum, items) => sum + items.length, 0) !== 1 ? 's' : ''}
+                  Showing{' '}
+                  {Object.values(filteredAndGroupedNodes).reduce(
+                    (sum, items) => sum + items.length,
+                    0
+                  )}{' '}
+                  matching node
+                  {Object.values(filteredAndGroupedNodes).reduce(
+                    (sum, items) => sum + items.length,
+                    0
+                  ) !== 1
+                    ? 's'
+                    : ''}
                 </span>
               </div>
               <div className="text-slate-400">

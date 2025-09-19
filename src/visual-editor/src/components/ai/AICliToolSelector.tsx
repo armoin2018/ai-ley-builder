@@ -1,8 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Terminal, Play, TestTube, Clock, Check, X, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {
+  AlertCircle,
+  Check,
+  Clock,
+  Play,
+  Terminal,
+  TestTube,
+  X,
+} from 'lucide-react';
 import { Button, Input, Label } from '../../shared/components';
 import { cn } from '../../utils';
-import { AICliService, type AICliRequest, type AICliResponse } from '../../services/aiCliService';
+import {
+  type AICliRequest,
+  type AICliResponse,
+  AICliService,
+} from '../../services/aiCliService';
 import type { LocalAITool } from '../../types/settings';
 
 interface AICliToolSelectorProps {
@@ -26,7 +38,9 @@ export function AICliToolSelector({
   const [isExecuting, setIsExecuting] = useState(false);
   const [isTesting, setIsTesting] = useState<string | null>(null);
   const [lastResponse, setLastResponse] = useState<AICliResponse | null>(null);
-  const [testResults, setTestResults] = useState<Map<string, { success: boolean; message: string }>>(new Map());
+  const [testResults, setTestResults] = useState<
+    Map<string, { success: boolean; message: string }>
+  >(new Map());
 
   // Load available tools
   useEffect(() => {
@@ -56,7 +70,9 @@ export function AICliToolSelector({
         toolId: selectedTool,
         prompt: prompt.trim(),
         model: model.trim() || undefined,
-        additionalArgs: additionalArgs.trim() ? additionalArgs.split(',').map(arg => arg.trim()) : undefined,
+        additionalArgs: additionalArgs.trim()
+          ? additionalArgs.split(',').map(arg => arg.trim())
+          : undefined,
       };
 
       const response = await AICliService.executeCommand(request);
@@ -66,7 +82,8 @@ export function AICliToolSelector({
       const errorResponse: AICliResponse = {
         success: false,
         output: '',
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
         executionTime: 0,
         toolUsed: selectedTool,
       };
@@ -83,30 +100,46 @@ export function AICliToolSelector({
     setIsTesting(toolId);
     try {
       const result = await AICliService.testTool(toolId);
-      setTestResults(prev => new Map(prev).set(toolId, {
-        success: result.success,
-        message: result.message + (result.version ? ` (${result.version})` : ''),
-      }));
+      setTestResults(prev =>
+        new Map(prev).set(toolId, {
+          success: result.success,
+          message:
+            result.message + (result.version ? ` (${result.version})` : ''),
+        })
+      );
     } catch (error) {
-      setTestResults(prev => new Map(prev).set(toolId, {
-        success: false,
-        message: error instanceof Error ? error.message : 'Test failed',
-      }));
+      setTestResults(prev =>
+        new Map(prev).set(toolId, {
+          success: false,
+          message: error instanceof Error ? error.message : 'Test failed',
+        })
+      );
     } finally {
       setIsTesting(null);
     }
   };
 
-  const selectedToolData = availableTools.find(tool => tool.id === selectedTool);
+  const selectedToolData = availableTools.find(
+    tool => tool.id === selectedTool
+  );
   const testResult = testResults.get(selectedTool);
 
   return (
-    <div className={cn('space-y-4 p-4 border border-slate-200 rounded-lg bg-white', className)}>
+    <div
+      className={cn(
+        'space-y-4 p-4 border border-slate-200 rounded-lg bg-white',
+        className
+      )}
+    >
       <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
         <Terminal className="w-5 h-5 text-green-600" />
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">AI CLI Tool Executor</h3>
-          <p className="text-sm text-slate-600">Execute prompts using configured local AI CLI tools</p>
+          <h3 className="text-lg font-semibold text-slate-900">
+            AI CLI Tool Executor
+          </h3>
+          <p className="text-sm text-slate-600">
+            Execute prompts using configured local AI CLI tools
+          </p>
         </div>
       </div>
 
@@ -114,15 +147,19 @@ export function AICliToolSelector({
         <div className="text-center py-8 text-slate-500">
           <Terminal className="w-12 h-12 mx-auto mb-3 text-slate-300" />
           <p className="text-sm font-medium">No AI CLI tools configured</p>
-          <p className="text-xs">Configure tools in Settings → Local AI Tools to get started</p>
+          <p className="text-xs">
+            Configure tools in Settings → Local AI Tools to get started
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
           {/* Tool Selection */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Select AI Tool</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Select AI Tool
+            </Label>
             <div className="space-y-2">
-              {availableTools.map((tool) => {
+              {availableTools.map(tool => {
                 const isSelected = selectedTool === tool.id;
                 const toolTestResult = testResults.get(tool.id);
 
@@ -140,14 +177,18 @@ export function AICliToolSelector({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-medium text-slate-900">{tool.name}</h4>
+                          <h4 className="text-sm font-medium text-slate-900">
+                            {tool.name}
+                          </h4>
                           {toolTestResult && (
-                            <span className={cn(
-                              'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
-                              toolTestResult.success
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            )}>
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
+                                toolTestResult.success
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-red-100 text-red-700'
+                              )}
+                            >
                               {toolTestResult.success ? (
                                 <Check className="w-3 h-3" />
                               ) : (
@@ -163,17 +204,21 @@ export function AICliToolSelector({
                           </code>
                         </p>
                         {tool.description && (
-                          <p className="text-xs text-slate-500 mt-1">{tool.description}</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {tool.description}
+                          </p>
                         )}
                         {toolTestResult && !toolTestResult.success && (
-                          <p className="text-xs text-red-600 mt-1">{toolTestResult.message}</p>
+                          <p className="text-xs text-red-600 mt-1">
+                            {toolTestResult.message}
+                          </p>
                         )}
                       </div>
                       {showTestButton && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleTestTool(tool.id);
                           }}
@@ -198,32 +243,40 @@ export function AICliToolSelector({
           {/* Tool Configuration */}
           {selectedToolData && (
             <div className="space-y-4 p-3 bg-slate-50 rounded-lg">
-              <h4 className="text-sm font-medium text-slate-700">Tool Configuration</h4>
+              <h4 className="text-sm font-medium text-slate-700">
+                Tool Configuration
+              </h4>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="model" className="text-xs font-medium text-slate-600">
+                  <Label
+                    htmlFor="model"
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Model (optional)
                   </Label>
                   <Input
                     id="model"
                     type="text"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
+                    onChange={e => setModel(e.target.value)}
                     placeholder="e.g., llama2, codellama"
                     className="text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="additional-args" className="text-xs font-medium text-slate-600">
+                  <Label
+                    htmlFor="additional-args"
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Additional Args (optional)
                   </Label>
                   <Input
                     id="additional-args"
                     type="text"
                     value={additionalArgs}
-                    onChange={(e) => setAdditionalArgs(e.target.value)}
+                    onChange={e => setAdditionalArgs(e.target.value)}
                     placeholder="--verbose, --format=json"
                     className="text-sm"
                   />
@@ -234,13 +287,16 @@ export function AICliToolSelector({
 
           {/* Prompt Input */}
           <div className="space-y-2">
-            <Label htmlFor="prompt" className="text-sm font-medium text-slate-700">
+            <Label
+              htmlFor="prompt"
+              className="text-sm font-medium text-slate-700"
+            >
               Prompt
             </Label>
             <textarea
               id="prompt"
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={e => setPrompt(e.target.value)}
               placeholder="Enter your prompt here..."
               rows={4}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
@@ -273,13 +329,17 @@ export function AICliToolSelector({
           {/* Response Display */}
           {lastResponse && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">Response</Label>
-              <div className={cn(
-                'p-3 border rounded-lg',
-                lastResponse.success
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-red-200 bg-red-50'
-              )}>
+              <Label className="text-sm font-medium text-slate-700">
+                Response
+              </Label>
+              <div
+                className={cn(
+                  'p-3 border rounded-lg',
+                  lastResponse.success
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-red-200 bg-red-50'
+                )}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     {lastResponse.success ? (

@@ -31,6 +31,22 @@ export interface ScriptNodeSettings {
   defaultTimeout: number;
 }
 
+export interface PlantUMLSettings {
+  validationEnabled: boolean;
+  renderUrl: string;
+  enableRichTextEditor: boolean;
+  enableValidationOnEdit: boolean;
+  customValidationScript?: string;
+}
+
+export interface AILeyPathSettings {
+  globalInstructions: string;
+  instructions: string;
+  personas: string;
+  variables: string;
+  prompts: string;
+}
+
 export interface UMLFlowsSettings {
   storageFolder: string;
   autoSave: boolean;
@@ -38,6 +54,7 @@ export interface UMLFlowsSettings {
   backupFolder?: string;
   autoArrange: AutoArrangeSettings;
   scriptNodes: ScriptNodeSettings;
+  plantUML: PlantUMLSettings;
 }
 
 export interface LocalAITool {
@@ -75,6 +92,7 @@ export interface AIRestSettings {
 }
 
 export interface AppSettings {
+  aiLeyPaths: AILeyPathSettings;
   umlFlows: UMLFlowsSettings;
   localAI: LocalAISettings;
   aiRest: AIRestSettings;
@@ -91,6 +109,13 @@ export interface SettingsState {
 
 // Default settings
 export const DEFAULT_SETTINGS: AppSettings = {
+  aiLeyPaths: {
+    globalInstructions: '.ai-ley/shared/global-instructions.md',
+    instructions: '.ai-ley/shared/instructions',
+    personas: '.ai-ley/shared/personas',
+    variables: '.ai-ley/shared/variables',
+    prompts: '.ai-ley/shared/prompts',
+  },
   umlFlows: {
     get storageFolder() {
       return AI_LEY_PATHS.UML_FLOWS_USER;
@@ -155,6 +180,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
         },
       ],
     },
+    plantUML: {
+      validationEnabled: true,
+      renderUrl: 'https://www.plantuml.com/plantuml',
+      enableRichTextEditor: true,
+      enableValidationOnEdit: false,
+    },
   },
   localAI: {
     tools: [
@@ -172,6 +203,30 @@ export const DEFAULT_SETTINGS: AppSettings = {
         command: 'llama-cpp-python',
         args: [],
         description: 'Llama.cpp Python bindings',
+        enabled: false,
+      },
+      {
+        id: 'claude-code-cli',
+        name: 'Claude Code CLI',
+        command: 'claude',
+        args: [],
+        description: 'Anthropic Claude Code CLI tool',
+        enabled: false,
+      },
+      {
+        id: 'github-copilot-cli',
+        name: 'GitHub Copilot CLI',
+        command: 'gh',
+        args: ['copilot'],
+        description: 'GitHub Copilot CLI integration',
+        enabled: false,
+      },
+      {
+        id: 'gemini-code-cli',
+        name: 'Gemini Code CLI',
+        command: 'gemini',
+        args: [],
+        description: 'Google Gemini Code CLI tool',
         enabled: false,
       },
     ],

@@ -1,14 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { AlertCircle, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Button, PromptDropdown, PersonaDropdown, InstructionDropdown } from '../../../shared/components';
+import {
+  Button,
+  InstructionDropdown,
+  PersonaDropdown,
+  PromptDropdown,
+} from '../../../shared/components';
 import { NodeType } from '../../../types/nodes';
 import { cn } from '../../../utils';
 import { useWorkflow } from '../../workflow';
 import { useValidation } from '../../validation/hooks/useValidation';
 import type { Node } from '@xyflow/react';
 import type { PromptFile } from '../../../services/promptService';
-import type { PersonaFile, InstructionFile } from '../../../services/fileSystem';
+import type {
+  InstructionFile,
+  PersonaFile,
+} from '../../../services/fileSystem';
 
 interface NodeInspectorProps {
   className?: string;
@@ -169,7 +177,8 @@ export function NodeInspector({ className }: NodeInspectorProps) {
         setSelectedNode(selected || null);
       } else if (selected && selectedNode) {
         // Update the selected node data if it has changed
-        const hasDataChanged = JSON.stringify(selected.data) !== JSON.stringify(selectedNode.data);
+        const hasDataChanged =
+          JSON.stringify(selected.data) !== JSON.stringify(selectedNode.data);
         if (hasDataChanged) {
           setSelectedNode(selected);
         }
@@ -190,10 +199,7 @@ export function NodeInspector({ className }: NodeInspectorProps) {
 
           if (pathArray.length === 1) {
             updatedData[pathArray[0]] = value;
-          } else if (
-            pathArray.length === 2 &&
-            pathArray[0] === 'properties'
-          ) {
+          } else if (pathArray.length === 2 && pathArray[0] === 'properties') {
             updatedData.properties = {
               ...(updatedData.properties || {}),
               [pathArray[1]]: value,
@@ -207,7 +213,7 @@ export function NodeInspector({ className }: NodeInspectorProps) {
 
           // Update the local selected node state immediately
           setSelectedNode(updatedNode);
-          
+
           return updatedNode;
         }
         return node;
@@ -236,13 +242,15 @@ export function NodeInspector({ className }: NodeInspectorProps) {
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Prompt</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Select Prompt
+              </label>
               <PromptDropdown
                 selectedPromptId={getProperty('selectedPromptId', '')}
                 onSelect={(prompt: PromptFile) => {
                   // Update both fileName and content in a single operation
                   if (!selectedNode) return;
-                  
+
                   const updatedNodes = getNodes().map(node => {
                     if (node.id === selectedNode.id) {
                       const updatedData = { ...node.data };
@@ -261,7 +269,7 @@ export function NodeInspector({ className }: NodeInspectorProps) {
 
                       // Update the local selected node state immediately
                       setSelectedNode(updatedNode);
-                      
+
                       return updatedNode;
                     }
                     return node;
@@ -320,13 +328,15 @@ export function NodeInspector({ className }: NodeInspectorProps) {
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Persona</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Select Persona
+              </label>
               <PersonaDropdown
                 selectedPersonaId={getProperty('selectedPersonaId', '')}
                 onSelect={(persona: PersonaFile) => {
                   // Update both persona properties and content in a single operation
                   if (!selectedNode) return;
-                  
+
                   const updatedNodes = getNodes().map(node => {
                     if (node.id === selectedNode.id) {
                       const updatedData = { ...node.data };
@@ -345,7 +355,7 @@ export function NodeInspector({ className }: NodeInspectorProps) {
 
                       // Update the local selected node state immediately
                       setSelectedNode(updatedNode);
-                      
+
                       return updatedNode;
                     }
                     return node;
@@ -404,13 +414,15 @@ export function NodeInspector({ className }: NodeInspectorProps) {
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Instruction</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Select Instruction
+              </label>
               <InstructionDropdown
                 selectedInstructionId={getProperty('selectedInstructionId', '')}
                 onSelect={(instruction: InstructionFile) => {
                   // Update both instruction properties and content in a single operation
                   if (!selectedNode) return;
-                  
+
                   const updatedNodes = getNodes().map(node => {
                     if (node.id === selectedNode.id) {
                       const updatedData = { ...node.data };
@@ -428,7 +440,7 @@ export function NodeInspector({ className }: NodeInspectorProps) {
 
                       // Update the local selected node state immediately
                       setSelectedNode(updatedNode);
-                      
+
                       return updatedNode;
                     }
                     return node;

@@ -47,11 +47,13 @@ export function PersonaDropdown({
 
   if (loading) {
     return (
-      <div className={cn(
-        'w-full px-3 py-2 border border-slate-200 rounded-md bg-white',
-        'flex items-center gap-2 text-sm text-slate-500',
-        className
-      )}>
+      <div
+        className={cn(
+          'w-full px-3 py-2 border border-slate-200 rounded-md bg-white',
+          'flex items-center gap-2 text-sm text-slate-500',
+          className
+        )}
+      >
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading personas...
       </div>
@@ -60,11 +62,13 @@ export function PersonaDropdown({
 
   if (error) {
     return (
-      <div className={cn(
-        'w-full px-3 py-2 border border-red-200 rounded-md bg-red-50',
-        'flex items-center gap-2 text-sm text-red-600',
-        className
-      )}>
+      <div
+        className={cn(
+          'w-full px-3 py-2 border border-red-200 rounded-md bg-red-50',
+          'flex items-center gap-2 text-sm text-red-600',
+          className
+        )}
+      >
         <FileText className="w-4 h-4" />
         Error: {error}
       </div>
@@ -85,17 +89,21 @@ export function PersonaDropdown({
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <span className={cn(
-            'truncate',
-            selectedPersona ? 'text-slate-900' : 'text-slate-500'
-          )}>
+          <span
+            className={cn(
+              'truncate',
+              selectedPersona ? 'text-slate-900' : 'text-slate-500'
+            )}
+          >
             {selectedPersona ? selectedPersona.name : placeholder}
           </span>
         </div>
-        <ChevronDown className={cn(
-          'w-4 h-4 text-slate-400 transition-transform duration-200',
-          isOpen && 'transform rotate-180'
-        )} />
+        <ChevronDown
+          className={cn(
+            'w-4 h-4 text-slate-400 transition-transform duration-200',
+            isOpen && 'transform rotate-180'
+          )}
+        />
       </button>
 
       {isOpen && (
@@ -105,7 +113,7 @@ export function PersonaDropdown({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Dropdown Menu */}
           <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
             {personas.length === 0 ? (
@@ -114,7 +122,7 @@ export function PersonaDropdown({
               </div>
             ) : (
               <>
-                {personas.map((persona) => (
+                {personas.map(persona => (
                   <button
                     key={persona.id}
                     onClick={() => handleSelect(persona)}
@@ -122,7 +130,8 @@ export function PersonaDropdown({
                       'w-full px-3 py-2 text-left hover:bg-slate-50 focus:bg-slate-50',
                       'focus:outline-none border-b border-slate-100 last:border-b-0',
                       'transition-colors duration-150',
-                      selectedPersonaId === persona.id && 'bg-blue-50 text-blue-900'
+                      selectedPersonaId === persona.id &&
+                        'bg-blue-50 text-blue-900'
                     )}
                   >
                     <div className="flex items-start gap-2">

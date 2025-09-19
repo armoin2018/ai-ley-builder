@@ -1,4 +1,4 @@
-import type { AppSettings, LocalAITool, AIEndpoint } from '../types/settings';
+import type { AIEndpoint, AppSettings, LocalAITool } from '../types/settings';
 import { DEFAULT_SETTINGS } from '../types/settings';
 
 const SETTINGS_STORAGE_KEY = 'ai-ley-visual-editor-settings';
@@ -34,7 +34,10 @@ export class SettingsService {
         lastUpdated: new Date().toISOString(),
       };
 
-      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(toSave, null, 2));
+      localStorage.setItem(
+        SETTINGS_STORAGE_KEY,
+        JSON.stringify(toSave, null, 2)
+      );
       console.log('Settings saved successfully');
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -55,6 +58,10 @@ export class SettingsService {
    */
   private static mergeWithDefaults(loaded: Partial<AppSettings>): AppSettings {
     return {
+      aiLeyPaths: {
+        ...DEFAULT_SETTINGS.aiLeyPaths,
+        ...loaded.aiLeyPaths,
+      },
       umlFlows: {
         ...DEFAULT_SETTINGS.umlFlows,
         ...loaded.umlFlows,
@@ -67,7 +74,8 @@ export class SettingsService {
       aiRest: {
         ...DEFAULT_SETTINGS.aiRest,
         ...loaded.aiRest,
-        endpoints: loaded.aiRest?.endpoints || DEFAULT_SETTINGS.aiRest.endpoints,
+        endpoints:
+          loaded.aiRest?.endpoints || DEFAULT_SETTINGS.aiRest.endpoints,
       },
       version: loaded.version || DEFAULT_SETTINGS.version,
       lastUpdated: loaded.lastUpdated || DEFAULT_SETTINGS.lastUpdated,
@@ -77,7 +85,10 @@ export class SettingsService {
   /**
    * Validate settings
    */
-  static validateSettings(settings: AppSettings): { isValid: boolean; errors: string[] } {
+  static validateSettings(settings: AppSettings): {
+    isValid: boolean;
+    errors: string[];
+  } {
     const errors: string[] = [];
 
     // Validate UML flows settings
@@ -94,7 +105,9 @@ export class SettingsService {
         errors.push(`AI endpoint ${index + 1}: URL is required`);
       }
       if (endpoint.enabled && !endpoint.apiKey?.trim()) {
-        errors.push(`AI endpoint ${index + 1}: API key is required when enabled`);
+        errors.push(
+          `AI endpoint ${index + 1}: API key is required when enabled`
+        );
       }
       if (endpoint.url && !this.isValidUrl(endpoint.url)) {
         errors.push(`AI endpoint ${index + 1}: Invalid URL format`);
@@ -135,7 +148,7 @@ export class SettingsService {
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json'
+        type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
 
@@ -162,7 +175,9 @@ export class SettingsService {
 
       const validation = this.validateSettings(imported);
       if (!validation.isValid) {
-        throw new Error(`Invalid settings file: ${validation.errors.join(', ')}`);
+        throw new Error(
+          `Invalid settings file: ${validation.errors.join(', ')}`
+        );
       }
 
       return this.mergeWithDefaults(imported);
@@ -194,7 +209,9 @@ export class SettingsService {
    */
   static saveLocalAITool(tool: LocalAITool): void {
     const settings = this.loadSettings();
-    const existingIndex = settings.localAI.tools.findIndex(t => t.id === tool.id);
+    const existingIndex = settings.localAI.tools.findIndex(
+      t => t.id === tool.id
+    );
 
     if (existingIndex >= 0) {
       settings.localAI.tools[existingIndex] = tool;
@@ -210,7 +227,9 @@ export class SettingsService {
    */
   static removeLocalAITool(toolId: string): void {
     const settings = this.loadSettings();
-    settings.localAI.tools = settings.localAI.tools.filter(t => t.id !== toolId);
+    settings.localAI.tools = settings.localAI.tools.filter(
+      t => t.id !== toolId
+    );
     this.saveSettings(settings);
   }
 
@@ -219,7 +238,9 @@ export class SettingsService {
    */
   static saveAIEndpoint(endpoint: AIEndpoint): void {
     const settings = this.loadSettings();
-    const existingIndex = settings.aiRest.endpoints.findIndex(e => e.id === endpoint.id);
+    const existingIndex = settings.aiRest.endpoints.findIndex(
+      e => e.id === endpoint.id
+    );
 
     if (existingIndex >= 0) {
       settings.aiRest.endpoints[existingIndex] = endpoint;
@@ -235,7 +256,9 @@ export class SettingsService {
    */
   static removeAIEndpoint(endpointId: string): void {
     const settings = this.loadSettings();
-    settings.aiRest.endpoints = settings.aiRest.endpoints.filter(e => e.id !== endpointId);
+    settings.aiRest.endpoints = settings.aiRest.endpoints.filter(
+      e => e.id !== endpointId
+    );
     this.saveSettings(settings);
   }
 

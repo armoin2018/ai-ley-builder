@@ -24,17 +24,17 @@ export interface TabOperations {
   createNewTab: (name?: string, path?: string) => Promise<string>;
   switchTab: (tabId: string) => void;
   closeTab: (tabId: string, forceDelete?: boolean) => Promise<void>;
-  
+
   // Tab operations
   renameTab: (tabId: string, newName: string) => Promise<void>;
   saveTab: (tabId: string) => Promise<void>;
   runTab: (tabId: string) => Promise<void>;
-  
+
   // Bulk operations
   loadTabsFromUML: () => Promise<void>;
   saveAllTabs: () => Promise<void>;
   closeAllTabs: () => Promise<void>;
-  
+
   // State management
   markTabModified: (tabId: string) => void;
   clearError: () => void;

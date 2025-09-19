@@ -4,7 +4,7 @@ import { BaseNode, type BaseNodeData } from './BaseNode';
 import { Badge, Input, Label } from '../../../../shared/components';
 import { useSettings } from '../../../../hooks/useSettings';
 import { useState } from 'react';
-import { Code, Play, Settings, Clock } from 'lucide-react';
+import { Clock, Code, Play, Settings } from 'lucide-react';
 
 export interface ScriptNodeData extends BaseNodeData {
   properties: {
@@ -27,11 +27,17 @@ export function ScriptNode(props: ScriptNodeProps) {
   const nodeData = data as unknown as ScriptNodeData;
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [scriptContent, setScriptContent] = useState(nodeData.properties?.script || '');
-  const [timeout, setTimeout] = useState(nodeData.properties?.timeout || settings.umlFlows.scriptNodes.defaultTimeout);
+  const [scriptContent, setScriptContent] = useState(
+    nodeData.properties?.script || ''
+  );
+  const [timeout, setTimeout] = useState(
+    nodeData.properties?.timeout || settings.umlFlows.scriptNodes.defaultTimeout
+  );
 
   // Find the executor configuration for this script type
-  const executor = settings.umlFlows.scriptNodes.executors.find(e => e.id === scriptType);
+  const executor = settings.umlFlows.scriptNodes.executors.find(
+    e => e.id === scriptType
+  );
 
   if (!executor) {
     return null; // Should not happen if settings are configured correctly
@@ -168,7 +174,9 @@ export function ScriptNode(props: ScriptNodeProps) {
               <span className="text-xs font-medium text-white/90">Script:</span>
             </div>
             <pre className="text-xs text-white/80 whitespace-pre-wrap break-words max-h-16 overflow-y-auto">
-              {scriptContent.length > 100 ? `${scriptContent.substring(0, 100)}...` : scriptContent}
+              {scriptContent.length > 100
+                ? `${scriptContent.substring(0, 100)}...`
+                : scriptContent}
             </pre>
           </div>
         )}
@@ -177,27 +185,38 @@ export function ScriptNode(props: ScriptNodeProps) {
         {isExpanded && (
           <div className="bg-black/20 rounded p-3 border border-white/20 space-y-3">
             <div className="space-y-2">
-              <Label htmlFor={`script-${id}`} className="text-xs font-medium text-white">
+              <Label
+                htmlFor={`script-${id}`}
+                className="text-xs font-medium text-white"
+              >
                 Script Code
               </Label>
               <textarea
                 id={`script-${id}`}
                 value={scriptContent}
-                onChange={(e) => handleScriptChange(e.target.value)}
+                onChange={e => handleScriptChange(e.target.value)}
                 placeholder={`Enter ${executor.name.toLowerCase()} code...`}
                 className="w-full h-20 text-xs bg-black/30 border border-white/30 rounded px-2 py-1 text-white placeholder-white/50 resize-none focus:outline-none focus:ring-1 focus:ring-white/50"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`timeout-${id}`} className="text-xs font-medium text-white">
+              <Label
+                htmlFor={`timeout-${id}`}
+                className="text-xs font-medium text-white"
+              >
                 Timeout (seconds)
               </Label>
               <Input
                 id={`timeout-${id}`}
                 type="number"
                 value={timeout}
-                onChange={(e) => handleTimeoutChange(parseInt(e.target.value) || settings.umlFlows.scriptNodes.defaultTimeout)}
+                onChange={e =>
+                  handleTimeoutChange(
+                    parseInt(e.target.value) ||
+                      settings.umlFlows.scriptNodes.defaultTimeout
+                  )
+                }
                 min="1"
                 max="300"
                 className="text-xs bg-black/30 border-white/30 text-white"
@@ -206,7 +225,9 @@ export function ScriptNode(props: ScriptNodeProps) {
 
             <div className="text-xs text-white/70 bg-black/20 rounded p-2">
               <div className="font-medium mb-1">Executor Command:</div>
-              <code className="text-white/90">{executor.command} {executor.args.join(' ')}</code>
+              <code className="text-white/90">
+                {executor.command} {executor.args.join(' ')}
+              </code>
             </div>
           </div>
         )}

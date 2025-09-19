@@ -1,14 +1,14 @@
 /**
- * Get the git root directory path
- * Uses environment variable or fallback for flexible deployment
+ * Get the git root directory path using git rev-parse --show-toplevel
+ * Environment variable is automatically set by build scripts using: git rev-parse --show-toplevel
  */
 export const getGitRoot = (): string => {
-  // Check if we have an environment variable for the git root
+  // Check if we have a runtime environment variable for the git root
   if (typeof window !== 'undefined' && (window as any).__AI_LEY_GIT_ROOT__) {
     return (window as any).__AI_LEY_GIT_ROOT__;
   }
 
-  // Check for Vite environment variable
+  // Primary source: Vite environment variable set from git rev-parse --show-toplevel
   if (import.meta.env && import.meta.env.VITE_AI_LEY_GIT_ROOT) {
     return import.meta.env.VITE_AI_LEY_GIT_ROOT;
   }
@@ -71,7 +71,7 @@ export const AI_LEY_PATHS = {
   },
   get PROMPTS() {
     return joinPath(this.SHARED, 'prompts');
-  }
+  },
 };
 
 /**
@@ -85,5 +85,5 @@ export const AI_LEY_DISPLAY_PATHS = {
   UML_FLOWS_USER: '.ai-ley/shared/uml-flows/user/',
   FLOWS: '.ai-ley/shared/flows/',
   FLOWS_BACKUP: '.ai-ley/shared/flows/backup/',
-  PROMPTS: '.ai-ley/shared/prompts/'
+  PROMPTS: '.ai-ley/shared/prompts/',
 };

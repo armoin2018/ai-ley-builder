@@ -19,12 +19,18 @@ import { WorkflowControls } from '@features/workflow';
 import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { ExecutionPanel } from '@features/execution/components/ExecutionPanel';
 import { CommandPalette, QuickActions, StatusBar } from '@features/ui-advanced';
-import { WorkflowTabs, WorkflowTabsProvider, SourceEditor, useWorkflowTabsContext } from '@features/tabs';
+import {
+  SourceEditor,
+  useWorkflowTabsContext,
+  WorkflowTabs,
+  WorkflowTabsProvider,
+} from '@features/tabs';
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import { PromptService } from './services/promptService';
-import { parsePlantUMLToFlow, flowToPlantUML } from './utils/plantuml-parser';
+import { flowToPlantUML, parsePlantUMLToFlow } from './utils/plantuml-parser';
 import { Settings } from './features/settings';
 import { AIDemo } from './components/ai';
+import { FileEditorTabs } from './features/file-editor';
 
 function AppContent() {
   const [showValidation, setShowValidation] = useState(false);
@@ -32,11 +38,12 @@ function AppContent() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showAIDemo, setShowAIDemo] = useState(false);
+  const [showFileEditor, setShowFileEditor] = useState(false);
   const [isSourceView, setIsSourceView] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
-  const { getNodes, getEdges, setNodes, setEdges, setViewport } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges, setViewport } =
+    useReactFlow();
   const { activeTab } = useWorkflowTabsContext();
-
 
   const nodes = getNodes();
   const edges = getEdges();
@@ -63,6 +70,9 @@ function AppContent() {
       case 'ai-demo':
         setShowAIDemo(true);
         break;
+      case 'file-editor':
+        setShowFileEditor(true);
+        break;
       default:
         console.log('Quick action:', action);
     }
@@ -84,24 +94,27 @@ function AppContent() {
   const handlePlantUMLUpdate = (content: string) => {
     try {
       console.log('Parsing PlantUML content and updating visual flow...');
-      
+
       // Parse PlantUML content to get nodes and edges
-      const { nodes: parsedNodes, edges: parsedEdges } = parsePlantUMLToFlow(content);
-      
+      const { nodes: parsedNodes, edges: parsedEdges } =
+        parsePlantUMLToFlow(content);
+
       console.log('Parsed nodes:', parsedNodes.length);
       console.log('Parsed edges:', parsedEdges.length);
-      
+
       // Update the React Flow canvas
       setNodes(parsedNodes);
       setEdges(parsedEdges);
-      
+
       // Reset viewport to center the new content
       setViewport({ x: 0, y: 0, zoom: 1 });
 
       console.log('Visual flow updated successfully from PlantUML');
     } catch (error) {
       console.error('Failed to parse PlantUML content:', error);
-      alert(`Failed to parse PlantUML content: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Failed to parse PlantUML content: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -112,24 +125,69 @@ function AppContent() {
       const currentNodes = getNodes();
       const currentEdges = getEdges();
 
+      // Clear existing timeout to avoid stacked updates
+      if (
+        typeof window !== 'undefined' &&
+        (window as any).visualUpdateTimeout
+      ) {
+        clearTimeout((window as any).visualUpdateTimeout);
+      }
+
       // Debounce updates to avoid too frequent regeneration
-      const timeoutId = setTimeout(() => {
-        if (currentNodes.length > 0 || currentEdges.length > 0) {
-          console.log('🔄 Auto-updating PlantUML from visual changes');
+      (window as any).visualUpdateTimeout = setTimeout(() => {
+        try {
+          if (currentNodes.length > 0 || currentEdges.length > 0) {
+            console.log('🔄 Auto-updating PlantUML from visual changes');
+            console.log('🖼️ Visual canvas state:', {
+              nodes: currentNodes.length,
+              edges: currentEdges.length,
+              tabName: activeTab.name,
+            });
 
-          const plantumlContent = flowToPlantUML(currentNodes, currentEdges, activeTab.name);
+            const plantumlContent = flowToPlantUML(
+              currentNodes,
+              currentEdges,
+              activeTab.name
+            );
 
-          // Store updated PlantUML content in localStorage for the active tab
-          if (activeTab.path) {
-            localStorage.setItem(`puml-content-${activeTab.path}`, plantumlContent);
+            // Store updated PlantUML content in localStorage for the active tab
+            if (activeTab.path) {
+              localStorage.setItem(
+                `puml-content-${activeTab.path}`,
+                plantumlContent
+              );
+            }
+            localStorage.setItem(
+              `puml-content-tab-plantuml-${activeTab.id}`,
+              plantumlContent
+            );
+
+            console.log(
+              '✅ PlantUML content updated automatically from visual changes'
+            );
+            console.log(
+              '📝 Generated PlantUML preview:',
+              `${plantumlContent.substring(0, 200)}...`
+            );
+          } else {
+            console.log('🔍 No nodes/edges to sync to PlantUML');
           }
-          localStorage.setItem(`puml-content-tab-plantuml-${activeTab.id}`, plantumlContent);
-
-          console.log('✅ PlantUML content updated automatically from visual changes');
+        } catch (error) {
+          console.error(
+            '❌ Failed to auto-update PlantUML from visual changes:',
+            error
+          );
         }
-      }, 1000); // 1 second debounce
+      }, 800); // Reduced to 800ms to match SourceEditor debounce timing
 
-      return () => clearTimeout(timeoutId);
+      return () => {
+        if (
+          typeof window !== 'undefined' &&
+          (window as any).visualUpdateTimeout
+        ) {
+          clearTimeout((window as any).visualUpdateTimeout);
+        }
+      };
     }
   }, [nodes, edges, isSourceView, activeTab, getNodes, getEdges]);
 
@@ -156,6 +214,10 @@ function AppContent() {
           case ',':
             event.preventDefault();
             setShowSettings(!showSettings);
+            break;
+          case 'f':
+            event.preventDefault();
+            setShowFileEditor(!showFileEditor);
             break;
         }
       }
@@ -223,6 +285,15 @@ function AppContent() {
       action: () => setShowAIDemo(!showAIDemo),
       keywords: ['ai', 'demo', 'cli', 'api', 'tools', 'test'],
     },
+    {
+      id: 'file-editor',
+      title: 'File Editor',
+      description: 'Open AI-LEY file editor for personas, instructions, and prompts',
+      category: 'Editor',
+      shortcut: '⌘⇧F',
+      action: () => setShowFileEditor(!showFileEditor),
+      keywords: ['file', 'editor', 'persona', 'instruction', 'prompt', 'plantuml'],
+    },
     // Add prompt commands dynamically from PromptService
     ...PromptService.getCommandPaletteEntries(),
   ];
@@ -244,16 +315,16 @@ function AppContent() {
           </div>
         </Header>
 
-        <WorkflowTabs 
+        <WorkflowTabs
           onViewModeChange={handleViewModeChange}
           isSourceView={isSourceView}
         />
 
         <ContentArea>
           {isSourceView ? (
-            <SourceEditor 
-              onUpdate={handlePlantUMLUpdate} 
-              className="flex-1" 
+            <SourceEditor
+              onUpdate={handlePlantUMLUpdate}
+              className="flex-1"
               refreshTrigger={lastSaved}
             />
           ) : (
@@ -311,22 +382,47 @@ function AppContent() {
         commands={commandPaletteCommands}
       />
 
-      <Settings
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
+      <Settings isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       {showAIDemo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-5/6 overflow-auto">
             <div className="flex items-center justify-between p-4 border-b border-slate-200">
-              <h2 className="text-xl font-semibold text-slate-900">AI Tools Demo</h2>
-              <Button variant="ghost" size="sm" onClick={() => setShowAIDemo(false)}>
+              <h2 className="text-xl font-semibold text-slate-900">
+                AI Tools Demo
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAIDemo(false)}
+              >
                 <X className="w-5 h-5" />
               </Button>
             </div>
             <div className="p-4">
               <AIDemo />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showFileEditor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-5/6 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200">
+              <h2 className="text-xl font-semibold text-slate-900">
+                AI-LEY File Editor
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFileEditor(false)}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="h-full">
+              <FileEditorTabs className="h-full" />
             </div>
           </div>
         </div>

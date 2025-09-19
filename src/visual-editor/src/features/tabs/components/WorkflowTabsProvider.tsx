@@ -8,7 +8,9 @@ const WorkflowTabsContext = createContext<UseWorkflowTabsReturn | null>(null);
 export function useWorkflowTabsContext() {
   const context = useContext(WorkflowTabsContext);
   if (!context) {
-    throw new Error('useWorkflowTabsContext must be used within WorkflowTabsProvider');
+    throw new Error(
+      'useWorkflowTabsContext must be used within WorkflowTabsProvider'
+    );
   }
   return context;
 }
@@ -31,7 +33,7 @@ export function WorkflowTabsProvider({ children }: WorkflowTabsProviderProps) {
   // Override the workflow save function to integrate with tabs
   useEffect(() => {
     const originalSave = workflow.saveWorkflow;
-    
+
     // Create a wrapper save function that also saves the active tab
     const wrappedSave = async (name?: string, description?: string) => {
       if (tabs.activeTabId) {

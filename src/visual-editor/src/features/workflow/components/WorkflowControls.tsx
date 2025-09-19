@@ -153,7 +153,7 @@ export function WorkflowControls({ className }: WorkflowControlsProps) {
           <input
             type="checkbox"
             checked={pumlAutoSaveEnabled}
-            onChange={(e) => {
+            onChange={e => {
               if (e.target.checked) {
                 enablePUMLAutoSave();
               } else {
@@ -162,7 +162,10 @@ export function WorkflowControls({ className }: WorkflowControlsProps) {
             }}
             className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
           />
-          <span className="text-slate-700" title="Automatically export to PlantUML when saving">
+          <span
+            className="text-slate-700"
+            title="Automatically export to PlantUML when saving"
+          >
             Auto PlantUML
           </span>
         </label>

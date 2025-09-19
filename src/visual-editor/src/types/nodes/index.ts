@@ -23,6 +23,15 @@ export const NodeType = {
   PYTHON_SCRIPT: 'python-script',
   PHP_SCRIPT: 'php-script',
   NODEJS_SCRIPT: 'nodejs-script',
+  // Local AI tool nodes
+  AI_LOCAL_OLLAMA: 'ai-local-ollama',
+  AI_LOCAL_LLAMACPP: 'ai-local-llamacpp',
+  AI_LOCAL_CLAUDE_CODE_CLI: 'ai-local-claude-code-cli',
+  AI_LOCAL_GITHUB_COPILOT_CLI: 'ai-local-github-copilot-cli',
+  AI_LOCAL_GEMINI_CODE_CLI: 'ai-local-gemini-code-cli',
+  // AI REST endpoint nodes
+  AI_REST_OPENAI: 'ai-rest-openai',
+  AI_REST_ANTHROPIC: 'ai-rest-anthropic',
   // Additional types for PlantUML compatibility
   CUSTOM_PROMPT: 'custom-prompt',
   INPUT: 'input',

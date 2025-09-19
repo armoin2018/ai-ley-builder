@@ -1,6 +1,6 @@
 import { Handle, type NodeProps, Position } from '@xyflow/react';
-import { BaseNode, type BaseNodeData } from './BaseNode';
 import { Badge } from '../../../../shared/components';
+import { BaseNode, type BaseNodeData } from './BaseNode';
 
 export interface LoopNodeData extends BaseNodeData {
   properties: {
@@ -51,16 +51,16 @@ export function LoopNode(props: NodeProps) {
       <BaseNode {...props} variant="loop" showHandles={false}>
         <div className="space-y-2">
           <div className="flex items-center gap-1">
-            <span className="text-xs font-medium">Type:</span>
-            <Badge variant="outline" className="text-xs py-0">
+            <span className="text-xs font-medium text-white">Type:</span>
+            <Badge variant="outline" className="text-xs py-0 text-white border-white/20">
               {loopType}
             </Badge>
           </div>
 
           {maxIterations && (
             <div className="flex items-center gap-1">
-              <span className="text-xs font-medium">Max:</span>
-              <Badge variant="secondary" className="text-xs py-0">
+              <span className="text-xs font-medium text-white">Max:</span>
+              <Badge variant="secondary" className="text-xs py-0 text-white border-white/20">
                 {maxIterations}
               </Badge>
             </div>
@@ -68,14 +68,14 @@ export function LoopNode(props: NodeProps) {
 
           {iteratorVariable && (
             <div className="space-y-1">
-              <span className="text-xs font-medium">Variable:</span>
-              <code className="text-xs bg-muted px-2 py-1 rounded block truncate">
+              <span className="text-xs font-medium text-white">Variable:</span>
+              <code className="text-xs bg-black/20 text-white px-2 py-1 rounded block truncate">
                 {iteratorVariable}
               </code>
             </div>
           )}
 
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-xs text-white">
             <span>🔄 Loop</span>
             <span>➡️ Next</span>
           </div>

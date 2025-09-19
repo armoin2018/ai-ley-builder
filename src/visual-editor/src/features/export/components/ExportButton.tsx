@@ -11,10 +11,10 @@ interface ExportButtonProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function ExportButton({ 
-  className, 
-  variant = 'outline', 
-  size = 'sm' 
+export function ExportButton({
+  className,
+  variant = 'outline',
+  size = 'sm',
 }: ExportButtonProps) {
   const { getNodes, getEdges } = useReactFlow();
 
@@ -22,7 +22,7 @@ export function ExportButton({
     try {
       const nodes = getNodes();
       const edges = getEdges();
-      
+
       const workflow = {
         name: 'AI-LEY Workflow',
         description: 'Visual workflow exported from AI-LEY Builder',
@@ -43,7 +43,9 @@ export function ExportButton({
       }
     } catch (error) {
       console.error('Export error:', error);
-      alert(`Export error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Export error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 

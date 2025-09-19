@@ -45,21 +45,24 @@ export class FileSystemService {
           id: 'default-assistant',
           name: 'Default Assistant',
           path: `${this.PERSONAS_DIR}default-assistant.md`,
-          content: 'You are a helpful AI assistant that provides clear, accurate, and concise responses.',
+          content:
+            'You are a helpful AI assistant that provides clear, accurate, and concise responses.',
           lastModified: new Date(),
         },
         {
           id: 'code-reviewer',
           name: 'Code Reviewer',
           path: `${this.PERSONAS_DIR}code-reviewer.md`,
-          content: 'You are an experienced software engineer focused on code quality, best practices, and identifying potential issues.',
+          content:
+            'You are an experienced software engineer focused on code quality, best practices, and identifying potential issues.',
           lastModified: new Date(),
         },
         {
           id: 'technical-writer',
           name: 'Technical Writer',
           path: `${this.PERSONAS_DIR}technical-writer.md`,
-          content: 'You are a technical writer who creates clear, comprehensive documentation and explanations.',
+          content:
+            'You are a technical writer who creates clear, comprehensive documentation and explanations.',
           lastModified: new Date(),
         },
       ];
@@ -86,28 +89,32 @@ export class FileSystemService {
           id: 'analyze-code',
           name: 'Analyze Code',
           path: `${this.INSTRUCTIONS_DIR}analyze-code.md`,
-          content: 'Analyze the provided code for potential issues, improvements, and best practices.',
+          content:
+            'Analyze the provided code for potential issues, improvements, and best practices.',
           lastModified: new Date(),
         },
         {
           id: 'write-tests',
           name: 'Write Tests',
           path: `${this.INSTRUCTIONS_DIR}write-tests.md`,
-          content: 'Write comprehensive unit tests for the provided code using appropriate testing frameworks.',
+          content:
+            'Write comprehensive unit tests for the provided code using appropriate testing frameworks.',
           lastModified: new Date(),
         },
         {
           id: 'optimize-performance',
           name: 'Optimize Performance',
           path: `${this.INSTRUCTIONS_DIR}optimize-performance.md`,
-          content: 'Review and suggest performance optimizations for the provided code.',
+          content:
+            'Review and suggest performance optimizations for the provided code.',
           lastModified: new Date(),
         },
         {
           id: 'refactor-clean',
           name: 'Refactor & Clean',
           path: `${this.INSTRUCTIONS_DIR}refactor-clean.md`,
-          content: 'Refactor the code to improve readability, maintainability, and follow clean code principles.',
+          content:
+            'Refactor the code to improve readability, maintainability, and follow clean code principles.',
           lastModified: new Date(),
         },
       ];
@@ -148,7 +155,9 @@ export class FileSystemService {
   /**
    * Save instruction files to storage (browser environment)
    */
-  static async saveInstructionFiles(instructions: InstructionFile[]): Promise<void> {
+  static async saveInstructionFiles(
+    instructions: InstructionFile[]
+  ): Promise<void> {
     try {
       localStorage.setItem('ai-ley-instructions', JSON.stringify(instructions));
     } catch (error) {
@@ -160,8 +169,14 @@ export class FileSystemService {
   /**
    * Create a new persona file
    */
-  static async createPersonaFile(name: string, content: string): Promise<PersonaFile> {
-    const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+  static async createPersonaFile(
+    name: string,
+    content: string
+  ): Promise<PersonaFile> {
+    const id = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-');
     const persona: PersonaFile = {
       id,
       name,
@@ -173,15 +188,21 @@ export class FileSystemService {
     const personas = await this.getPersonaFiles();
     personas.push(persona);
     await this.savePersonaFiles(personas);
-    
+
     return persona;
   }
 
   /**
    * Create a new instruction file
    */
-  static async createInstructionFile(name: string, content: string): Promise<InstructionFile> {
-    const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+  static async createInstructionFile(
+    name: string,
+    content: string
+  ): Promise<InstructionFile> {
+    const id = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-');
     const instruction: InstructionFile = {
       id,
       name,
@@ -193,17 +214,20 @@ export class FileSystemService {
     const instructions = await this.getInstructionFiles();
     instructions.push(instruction);
     await this.saveInstructionFiles(instructions);
-    
+
     return instruction;
   }
 
   /**
    * Update existing persona file
    */
-  static async updatePersonaFile(id: string, updates: Partial<Pick<PersonaFile, 'name' | 'content'>>): Promise<PersonaFile | null> {
+  static async updatePersonaFile(
+    id: string,
+    updates: Partial<Pick<PersonaFile, 'name' | 'content'>>
+  ): Promise<PersonaFile | null> {
     const personas = await this.getPersonaFiles();
     const index = personas.findIndex(p => p.id === id);
-    
+
     if (index === -1) {
       return null;
     }
@@ -221,10 +245,13 @@ export class FileSystemService {
   /**
    * Update existing instruction file
    */
-  static async updateInstructionFile(id: string, updates: Partial<Pick<InstructionFile, 'name' | 'content'>>): Promise<InstructionFile | null> {
+  static async updateInstructionFile(
+    id: string,
+    updates: Partial<Pick<InstructionFile, 'name' | 'content'>>
+  ): Promise<InstructionFile | null> {
     const instructions = await this.getInstructionFiles();
     const index = instructions.findIndex(i => i.id === id);
-    
+
     if (index === -1) {
       return null;
     }
@@ -245,7 +272,7 @@ export class FileSystemService {
   static async deletePersonaFile(id: string): Promise<boolean> {
     const personas = await this.getPersonaFiles();
     const filteredPersonas = personas.filter(p => p.id !== id);
-    
+
     if (filteredPersonas.length === personas.length) {
       return false; // No file found
     }
@@ -260,7 +287,7 @@ export class FileSystemService {
   static async deleteInstructionFile(id: string): Promise<boolean> {
     const instructions = await this.getInstructionFiles();
     const filteredInstructions = instructions.filter(i => i.id !== id);
-    
+
     if (filteredInstructions.length === instructions.length) {
       return false; // No file found
     }

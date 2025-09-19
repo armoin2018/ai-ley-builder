@@ -428,6 +428,305 @@ function performRelationalJoin(
   return result;
 }
 
+/**
+ * Local AI Executors
+ */
+export const ollamaNodeExecutor: NodeExecutor = {
+  nodeType: 'ai-local-ollama',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const model = properties.model || 'llama2';
+    const temperature = properties.temperature || 0.7;
+    const maxTokens = properties.maxTokens || 1000;
+
+    const prompt = inputs.prompt || '';
+    const contextInput = inputs.context || '';
+
+    // In a real implementation, this would call Ollama API
+    // For now, return a placeholder response
+    return `[Ollama ${model}] Response to: "${prompt}" with context: "${contextInput}"`;
+  },
+  timeout: 30000,
+};
+
+export const llamacppNodeExecutor: NodeExecutor = {
+  nodeType: 'ai-local-llamacpp',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const modelPath = properties.modelPath || 'models/llama-2-7b-chat.gguf';
+    const temperature = properties.temperature || 0.7;
+    const maxTokens = properties.maxTokens || 1000;
+
+    const prompt = inputs.prompt || '';
+    const contextInput = inputs.context || '';
+
+    // In a real implementation, this would call Llama.cpp Python bindings
+    // For now, return a placeholder response
+    return `[Llama.cpp ${modelPath}] Response to: "${prompt}" with context: "${contextInput}"`;
+  },
+  timeout: 30000,
+};
+
+export const claudeCodeCliExecutor: NodeExecutor = {
+  nodeType: 'ai-local-claude-code-cli',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const task = properties.task || 'ask';
+    const model = properties.model || 'claude-3-5-sonnet';
+    const project = properties.project;
+
+    const prompt = inputs.prompt || '';
+    const contextInput = inputs.context || '';
+
+    // In a real implementation, this would call Claude Code CLI
+    // Example: claude ask "How to implement this function?" --project=./my-project
+    return `[Claude Code CLI - ${task}] ${model} response to: "${prompt}" with context: "${contextInput}" ${project ? `in project: ${project}` : ''}`;
+  },
+  timeout: 60000,
+};
+
+export const githubCopilotCliExecutor: NodeExecutor = {
+  nodeType: 'ai-local-github-copilot-cli',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const command = properties.command || 'suggest';
+    const language = properties.language || 'auto';
+    const format = properties.format || 'text';
+
+    const prompt = inputs.prompt || '';
+    const codeContext = inputs.code || '';
+
+    // In a real implementation, this would call GitHub Copilot CLI
+    // Example: gh copilot suggest "write a function to sort an array"
+    return {
+      response: `[GitHub Copilot CLI - ${command}] Suggestion for: "${prompt}" in ${language}`,
+      suggestions: [
+        `// Generated ${language} code suggestion`,
+        `function example() { /* ${prompt} */ }`,
+      ],
+    };
+  },
+  timeout: 60000,
+};
+
+export const geminiCodeCliExecutor: NodeExecutor = {
+  nodeType: 'ai-local-gemini-code-cli',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const mode = properties.mode || 'chat';
+    const model = properties.model || 'gemini-pro';
+    const temperature = properties.temperature || 0.7;
+    const maxTokens = properties.maxTokens || 2048;
+
+    const prompt = inputs.prompt || '';
+    const codeContext = inputs.code || '';
+
+    // In a real implementation, this would call Gemini Code CLI
+    // Example: gemini code --mode=analyze "explain this function"
+    return {
+      response: `[Gemini Code CLI - ${mode}] ${model} response to: "${prompt}"`,
+      analysis: {
+        mode,
+        model,
+        temperature,
+        tokensUsed: Math.floor(Math.random() * maxTokens),
+        codeQuality: 'good',
+        suggestions: ['Consider adding error handling', 'Add type annotations'],
+      },
+    };
+  },
+  timeout: 60000,
+};
+
+/**
+ * AI REST Executors
+ */
+export const openaiNodeExecutor: NodeExecutor = {
+  nodeType: 'ai-rest-openai',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const model = properties.model || 'gpt-4';
+    const temperature = properties.temperature || 0.7;
+    const maxTokens = properties.maxTokens || 4096;
+    const apiKey = properties.apiKey;
+
+    const prompt = inputs.prompt || '';
+    const systemMessage = inputs.systemMessage || '';
+
+    if (!apiKey) {
+      throw new Error('OpenAI API key is required');
+    }
+
+    // In a real implementation, this would call OpenAI API
+    // For now, return a placeholder response
+    return {
+      response: `[OpenAI ${model}] Response to: "${prompt}" with system: "${systemMessage}"`,
+      usage: { promptTokens: 50, completionTokens: 100, totalTokens: 150 },
+    };
+  },
+  timeout: 60000,
+};
+
+export const anthropicNodeExecutor: NodeExecutor = {
+  nodeType: 'ai-rest-anthropic',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const model = properties.model || 'claude-3-sonnet-20240229';
+    const temperature = properties.temperature || 0.7;
+    const maxTokens = properties.maxTokens || 4096;
+    const apiKey = properties.apiKey;
+
+    const prompt = inputs.prompt || '';
+    const systemMessage = inputs.systemMessage || '';
+
+    if (!apiKey) {
+      throw new Error('Anthropic API key is required');
+    }
+
+    // In a real implementation, this would call Anthropic API
+    // For now, return a placeholder response
+    return {
+      response: `[Anthropic ${model}] Response to: "${prompt}" with system: "${systemMessage}"`,
+      usage: { inputTokens: 50, outputTokens: 100, totalTokens: 150 },
+    };
+  },
+  timeout: 60000,
+};
+
+/**
+ * Script Executors
+ */
+export const shellScriptExecutor: NodeExecutor = {
+  nodeType: 'script-shell',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const script = inputs.script || properties.script || '';
+    const workingDirectory = properties.workingDirectory;
+    const timeout = properties.timeout || 30;
+    const environment = properties.environment || {};
+
+    const inputData = inputs.input;
+
+    // In a real implementation, this would execute the shell script
+    // For now, return a placeholder response
+    return {
+      stdout: `[Shell Script] Executed: ${script.substring(0, 50)}... with input: ${JSON.stringify(inputData)}`,
+      stderr: '',
+      exitCode: 0,
+    };
+  },
+  timeout: 30000,
+};
+
+export const pythonScriptExecutor: NodeExecutor = {
+  nodeType: 'script-python',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const script = inputs.script || properties.script || '';
+    const pythonPath = properties.pythonPath || 'python3';
+    const timeout = properties.timeout || 30;
+    const requirements = properties.requirements || [];
+
+    const inputData = inputs.input;
+
+    // In a real implementation, this would execute the Python script
+    // For now, return a placeholder response
+    return {
+      stdout: `[Python Script] Executed: ${script.substring(0, 50)}... with input: ${JSON.stringify(inputData)}`,
+      stderr: '',
+      result: 'success',
+    };
+  },
+  timeout: 30000,
+};
+
+export const phpScriptExecutor: NodeExecutor = {
+  nodeType: 'script-php',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const script = inputs.script || properties.script || '';
+    const phpPath = properties.phpPath || 'php';
+    const timeout = properties.timeout || 30;
+
+    const inputData = inputs.input;
+
+    // In a real implementation, this would execute the PHP script
+    // For now, return a placeholder response
+    return {
+      stdout: `[PHP Script] Executed: ${script.substring(0, 50)}... with input: ${JSON.stringify(inputData)}`,
+      stderr: '',
+      result: 'success',
+    };
+  },
+  timeout: 30000,
+};
+
+export const nodejsScriptExecutor: NodeExecutor = {
+  nodeType: 'script-nodejs',
+  execute: async (
+    node: any,
+    inputs: Record<string, any>,
+    context: ExecutionContext
+  ) => {
+    const properties = node.data?.properties || {};
+    const script = inputs.script || properties.script || '';
+    const nodePath = properties.nodePath || 'node';
+    const timeout = properties.timeout || 30;
+    const modules = properties.modules || [];
+
+    const inputData = inputs.input;
+
+    // In a real implementation, this would execute the Node.js script
+    // For now, return a placeholder response
+    return {
+      stdout: `[Node.js Script] Executed: ${script.substring(0, 50)}... with input: ${JSON.stringify(inputData)}`,
+      stderr: '',
+      result: 'success',
+    };
+  },
+  timeout: 30000,
+};
+
 // Export all executors
 export const nodeExecutors: Record<string, NodeExecutor> = {
   input: inputNodeExecutor,
@@ -435,4 +734,21 @@ export const nodeExecutors: Record<string, NodeExecutor> = {
   transform: transformNodeExecutor,
   filter: filterNodeExecutor,
   join: joinNodeExecutor,
+
+  // Local AI executors
+  'ai-local-ollama': ollamaNodeExecutor,
+  'ai-local-llamacpp': llamacppNodeExecutor,
+  'ai-local-claude-code-cli': claudeCodeCliExecutor,
+  'ai-local-github-copilot-cli': githubCopilotCliExecutor,
+  'ai-local-gemini-code-cli': geminiCodeCliExecutor,
+
+  // AI REST executors
+  'ai-rest-openai': openaiNodeExecutor,
+  'ai-rest-anthropic': anthropicNodeExecutor,
+
+  // Script executors
+  'script-shell': shellScriptExecutor,
+  'script-python': pythonScriptExecutor,
+  'script-php': phpScriptExecutor,
+  'script-nodejs': nodejsScriptExecutor,
 };

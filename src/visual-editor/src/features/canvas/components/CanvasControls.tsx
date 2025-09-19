@@ -9,7 +9,16 @@ interface CanvasControlsProps {
 }
 
 export function CanvasControls({ className }: CanvasControlsProps) {
-  const { zoomIn, zoomOut, zoomTo, fitView, getZoom, getNodes, getEdges, setNodes } = useReactFlow();
+  const {
+    zoomIn,
+    zoomOut,
+    zoomTo,
+    fitView,
+    getZoom,
+    getNodes,
+    getEdges,
+    setNodes,
+  } = useReactFlow();
   const { settings } = useSettings();
 
   const handleZoomIn = useCallback(() => {
@@ -45,28 +54,34 @@ export function CanvasControls({ className }: CanvasControlsProps) {
       }
 
       // Import the auto-arrange utility dynamically
-      import('../../../utils/autoArrange').then(({ autoArrangeNodesWithAnimation }) => {
-        const { autoArrange } = settings.umlFlows;
-        const arrangedNodes = autoArrangeNodesWithAnimation(currentNodes, currentEdges, {
-          horizontalSpacing: autoArrange.horizontalSpacing,
-          verticalSpacing: autoArrange.verticalSpacing,
-          connectionSpacing: autoArrange.connectionSpacing,
-          enableConnectionAwareSpacing: autoArrange.enableConnectionAwareSpacing,
-          minSpacing: autoArrange.minSpacing,
-          enableCollisionDetection: autoArrange.enableCollisionDetection,
-          startX: 200,
-          startY: 100,
-          direction: 'top-to-bottom',
+      import('../../../utils/autoArrange')
+        .then(({ autoArrangeNodesWithAnimation }) => {
+          const { autoArrange } = settings.umlFlows;
+          const arrangedNodes = autoArrangeNodesWithAnimation(
+            currentNodes,
+            currentEdges,
+            {
+              horizontalSpacing: autoArrange.horizontalSpacing,
+              verticalSpacing: autoArrange.verticalSpacing,
+              connectionSpacing: autoArrange.connectionSpacing,
+              enableConnectionAwareSpacing:
+                autoArrange.enableConnectionAwareSpacing,
+              minSpacing: autoArrange.minSpacing,
+              enableCollisionDetection: autoArrange.enableCollisionDetection,
+              startX: 200,
+              startY: 100,
+              direction: 'top-to-bottom',
+            }
+          );
+
+          // Apply the new positions
+          setNodes(arrangedNodes);
+
+          console.log(`Auto arranged ${arrangedNodes.length} nodes`);
+        })
+        .catch(error => {
+          console.error('Failed to load auto-arrange utility:', error);
         });
-
-        // Apply the new positions
-        setNodes(arrangedNodes);
-
-        console.log(`Auto arranged ${arrangedNodes.length} nodes`);
-      }).catch(error => {
-        console.error('Failed to load auto-arrange utility:', error);
-      });
-
     } catch (error) {
       console.error('Auto arrange failed:', error);
     }

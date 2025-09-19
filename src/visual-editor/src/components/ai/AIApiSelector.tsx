@@ -1,15 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Globe, Send, TestTube, Clock, Check, X, AlertCircle, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import {
+  AlertCircle,
+  Check,
+  Clock,
+  Globe,
+  Send,
+  TestTube,
+  X,
+  Zap,
+} from 'lucide-react';
 import { Button, Input, Label } from '../../shared/components';
 import { cn } from '../../utils';
-import { AIApiService, type AIApiRequest, type AIApiResponse } from '../../services/aiApiService';
+import {
+  type AIApiRequest,
+  type AIApiResponse,
+  AIApiService,
+} from '../../services/aiApiService';
 import type { AIEndpoint } from '../../types/settings';
 
 interface AIApiSelectorProps {
   onResponse?: (response: AIApiResponse) => void;
   onStreamingChunk?: (chunk: string) => void;
   className?: string;
-  defaultMessages?: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
+  defaultMessages?: Array<{
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+  }>;
   showTestButton?: boolean;
   enableStreaming?: boolean;
 }
@@ -22,9 +38,14 @@ export function AIApiSelector({
   showTestButton = true,
   enableStreaming = false,
 }: AIApiSelectorProps) {
-  const [availableEndpoints, setAvailableEndpoints] = useState<AIEndpoint[]>([]);
+  const [availableEndpoints, setAvailableEndpoints] = useState<AIEndpoint[]>(
+    []
+  );
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('');
-  const [messages, setMessages] = useState<Array<{ role: 'system' | 'user' | 'assistant'; content: string }>>(defaultMessages);
+  const [messages, setMessages] =
+    useState<Array<{ role: 'system' | 'user' | 'assistant'; content: string }>>(
+      defaultMessages
+    );
   const [currentMessage, setCurrentMessage] = useState('');
   const [model, setModel] = useState('');
   const [maxTokens, setMaxTokens] = useState<number>(4096);
@@ -34,7 +55,9 @@ export function AIApiSelector({
   const [isTesting, setIsTesting] = useState<string | null>(null);
   const [lastResponse, setLastResponse] = useState<AIApiResponse | null>(null);
   const [streamingContent, setStreamingContent] = useState('');
-  const [testResults, setTestResults] = useState<Map<string, { success: boolean; message: string; responseTime?: number }>>(new Map());
+  const [testResults, setTestResults] = useState<
+    Map<string, { success: boolean; message: string; responseTime?: number }>
+  >(new Map());
 
   // Load available endpoints
   useEffect(() => {
@@ -101,7 +124,7 @@ export function AIApiSelector({
       };
 
       if (streaming && enableStreaming) {
-        await AIApiService.sendStreamingRequest(request, (chunk) => {
+        await AIApiService.sendStreamingRequest(request, chunk => {
           if (chunk.success && !chunk.finished) {
             setStreamingContent(prev => prev + chunk.content);
             onStreamingChunk?.(chunk.content);
@@ -139,7 +162,8 @@ export function AIApiSelector({
       const errorResponse: AIApiResponse = {
         success: false,
         content: '',
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
         executionTime: 0,
         endpointUsed: selectedEndpoint,
       };
@@ -158,31 +182,46 @@ export function AIApiSelector({
     setIsTesting(endpointId);
     try {
       const result = await AIApiService.testEndpoint(endpointId);
-      setTestResults(prev => new Map(prev).set(endpointId, {
-        success: result.success,
-        message: result.message,
-        responseTime: result.responseTime,
-      }));
+      setTestResults(prev =>
+        new Map(prev).set(endpointId, {
+          success: result.success,
+          message: result.message,
+          responseTime: result.responseTime,
+        })
+      );
     } catch (error) {
-      setTestResults(prev => new Map(prev).set(endpointId, {
-        success: false,
-        message: error instanceof Error ? error.message : 'Test failed',
-      }));
+      setTestResults(prev =>
+        new Map(prev).set(endpointId, {
+          success: false,
+          message: error instanceof Error ? error.message : 'Test failed',
+        })
+      );
     } finally {
       setIsTesting(null);
     }
   };
 
-  const selectedEndpointData = availableEndpoints.find(endpoint => endpoint.id === selectedEndpoint);
+  const selectedEndpointData = availableEndpoints.find(
+    endpoint => endpoint.id === selectedEndpoint
+  );
   const testResult = testResults.get(selectedEndpoint);
 
   return (
-    <div className={cn('space-y-4 p-4 border border-slate-200 rounded-lg bg-white', className)}>
+    <div
+      className={cn(
+        'space-y-4 p-4 border border-slate-200 rounded-lg bg-white',
+        className
+      )}
+    >
       <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
         <Globe className="w-5 h-5 text-purple-600" />
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">AI API Request Builder</h3>
-          <p className="text-sm text-slate-600">Send requests to configured AI API endpoints</p>
+          <h3 className="text-lg font-semibold text-slate-900">
+            AI API Request Builder
+          </h3>
+          <p className="text-sm text-slate-600">
+            Send requests to configured AI API endpoints
+          </p>
         </div>
       </div>
 
@@ -190,15 +229,19 @@ export function AIApiSelector({
         <div className="text-center py-8 text-slate-500">
           <Globe className="w-12 h-12 mx-auto mb-3 text-slate-300" />
           <p className="text-sm font-medium">No AI API endpoints configured</p>
-          <p className="text-xs">Configure endpoints in Settings → AI REST APIs to get started</p>
+          <p className="text-xs">
+            Configure endpoints in Settings → AI REST APIs to get started
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
           {/* Endpoint Selection */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Select AI Endpoint</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Select AI Endpoint
+            </Label>
             <div className="space-y-2">
-              {availableEndpoints.map((endpoint) => {
+              {availableEndpoints.map(endpoint => {
                 const isSelected = selectedEndpoint === endpoint.id;
                 const endpointTestResult = testResults.get(endpoint.id);
 
@@ -216,41 +259,52 @@ export function AIApiSelector({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-medium text-slate-900">{endpoint.name}</h4>
+                          <h4 className="text-sm font-medium text-slate-900">
+                            {endpoint.name}
+                          </h4>
                           <span className="px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600">
                             {endpoint.provider}
                           </span>
                           {endpointTestResult && (
-                            <span className={cn(
-                              'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
-                              endpointTestResult.success
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            )}>
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs',
+                                endpointTestResult.success
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-red-100 text-red-700'
+                              )}
+                            >
                               {endpointTestResult.success ? (
                                 <Check className="w-3 h-3" />
                               ) : (
                                 <X className="w-3 h-3" />
                               )}
-                              {endpointTestResult.success ? 'Available' : 'Error'}
+                              {endpointTestResult.success
+                                ? 'Available'
+                                : 'Error'}
                               {endpointTestResult.responseTime && (
-                                <span className="ml-1">({endpointTestResult.responseTime}ms)</span>
+                                <span className="ml-1">
+                                  ({endpointTestResult.responseTime}ms)
+                                </span>
                               )}
                             </span>
                           )}
                         </div>
                         <p className="text-xs text-slate-600 mt-1">
-                          Model: {endpoint.model || 'default'} • Max Tokens: {endpoint.maxTokens || 4096}
+                          Model: {endpoint.model || 'default'} • Max Tokens:{' '}
+                          {endpoint.maxTokens || 4096}
                         </p>
                         {endpointTestResult && !endpointTestResult.success && (
-                          <p className="text-xs text-red-600 mt-1">{endpointTestResult.message}</p>
+                          <p className="text-xs text-red-600 mt-1">
+                            {endpointTestResult.message}
+                          </p>
                         )}
                       </div>
                       {showTestButton && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleTestEndpoint(endpoint.id);
                           }}
@@ -275,25 +329,33 @@ export function AIApiSelector({
           {/* API Configuration */}
           {selectedEndpointData && (
             <div className="space-y-4 p-3 bg-slate-50 rounded-lg">
-              <h4 className="text-sm font-medium text-slate-700">Request Configuration</h4>
+              <h4 className="text-sm font-medium text-slate-700">
+                Request Configuration
+              </h4>
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="model" className="text-xs font-medium text-slate-600">
+                  <Label
+                    htmlFor="model"
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Model
                   </Label>
                   <Input
                     id="model"
                     type="text"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                    placeholder={selectedEndpointData.model || "default"}
+                    onChange={e => setModel(e.target.value)}
+                    placeholder={selectedEndpointData.model || 'default'}
                     className="text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="max-tokens" className="text-xs font-medium text-slate-600">
+                  <Label
+                    htmlFor="max-tokens"
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Max Tokens
                   </Label>
                   <Input
@@ -302,13 +364,18 @@ export function AIApiSelector({
                     min="1"
                     max="100000"
                     value={maxTokens}
-                    onChange={(e) => setMaxTokens(parseInt(e.target.value) || 4096)}
+                    onChange={e =>
+                      setMaxTokens(parseInt(e.target.value) || 4096)
+                    }
                     className="text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="temperature" className="text-xs font-medium text-slate-600">
+                  <Label
+                    htmlFor="temperature"
+                    className="text-xs font-medium text-slate-600"
+                  >
                     Temperature
                   </Label>
                   <Input
@@ -318,7 +385,9 @@ export function AIApiSelector({
                     max="2"
                     step="0.1"
                     value={temperature}
-                    onChange={(e) => setTemperature(parseFloat(e.target.value) || 0.7)}
+                    onChange={e =>
+                      setTemperature(parseFloat(e.target.value) || 0.7)
+                    }
                     className="text-sm"
                   />
                 </div>
@@ -328,19 +397,30 @@ export function AIApiSelector({
 
           {/* Messages */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Messages</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Messages
+            </Label>
 
             {/* Existing Messages */}
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {messages.map((message, index) => (
-                <div key={index} className="p-2 border border-slate-200 rounded bg-slate-50">
+                <div
+                  key={index}
+                  className="p-2 border border-slate-200 rounded bg-slate-50"
+                >
                   <div className="flex items-center justify-between mb-1">
-                    <span className={cn(
-                      'text-xs font-medium',
-                      message.role === 'system' ? 'text-blue-600' :
-                      message.role === 'user' ? 'text-green-600' : 'text-purple-600'
-                    )}>
-                      {message.role.charAt(0).toUpperCase() + message.role.slice(1)}
+                    <span
+                      className={cn(
+                        'text-xs font-medium',
+                        message.role === 'system'
+                          ? 'text-blue-600'
+                          : message.role === 'user'
+                            ? 'text-green-600'
+                            : 'text-purple-600'
+                      )}
+                    >
+                      {message.role.charAt(0).toUpperCase() +
+                        message.role.slice(1)}
                     </span>
                     <Button
                       variant="ghost"
@@ -360,7 +440,7 @@ export function AIApiSelector({
             <div className="flex gap-2">
               <textarea
                 value={currentMessage}
-                onChange={(e) => setCurrentMessage(e.target.value)}
+                onChange={e => setCurrentMessage(e.target.value)}
                 placeholder="Type your message here..."
                 rows={3}
                 className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-vertical"
@@ -381,7 +461,9 @@ export function AIApiSelector({
           <div className="flex items-center gap-2">
             <Button
               onClick={() => handleSendRequest(false)}
-              disabled={!selectedEndpoint || messages.length === 0 || isExecuting}
+              disabled={
+                !selectedEndpoint || messages.length === 0 || isExecuting
+              }
               className="flex items-center gap-2"
             >
               {isExecuting && !isStreaming ? (
@@ -395,7 +477,9 @@ export function AIApiSelector({
             {enableStreaming && (
               <Button
                 onClick={() => handleSendRequest(true)}
-                disabled={!selectedEndpoint || messages.length === 0 || isExecuting}
+                disabled={
+                  !selectedEndpoint || messages.length === 0 || isExecuting
+                }
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -419,7 +503,9 @@ export function AIApiSelector({
           {/* Streaming Content */}
           {isStreaming && streamingContent && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">Streaming Response</Label>
+              <Label className="text-sm font-medium text-slate-700">
+                Streaming Response
+              </Label>
               <div className="p-3 border border-blue-200 bg-blue-50 rounded-lg">
                 <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono overflow-auto max-h-48">
                   {streamingContent}
@@ -432,13 +518,17 @@ export function AIApiSelector({
           {/* Response Display */}
           {lastResponse && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-700">Response</Label>
-              <div className={cn(
-                'p-3 border rounded-lg',
-                lastResponse.success
-                  ? 'border-green-200 bg-green-50'
-                  : 'border-red-200 bg-red-50'
-              )}>
+              <Label className="text-sm font-medium text-slate-700">
+                Response
+              </Label>
+              <div
+                className={cn(
+                  'p-3 border rounded-lg',
+                  lastResponse.success
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-red-200 bg-red-50'
+                )}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     {lastResponse.success ? (
@@ -451,11 +541,15 @@ export function AIApiSelector({
                     </span>
                   </div>
                   <div className="text-xs text-slate-500 flex items-center gap-2">
-                    <span>{lastResponse.executionTime}ms • {lastResponse.endpointUsed}</span>
+                    <span>
+                      {lastResponse.executionTime}ms •{' '}
+                      {lastResponse.endpointUsed}
+                    </span>
                     {lastResponse.usage && (
                       <span>
-                        {lastResponse.usage.totalTokens} tokens
-                        ({lastResponse.usage.promptTokens}+{lastResponse.usage.completionTokens})
+                        {lastResponse.usage.totalTokens} tokens (
+                        {lastResponse.usage.promptTokens}+
+                        {lastResponse.usage.completionTokens})
                       </span>
                     )}
                   </div>

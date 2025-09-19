@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AICliToolSelector } from './AICliToolSelector';
 import { AIApiSelector } from './AIApiSelector';
-import { Bot, Terminal, Globe } from 'lucide-react';
+import { Bot, Globe, Terminal } from 'lucide-react';
 import { Button } from '../../shared/components';
 import { cn } from '../../utils';
 import type { AICliResponse } from '../../services/aiCliService';
@@ -33,11 +33,14 @@ export function AIDemo() {
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-3">
           <Bot className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-slate-900">AI Integration Demo</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            AI Integration Demo
+          </h1>
         </div>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          Demonstrate the AI CLI Tools and API endpoints configured in your settings.
-          Test local AI tools like Ollama or cloud APIs like OpenAI/Anthropic.
+          Demonstrate the AI CLI Tools and API endpoints configured in your
+          settings. Test local AI tools like Ollama or cloud APIs like
+          OpenAI/Anthropic.
         </p>
       </div>
 
@@ -77,12 +80,16 @@ export function AIDemo() {
 
             {/* CLI Response Display */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-900">CLI Response</h3>
+              <h3 className="text-lg font-semibold text-slate-900">
+                CLI Response
+              </h3>
               {cliResponse ? (
                 <div className="p-4 border border-slate-200 rounded-lg bg-slate-50">
                   <div className="mb-3">
                     <div className="flex items-center justify-between">
-                      <span className={`font-medium ${cliResponse.success ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`font-medium ${cliResponse.success ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {cliResponse.success ? '✅ Success' : '❌ Error'}
                       </span>
                       <span className="text-sm text-slate-500">
@@ -92,7 +99,9 @@ export function AIDemo() {
                   </div>
 
                   {cliResponse.error ? (
-                    <div className="text-red-700 text-sm">{cliResponse.error}</div>
+                    <div className="text-red-700 text-sm">
+                      {cliResponse.error}
+                    </div>
                   ) : (
                     <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-white p-3 rounded border overflow-auto max-h-96">
                       {cliResponse.output}
@@ -119,12 +128,14 @@ export function AIDemo() {
               defaultMessages={[
                 {
                   role: 'system',
-                  content: 'You are a helpful AI assistant. Respond concisely and helpfully.'
+                  content:
+                    'You are a helpful AI assistant. Respond concisely and helpfully.',
                 },
                 {
                   role: 'user',
-                  content: 'Hello! Can you explain what you are and what you can help me with?'
-                }
+                  content:
+                    'Hello! Can you explain what you are and what you can help me with?',
+                },
               ]}
               showTestButton={true}
               enableStreaming={true}
@@ -132,14 +143,19 @@ export function AIDemo() {
 
             {/* API Response Display */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-900">API Response</h3>
+              <h3 className="text-lg font-semibold text-slate-900">
+                API Response
+              </h3>
 
               {/* Streaming Content */}
               {streamingContent && (
                 <div className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-                  <h4 className="text-sm font-medium text-blue-700 mb-2">Streaming Response</h4>
+                  <h4 className="text-sm font-medium text-blue-700 mb-2">
+                    Streaming Response
+                  </h4>
                   <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-white p-3 rounded border overflow-auto max-h-48">
-                    {streamingContent}<span className="animate-pulse">|</span>
+                    {streamingContent}
+                    <span className="animate-pulse">|</span>
                   </pre>
                 </div>
               )}
@@ -148,22 +164,27 @@ export function AIDemo() {
                 <div className="p-4 border border-slate-200 rounded-lg bg-slate-50">
                   <div className="mb-3">
                     <div className="flex items-center justify-between">
-                      <span className={`font-medium ${apiResponse.success ? 'text-green-600' : 'text-red-600'}`}>
+                      <span
+                        className={`font-medium ${apiResponse.success ? 'text-green-600' : 'text-red-600'}`}
+                      >
                         {apiResponse.success ? '✅ Success' : '❌ Error'}
                       </span>
                       <div className="text-sm text-slate-500 flex items-center gap-2">
-                        <span>{apiResponse.executionTime}ms • {apiResponse.endpointUsed}</span>
+                        <span>
+                          {apiResponse.executionTime}ms •{' '}
+                          {apiResponse.endpointUsed}
+                        </span>
                         {apiResponse.usage && (
-                          <span>
-                            {apiResponse.usage.totalTokens} tokens
-                          </span>
+                          <span>{apiResponse.usage.totalTokens} tokens</span>
                         )}
                       </div>
                     </div>
                   </div>
 
                   {apiResponse.error ? (
-                    <div className="text-red-700 text-sm">{apiResponse.error}</div>
+                    <div className="text-red-700 text-sm">
+                      {apiResponse.error}
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-white p-3 rounded border overflow-auto max-h-96">
@@ -172,7 +193,10 @@ export function AIDemo() {
 
                       {apiResponse.usage && (
                         <div className="text-xs text-slate-500 bg-white p-2 rounded border">
-                          <strong>Token Usage:</strong> {apiResponse.usage.promptTokens} prompt + {apiResponse.usage.completionTokens} completion = {apiResponse.usage.totalTokens} total
+                          <strong>Token Usage:</strong>{' '}
+                          {apiResponse.usage.promptTokens} prompt +{' '}
+                          {apiResponse.usage.completionTokens} completion ={' '}
+                          {apiResponse.usage.totalTokens} total
                         </div>
                       )}
                     </div>

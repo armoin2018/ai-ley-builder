@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Search, FileText } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, FileText, Search } from 'lucide-react';
 import { cn } from '../../utils';
-import { PromptService, type PromptFile } from '../../services/promptService';
+import { type PromptFile, PromptService } from '../../services/promptService';
 
 interface PromptDropdownProps {
   onSelect: (prompt: PromptFile) => void;
@@ -10,11 +10,11 @@ interface PromptDropdownProps {
   selectedPromptId?: string;
 }
 
-export function PromptDropdown({ 
-  onSelect, 
-  placeholder = 'Select a prompt...', 
+export function PromptDropdown({
+  onSelect,
+  placeholder = 'Select a prompt...',
   className,
-  selectedPromptId
+  selectedPromptId,
 }: PromptDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,23 +36,31 @@ export function PromptDropdown({
   }, [selectedPromptId]);
 
   // Filter prompts based on search query
-  const filteredPrompts = searchQuery.trim() 
+  const filteredPrompts = searchQuery.trim()
     ? PromptService.searchPrompts(searchQuery)
     : allPrompts;
 
   // Group prompts by category
-  const groupedPrompts = categories.reduce((acc, category) => {
-    const promptsInCategory = filteredPrompts.filter(prompt => prompt.category === category);
-    if (promptsInCategory.length > 0) {
-      acc[category] = promptsInCategory;
-    }
-    return acc;
-  }, {} as Record<string, PromptFile[]>);
+  const groupedPrompts = categories.reduce(
+    (acc, category) => {
+      const promptsInCategory = filteredPrompts.filter(
+        prompt => prompt.category === category
+      );
+      if (promptsInCategory.length > 0) {
+        acc[category] = promptsInCategory;
+      }
+      return acc;
+    },
+    {} as Record<string, PromptFile[]>
+  );
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchQuery('');
       }
@@ -98,26 +106,34 @@ export function PromptDropdown({
       >
         <div className="flex items-center gap-2 min-w-0">
           <FileText className="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" />
-          <span className={cn(
-            'truncate',
-            selectedPrompt ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400'
-          )}>
+          <span
+            className={cn(
+              'truncate',
+              selectedPrompt
+                ? 'text-slate-900 dark:text-slate-100'
+                : 'text-slate-500 dark:text-slate-400'
+            )}
+          >
             {selectedPrompt ? selectedPrompt.displayName : placeholder}
           </span>
         </div>
-        <ChevronDown className={cn(
-          'w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform flex-shrink-0',
-          isOpen && 'rotate-180'
-        )} />
+        <ChevronDown
+          className={cn(
+            'w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform flex-shrink-0',
+            isOpen && 'rotate-180'
+          )}
+        />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className={cn(
-          'absolute top-full left-0 right-0 mt-1 z-50',
-          'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-          'rounded-md shadow-lg max-h-80 overflow-hidden'
-        )}>
+        <div
+          className={cn(
+            'absolute top-full left-0 right-0 mt-1 z-50',
+            'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
+            'rounded-md shadow-lg max-h-80 overflow-hidden'
+          )}
+        >
           {/* Search Input */}
           <div className="p-3 border-b border-slate-200 dark:border-slate-700">
             <div className="relative">
@@ -127,7 +143,7 @@ export function PromptDropdown({
                 type="text"
                 placeholder="Search prompts..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className={cn(
                   'w-full pl-10 pr-3 py-2 text-sm',
                   'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600',
@@ -153,9 +169,9 @@ export function PromptDropdown({
                       {category} ({prompts.length})
                     </div>
                   )}
-                  
+
                   {/* Prompts in Category */}
-                  {prompts.map((prompt) => (
+                  {prompts.map(prompt => (
                     <button
                       key={prompt.id}
                       onClick={() => handlePromptSelect(prompt)}

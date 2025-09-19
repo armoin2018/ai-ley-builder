@@ -310,7 +310,9 @@ export class PlantUMLStorageProvider implements WorkflowStorageProvider {
       return workflow.id;
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to save workflow as PlantUML: ${error.message}`);
+        throw new Error(
+          `Failed to save workflow as PlantUML: ${error.message}`
+        );
       }
       throw new Error('Failed to save workflow as PlantUML: Unknown error');
     }
@@ -318,7 +320,9 @@ export class PlantUMLStorageProvider implements WorkflowStorageProvider {
 
   async load(_id: string): Promise<SerializedWorkflow> {
     // PlantUML import is not yet implemented
-    throw new Error('PlantUML import not yet implemented - use importFromPUML method instead');
+    throw new Error(
+      'PlantUML import not yet implemented - use importFromPUML method instead'
+    );
   }
 
   async list(): Promise<WorkflowMetadata[]> {
@@ -327,7 +331,9 @@ export class PlantUMLStorageProvider implements WorkflowStorageProvider {
   }
 
   async delete(_id: string): Promise<void> {
-    throw new Error('PlantUML file deletion not supported in browser environment');
+    throw new Error(
+      'PlantUML file deletion not supported in browser environment'
+    );
   }
 
   async exists(_id: string): Promise<boolean> {

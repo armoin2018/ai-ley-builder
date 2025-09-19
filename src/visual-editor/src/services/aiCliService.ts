@@ -72,7 +72,9 @@ export class AICliService {
       // Validate tool exists and is enabled
       const tool = this.getTool(request.toolId);
       if (!tool) {
-        throw new Error(`AI CLI tool '${request.toolId}' not found or not enabled`);
+        throw new Error(
+          `AI CLI tool '${request.toolId}' not found or not enabled`
+        );
       }
 
       // In browser environment, we can't execute CLI commands directly
@@ -97,12 +99,12 @@ export class AICliService {
         executionTime: Date.now() - startTime,
         toolUsed: tool.name,
       };
-
     } catch (error) {
       return {
         success: false,
         output: '',
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
         executionTime: Date.now() - startTime,
         toolUsed: request.toolId,
       };
@@ -147,7 +149,6 @@ export class AICliService {
         message: `Tool '${tool.name}' is available`,
         version: testResult.output.trim(),
       };
-
     } catch (error) {
       return {
         success: false,
@@ -211,7 +212,8 @@ export class AICliService {
         toolStats.successfulCalls += 1;
       }
       toolStats.totalExecutionTime += executionTime;
-      toolStats.averageExecutionTime = toolStats.totalExecutionTime / toolStats.totalCalls;
+      toolStats.averageExecutionTime =
+        toolStats.totalExecutionTime / toolStats.totalCalls;
       toolStats.lastUsed = new Date().toISOString();
 
       existingStats[toolId] = toolStats;
@@ -224,7 +226,10 @@ export class AICliService {
   /**
    * Build command arguments for the AI tool
    */
-  private static buildCommandArgs(tool: LocalAITool, request: AICliRequest): string[] {
+  private static buildCommandArgs(
+    tool: LocalAITool,
+    request: AICliRequest
+  ): string[] {
     const args = [...tool.args];
 
     // Add model if specified and tool supports it
@@ -246,9 +251,10 @@ export class AICliService {
   private static toolSupportsModel(tool: LocalAITool): boolean {
     // Common patterns for tools that support model specification
     const modelSupportingTools = ['ollama', 'llama', 'gpt4all'];
-    return modelSupportingTools.some(pattern =>
-      tool.command.toLowerCase().includes(pattern) ||
-      tool.name.toLowerCase().includes(pattern)
+    return modelSupportingTools.some(
+      pattern =>
+        tool.command.toLowerCase().includes(pattern) ||
+        tool.name.toLowerCase().includes(pattern)
     );
   }
 
@@ -333,7 +339,9 @@ export class AICliService {
     startTime: number
   ): Promise<AICliResponse> {
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1500));
+    await new Promise(resolve =>
+      setTimeout(resolve, 500 + Math.random() * 1500)
+    );
 
     const executionTime = Date.now() - startTime;
     this.recordUsage(tool.id, tool.name, true, executionTime);

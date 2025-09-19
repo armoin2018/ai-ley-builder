@@ -1,6 +1,6 @@
 import { type NodeProps } from '@xyflow/react';
-import { BaseNode, type BaseNodeData } from './BaseNode';
 import { Badge } from '../../../../shared/components';
+import { BaseNode, type BaseNodeData } from './BaseNode';
 
 export interface PersonaNodeData extends BaseNodeData {
   properties: {
@@ -18,19 +18,9 @@ export function PersonaNode(props: NodeProps) {
   const expertise = (nodeData.properties?.expertise as string[]) || [];
   const tone = nodeData.properties?.tone || 'professional';
 
-  const getToneColor = (toneValue: string) => {
-    switch (toneValue) {
-      case 'professional':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'casual':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'formal':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'friendly':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
+  const getToneColor = () => {
+    // All badges should use white text for consistency
+    return 'text-white border-white/20';
   };
 
   return (
@@ -38,8 +28,8 @@ export function PersonaNode(props: NodeProps) {
       <div className="space-y-2">
         {personaType && (
           <div className="flex items-center gap-1">
-            <span className="text-xs font-medium">Role:</span>
-            <Badge variant="outline" className="text-xs py-0">
+            <span className="text-xs font-medium text-white">Role:</span>
+            <Badge variant="outline" className="text-xs py-0 text-white border-white/20">
               {personaType}
             </Badge>
           </div>
@@ -47,9 +37,9 @@ export function PersonaNode(props: NodeProps) {
 
         {tone && (
           <div className="flex items-center gap-1">
-            <span className="text-xs font-medium">Tone:</span>
+            <span className="text-xs font-medium text-white">Tone:</span>
             <Badge
-              className={`text-xs py-0 ${getToneColor(tone)}`}
+              className={`text-xs py-0 ${getToneColor()}`}
               variant="outline"
             >
               {tone}
@@ -59,23 +49,22 @@ export function PersonaNode(props: NodeProps) {
 
         {expertise.length > 0 && (
           <div className="space-y-1">
-            <span className="text-xs font-medium">Expertise:</span>
+            <span className="text-xs font-medium text-white">Expertise:</span>
             <div className="flex flex-wrap gap-1">
-              {expertise.slice(0, 2).map((skill, index) => (
-                <Badge key={index} variant="secondary" className="text-xs py-0">
-                  {skill}
+              {expertise.map((item, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="text-xs py-0 text-white border-white/20"
+                >
+                  {item}
                 </Badge>
               ))}
-              {expertise.length > 2 && (
-                <Badge variant="secondary" className="text-xs py-0">
-                  +{expertise.length - 2}
-                </Badge>
-              )}
             </div>
           </div>
         )}
 
-        <div className="flex items-center text-xs text-muted-foreground">
+        <div className="flex items-center text-xs text-white">
           <span>👤 AI Persona</span>
         </div>
       </div>

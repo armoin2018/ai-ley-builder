@@ -1,4 +1,4 @@
-import type { Node, Edge } from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 import { CANVAS_CONFIG } from '../constants';
 
 export interface ArrangeOptions {
@@ -36,8 +36,10 @@ export class AutoArrangeEngine {
     this.nodes = [...nodes];
     this.edges = [...edges];
     this.options = {
-      horizontalSpacing: options.horizontalSpacing ?? CANVAS_CONFIG.NODE_WIDTH + 100,
-      verticalSpacing: options.verticalSpacing ?? CANVAS_CONFIG.NODE_HEIGHT + 60,
+      horizontalSpacing:
+        options.horizontalSpacing ?? CANVAS_CONFIG.NODE_WIDTH + 100,
+      verticalSpacing:
+        options.verticalSpacing ?? CANVAS_CONFIG.NODE_HEIGHT + 60,
       startX: options.startX ?? 100,
       startY: options.startY ?? 100,
       direction: options.direction ?? 'top-to-bottom',
@@ -45,7 +47,8 @@ export class AutoArrangeEngine {
       minSpacing: options.minSpacing ?? 50,
       maxIterations: options.maxIterations ?? 100,
       connectionSpacing: options.connectionSpacing ?? 50,
-      enableConnectionAwareSpacing: options.enableConnectionAwareSpacing ?? true,
+      enableConnectionAwareSpacing:
+        options.enableConnectionAwareSpacing ?? true,
     };
   }
 
@@ -141,11 +144,18 @@ export class AutoArrangeEngine {
 
     layers.forEach((layer, layerIndex) => {
       // Sort nodes in layer to minimize edge crossings
-      const sortedNodes = this.sortNodesInLayer(layer.nodes, layerIndex > 0 ? layers[layerIndex - 1] : null);
+      const sortedNodes = this.sortNodesInLayer(
+        layer.nodes,
+        layerIndex > 0 ? layers[layerIndex - 1] : null
+      );
 
       // Calculate positions for nodes in this layer
       sortedNodes.forEach((node, nodeIndex) => {
-        const position = this.calculateNodePosition(layerIndex, nodeIndex, sortedNodes.length);
+        const position = this.calculateNodePosition(
+          layerIndex,
+          nodeIndex,
+          sortedNodes.length
+        );
         nodePositions.set(node.id, position);
       });
     });
@@ -164,7 +174,10 @@ export class AutoArrangeEngine {
   /**
    * Sort nodes within a layer to minimize edge crossings
    */
-  private sortNodesInLayer(nodes: Node[], previousLayer: NodeLayer | null): Node[] {
+  private sortNodesInLayer(
+    nodes: Node[],
+    previousLayer: NodeLayer | null
+  ): Node[] {
     if (!previousLayer || nodes.length <= 1) {
       return [...nodes];
     }
@@ -174,15 +187,18 @@ export class AutoArrangeEngine {
 
     nodes.forEach(node => {
       const parentEdges = this.edges.filter(e => e.target === node.id);
-      const parentNodes = parentEdges.map(e =>
-        previousLayer.nodes.find(n => n.id === e.source)
-      ).filter(Boolean) as Node[];
+      const parentNodes = parentEdges
+        .map(e => previousLayer.nodes.find(n => n.id === e.source))
+        .filter(Boolean) as Node[];
 
       if (parentNodes.length > 0) {
-        const avgPosition = parentNodes.reduce((sum, parent, index) => {
-          const parentIndex = previousLayer.nodes.findIndex(n => n.id === parent.id);
-          return sum + parentIndex;
-        }, 0) / parentNodes.length;
+        const avgPosition =
+          parentNodes.reduce((sum, parent, index) => {
+            const parentIndex = previousLayer.nodes.findIndex(
+              n => n.id === parent.id
+            );
+            return sum + parentIndex;
+          }, 0) / parentNodes.length;
         nodeParentPositions.set(node.id, avgPosition);
       } else {
         // No parents - place at end
@@ -201,15 +217,21 @@ export class AutoArrangeEngine {
   /**
    * Calculate the position for a specific node
    */
-  private calculateNodePosition(layerIndex: number, nodeIndex: number, totalNodesInLayer: number): NodePosition {
+  private calculateNodePosition(
+    layerIndex: number,
+    nodeIndex: number,
+    totalNodesInLayer: number
+  ): NodePosition {
     if (this.options.direction === 'left-to-right') {
       const baseHorizontalSpacing = this.options.enableConnectionAwareSpacing
         ? this.options.horizontalSpacing + this.options.connectionSpacing
         : this.options.horizontalSpacing;
 
       return {
-        x: this.options.startX + (layerIndex * baseHorizontalSpacing),
-        y: this.options.startY + this.calculateVerticalOffset(nodeIndex, totalNodesInLayer),
+        x: this.options.startX + layerIndex * baseHorizontalSpacing,
+        y:
+          this.options.startY +
+          this.calculateVerticalOffset(nodeIndex, totalNodesInLayer),
       };
     } else {
       // top-to-bottom
@@ -218,8 +240,10 @@ export class AutoArrangeEngine {
         : this.options.verticalSpacing;
 
       return {
-        x: this.options.startX + this.calculateHorizontalOffset(nodeIndex, totalNodesInLayer),
-        y: this.options.startY + (layerIndex * baseVerticalSpacing),
+        x:
+          this.options.startX +
+          this.calculateHorizontalOffset(nodeIndex, totalNodesInLayer),
+        y: this.options.startY + layerIndex * baseVerticalSpacing,
       };
     }
   }
@@ -227,23 +251,29 @@ export class AutoArrangeEngine {
   /**
    * Calculate horizontal offset for centering nodes in a layer
    */
-  private calculateHorizontalOffset(nodeIndex: number, totalNodes: number): number {
+  private calculateHorizontalOffset(
+    nodeIndex: number,
+    totalNodes: number
+  ): number {
     if (totalNodes === 1) return 0;
 
     const totalWidth = (totalNodes - 1) * this.options.horizontalSpacing;
     const startOffset = -totalWidth / 2;
-    return startOffset + (nodeIndex * this.options.horizontalSpacing);
+    return startOffset + nodeIndex * this.options.horizontalSpacing;
   }
 
   /**
    * Calculate vertical offset for centering nodes in a layer
    */
-  private calculateVerticalOffset(nodeIndex: number, totalNodes: number): number {
+  private calculateVerticalOffset(
+    nodeIndex: number,
+    totalNodes: number
+  ): number {
     if (totalNodes === 1) return 0;
 
     const totalHeight = (totalNodes - 1) * this.options.verticalSpacing;
     const startOffset = -totalHeight / 2;
-    return startOffset + (nodeIndex * this.options.verticalSpacing);
+    return startOffset + nodeIndex * this.options.verticalSpacing;
   }
 
   /**
@@ -260,8 +290,8 @@ export class AutoArrangeEngine {
       const col = index % cols;
 
       node.position = {
-        x: this.options.startX + (col * this.options.horizontalSpacing),
-        y: this.options.startY + (row * this.options.verticalSpacing),
+        x: this.options.startX + col * this.options.horizontalSpacing,
+        y: this.options.startY + row * this.options.verticalSpacing,
       };
     });
 

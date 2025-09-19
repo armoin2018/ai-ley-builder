@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { X, Save, RefreshCw, Download, Upload, Settings as SettingsIcon } from 'lucide-react';
+import {
+  Download,
+  RefreshCw,
+  Save,
+  Settings as SettingsIcon,
+  Upload,
+  X,
+} from 'lucide-react';
 import { Button, Input, Label } from '../../../shared/components';
 import { cn } from '../../../utils';
 import { useSettings } from '../../../hooks/useSettings';
-import { UMLFlowsSettings } from './UMLFlowsSettings';
+import { TabbedUMLFlowsSettings } from './TabbedUMLFlowsSettings';
 import { LocalAISettings } from './LocalAISettings';
 import { AIRestSettings } from './AIRestSettings';
 
@@ -62,7 +69,11 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
   };
 
   const handleReset = () => {
-    if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to reset all settings to defaults? This cannot be undone.'
+      )
+    ) {
       resetSettings();
     }
   };
@@ -94,7 +105,7 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
 
         {/* Tabs */}
         <div className="flex border-b border-slate-200">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -125,7 +136,7 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
-          {activeTab === 'umlFlows' && <UMLFlowsSettings />}
+          {activeTab === 'umlFlows' && <TabbedUMLFlowsSettings />}
           {activeTab === 'localAI' && <LocalAISettings />}
           {activeTab === 'aiRest' && <AIRestSettings />}
         </div>

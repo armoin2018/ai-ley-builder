@@ -88,7 +88,7 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
     },
   },
 
-  'persona': {
+  persona: {
     type: 'persona',
     name: 'Persona',
     category: 'context',
@@ -143,7 +143,7 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
     },
   },
 
-  'instruction': {
+  instruction: {
     type: 'instruction',
     name: 'Instruction',
     category: 'context',
@@ -245,7 +245,7 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
     },
   },
 
-  'loop': {
+  loop: {
     type: 'loop',
     name: 'Loop',
     category: 'logic',
@@ -752,6 +752,854 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
           warnings,
         };
       },
+    },
+  },
+
+  // Local AI Tool Nodes
+  'ai-local-ollama': {
+    type: 'ai-local-ollama',
+    name: 'Ollama AI',
+    category: 'ai-local',
+    description: 'Local Ollama AI model runner for inference',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for the AI model',
+      },
+      {
+        id: 'context',
+        name: 'Context',
+        dataType: 'string',
+        required: false,
+        description: 'Additional context for the AI model',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'AI Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from the Ollama AI model',
+      },
+    ],
+    properties: [
+      {
+        key: 'model',
+        name: 'Model',
+        type: 'text',
+        required: true,
+        defaultValue: 'llama2',
+        description: 'Ollama model to use (e.g., llama2, codellama)',
+      },
+      {
+        key: 'temperature',
+        name: 'Temperature',
+        type: 'number',
+        required: false,
+        defaultValue: 0.7,
+        description: 'Model temperature (0.0 to 1.0)',
+      },
+      {
+        key: 'maxTokens',
+        name: 'Max Tokens',
+        type: 'number',
+        required: false,
+        defaultValue: 1000,
+        description: 'Maximum number of tokens to generate',
+      },
+    ],
+    validation: {
+      required: ['model'],
+    },
+  },
+
+  'ai-local-llamacpp': {
+    type: 'ai-local-llamacpp',
+    name: 'Llama.cpp AI',
+    category: 'ai-local',
+    description: 'Local Llama.cpp AI inference using Python bindings',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for the AI model',
+      },
+      {
+        id: 'context',
+        name: 'Context',
+        dataType: 'string',
+        required: false,
+        description: 'Additional context for the AI model',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'AI Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from the Llama.cpp AI model',
+      },
+    ],
+    properties: [
+      {
+        key: 'modelPath',
+        name: 'Model Path',
+        type: 'text',
+        required: true,
+        defaultValue: 'models/llama-2-7b-chat.gguf',
+        description: 'Path to the GGUF model file',
+      },
+      {
+        key: 'temperature',
+        name: 'Temperature',
+        type: 'number',
+        required: false,
+        defaultValue: 0.7,
+        description: 'Model temperature (0.0 to 1.0)',
+      },
+      {
+        key: 'maxTokens',
+        name: 'Max Tokens',
+        type: 'number',
+        required: false,
+        defaultValue: 1000,
+        description: 'Maximum number of tokens to generate',
+      },
+      {
+        key: 'nCtx',
+        name: 'Context Length',
+        type: 'number',
+        required: false,
+        defaultValue: 2048,
+        description: 'Context window size',
+      },
+    ],
+    validation: {
+      required: ['modelPath'],
+    },
+  },
+
+  'ai-local-claude-code-cli': {
+    type: 'ai-local-claude-code-cli',
+    name: 'Claude Code CLI',
+    category: 'ai-local',
+    description: 'Anthropic Claude Code CLI for local AI assistance',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for Claude Code CLI',
+      },
+      {
+        id: 'context',
+        name: 'Context',
+        dataType: 'string',
+        required: false,
+        description: 'Additional context or file content',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'Claude Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from Claude Code CLI',
+      },
+    ],
+    properties: [
+      {
+        key: 'task',
+        name: 'Task Type',
+        type: 'select',
+        required: false,
+        defaultValue: 'ask',
+        validation: {
+          options: ['ask', 'code', 'review', 'explain', 'debug'],
+        },
+        description: 'Type of task for Claude Code CLI',
+      },
+      {
+        key: 'model',
+        name: 'Model',
+        type: 'select',
+        required: false,
+        defaultValue: 'claude-3-5-sonnet',
+        validation: {
+          options: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-haiku'],
+        },
+        description: 'Claude model to use',
+      },
+      {
+        key: 'project',
+        name: 'Project Path',
+        type: 'text',
+        required: false,
+        description: 'Path to project directory for context',
+      },
+    ],
+    validation: {
+      required: [],
+    },
+  },
+
+  'ai-local-github-copilot-cli': {
+    type: 'ai-local-github-copilot-cli',
+    name: 'GitHub Copilot CLI',
+    category: 'ai-local',
+    description: 'GitHub Copilot CLI for code suggestions and assistance',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for GitHub Copilot',
+      },
+      {
+        id: 'code',
+        name: 'Code Context',
+        dataType: 'string',
+        required: false,
+        description: 'Existing code for context',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'Copilot Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from GitHub Copilot CLI',
+      },
+      {
+        id: 'suggestions',
+        name: 'Code Suggestions',
+        dataType: 'array',
+        required: false,
+        description: 'Code suggestions from Copilot',
+      },
+    ],
+    properties: [
+      {
+        key: 'command',
+        name: 'Copilot Command',
+        type: 'select',
+        required: false,
+        defaultValue: 'suggest',
+        validation: {
+          options: ['suggest', 'explain', 'fix', 'test', 'review'],
+        },
+        description: 'GitHub Copilot command to execute',
+      },
+      {
+        key: 'language',
+        name: 'Programming Language',
+        type: 'select',
+        required: false,
+        defaultValue: 'auto',
+        validation: {
+          options: [
+            'auto',
+            'javascript',
+            'typescript',
+            'python',
+            'java',
+            'go',
+            'rust',
+            'php',
+            'ruby',
+          ],
+        },
+        description: 'Target programming language',
+      },
+      {
+        key: 'format',
+        name: 'Output Format',
+        type: 'select',
+        required: false,
+        defaultValue: 'text',
+        validation: {
+          options: ['text', 'json', 'markdown'],
+        },
+        description: 'Output format preference',
+      },
+    ],
+    validation: {
+      required: [],
+    },
+  },
+
+  'ai-local-gemini-code-cli': {
+    type: 'ai-local-gemini-code-cli',
+    name: 'Gemini Code CLI',
+    category: 'ai-local',
+    description: 'Google Gemini Code CLI for AI-powered coding assistance',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for Gemini Code CLI',
+      },
+      {
+        id: 'code',
+        name: 'Code Context',
+        dataType: 'string',
+        required: false,
+        description: 'Code context for analysis',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'Gemini Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from Gemini Code CLI',
+      },
+      {
+        id: 'analysis',
+        name: 'Code Analysis',
+        dataType: 'object',
+        required: false,
+        description: 'Code analysis results',
+      },
+    ],
+    properties: [
+      {
+        key: 'mode',
+        name: 'Operation Mode',
+        type: 'select',
+        required: false,
+        defaultValue: 'chat',
+        validation: {
+          options: ['chat', 'code', 'analyze', 'optimize', 'document'],
+        },
+        description: 'Gemini operation mode',
+      },
+      {
+        key: 'model',
+        name: 'Gemini Model',
+        type: 'select',
+        required: false,
+        defaultValue: 'gemini-pro',
+        validation: {
+          options: ['gemini-pro', 'gemini-pro-vision', 'gemini-ultra'],
+        },
+        description: 'Gemini model variant',
+      },
+      {
+        key: 'temperature',
+        name: 'Temperature',
+        type: 'number',
+        required: false,
+        defaultValue: 0.7,
+        description: 'Model temperature (0.0 to 1.0)',
+      },
+      {
+        key: 'maxTokens',
+        name: 'Max Tokens',
+        type: 'number',
+        required: false,
+        defaultValue: 2048,
+        description: 'Maximum number of tokens to generate',
+      },
+    ],
+    validation: {
+      required: [],
+    },
+  },
+
+  // AI REST Endpoint Nodes
+  'ai-rest-openai': {
+    type: 'ai-rest-openai',
+    name: 'OpenAI GPT',
+    category: 'ai-rest',
+    description: 'OpenAI GPT API integration for AI inference',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for the AI model',
+      },
+      {
+        id: 'systemMessage',
+        name: 'System Message',
+        dataType: 'string',
+        required: false,
+        description: 'System message to set AI behavior',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'AI Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from the OpenAI GPT model',
+      },
+      {
+        id: 'usage',
+        name: 'Usage Stats',
+        dataType: 'object',
+        required: false,
+        description: 'Token usage statistics',
+      },
+    ],
+    properties: [
+      {
+        key: 'model',
+        name: 'Model',
+        type: 'select',
+        required: true,
+        defaultValue: 'gpt-4',
+        validation: {
+          options: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'gpt-4o'],
+        },
+        description: 'OpenAI model to use',
+      },
+      {
+        key: 'temperature',
+        name: 'Temperature',
+        type: 'number',
+        required: false,
+        defaultValue: 0.7,
+        description: 'Model temperature (0.0 to 2.0)',
+      },
+      {
+        key: 'maxTokens',
+        name: 'Max Tokens',
+        type: 'number',
+        required: false,
+        defaultValue: 4096,
+        description: 'Maximum number of tokens to generate',
+      },
+      {
+        key: 'apiKey',
+        name: 'API Key',
+        type: 'password',
+        required: true,
+        description: 'OpenAI API key',
+      },
+    ],
+    validation: {
+      required: ['model', 'apiKey'],
+    },
+  },
+
+  'ai-rest-anthropic': {
+    type: 'ai-rest-anthropic',
+    name: 'Anthropic Claude',
+    category: 'ai-rest',
+    description: 'Anthropic Claude API integration for AI inference',
+    inputs: [
+      {
+        id: 'prompt',
+        name: 'Prompt',
+        dataType: 'string',
+        required: true,
+        description: 'Input prompt for the AI model',
+      },
+      {
+        id: 'systemMessage',
+        name: 'System Message',
+        dataType: 'string',
+        required: false,
+        description: 'System message to set AI behavior',
+      },
+    ],
+    outputs: [
+      {
+        id: 'response',
+        name: 'AI Response',
+        dataType: 'string',
+        required: false,
+        description: 'Response from the Anthropic Claude model',
+      },
+      {
+        id: 'usage',
+        name: 'Usage Stats',
+        dataType: 'object',
+        required: false,
+        description: 'Token usage statistics',
+      },
+    ],
+    properties: [
+      {
+        key: 'model',
+        name: 'Model',
+        type: 'select',
+        required: true,
+        defaultValue: 'claude-3-sonnet-20240229',
+        validation: {
+          options: [
+            'claude-3-sonnet-20240229',
+            'claude-3-opus-20240229',
+            'claude-3-haiku-20240307',
+          ],
+        },
+        description: 'Anthropic Claude model to use',
+      },
+      {
+        key: 'temperature',
+        name: 'Temperature',
+        type: 'number',
+        required: false,
+        defaultValue: 0.7,
+        description: 'Model temperature (0.0 to 1.0)',
+      },
+      {
+        key: 'maxTokens',
+        name: 'Max Tokens',
+        type: 'number',
+        required: false,
+        defaultValue: 4096,
+        description: 'Maximum number of tokens to generate',
+      },
+      {
+        key: 'apiKey',
+        name: 'API Key',
+        type: 'password',
+        required: true,
+        description: 'Anthropic API key',
+      },
+    ],
+    validation: {
+      required: ['model', 'apiKey'],
+    },
+  },
+
+  // Script Executor Nodes
+  'script-shell': {
+    type: 'script-shell',
+    name: 'Shell Script',
+    category: 'script',
+    description: 'Execute shell/bash scripts with input data',
+    inputs: [
+      {
+        id: 'input',
+        name: 'Input Data',
+        dataType: 'any',
+        required: false,
+        description: 'Input data for the script',
+      },
+      {
+        id: 'script',
+        name: 'Script Content',
+        dataType: 'string',
+        required: false,
+        description: 'Dynamic script content',
+      },
+    ],
+    outputs: [
+      {
+        id: 'stdout',
+        name: 'Standard Output',
+        dataType: 'string',
+        required: false,
+        description: 'Script standard output',
+      },
+      {
+        id: 'stderr',
+        name: 'Standard Error',
+        dataType: 'string',
+        required: false,
+        description: 'Script error output',
+      },
+      {
+        id: 'exitCode',
+        name: 'Exit Code',
+        dataType: 'number',
+        required: false,
+        description: 'Script exit code',
+      },
+    ],
+    properties: [
+      {
+        key: 'script',
+        name: 'Script',
+        type: 'textarea',
+        required: true,
+        defaultValue: '#!/bin/bash\necho "Hello World"',
+        description: 'Shell script to execute',
+      },
+      {
+        key: 'workingDirectory',
+        name: 'Working Directory',
+        type: 'text',
+        required: false,
+        description: 'Working directory for script execution',
+      },
+      {
+        key: 'timeout',
+        name: 'Timeout (seconds)',
+        type: 'number',
+        required: false,
+        defaultValue: 30,
+        description: 'Script execution timeout',
+      },
+      {
+        key: 'environment',
+        name: 'Environment Variables',
+        type: 'object',
+        required: false,
+        description: 'Environment variables for the script',
+      },
+    ],
+    validation: {
+      required: ['script'],
+    },
+  },
+
+  'script-python': {
+    type: 'script-python',
+    name: 'Python Script',
+    category: 'script',
+    description: 'Execute Python scripts with input data',
+    inputs: [
+      {
+        id: 'input',
+        name: 'Input Data',
+        dataType: 'any',
+        required: false,
+        description: 'Input data for the script',
+      },
+      {
+        id: 'script',
+        name: 'Script Content',
+        dataType: 'string',
+        required: false,
+        description: 'Dynamic script content',
+      },
+    ],
+    outputs: [
+      {
+        id: 'stdout',
+        name: 'Standard Output',
+        dataType: 'string',
+        required: false,
+        description: 'Script standard output',
+      },
+      {
+        id: 'stderr',
+        name: 'Standard Error',
+        dataType: 'string',
+        required: false,
+        description: 'Script error output',
+      },
+      {
+        id: 'result',
+        name: 'Return Value',
+        dataType: 'any',
+        required: false,
+        description: 'Script return value',
+      },
+    ],
+    properties: [
+      {
+        key: 'script',
+        name: 'Python Script',
+        type: 'textarea',
+        required: true,
+        defaultValue: 'print("Hello World")\nresult = "success"',
+        description: 'Python script to execute',
+      },
+      {
+        key: 'pythonPath',
+        name: 'Python Path',
+        type: 'text',
+        required: false,
+        defaultValue: 'python3',
+        description: 'Python executable path',
+      },
+      {
+        key: 'timeout',
+        name: 'Timeout (seconds)',
+        type: 'number',
+        required: false,
+        defaultValue: 30,
+        description: 'Script execution timeout',
+      },
+      {
+        key: 'requirements',
+        name: 'Requirements',
+        type: 'array',
+        required: false,
+        description: 'Python package requirements',
+      },
+    ],
+    validation: {
+      required: ['script'],
+    },
+  },
+
+  'script-php': {
+    type: 'script-php',
+    name: 'PHP Script',
+    category: 'script',
+    description: 'Execute PHP scripts with input data',
+    inputs: [
+      {
+        id: 'input',
+        name: 'Input Data',
+        dataType: 'any',
+        required: false,
+        description: 'Input data for the script',
+      },
+      {
+        id: 'script',
+        name: 'Script Content',
+        dataType: 'string',
+        required: false,
+        description: 'Dynamic script content',
+      },
+    ],
+    outputs: [
+      {
+        id: 'stdout',
+        name: 'Standard Output',
+        dataType: 'string',
+        required: false,
+        description: 'Script standard output',
+      },
+      {
+        id: 'stderr',
+        name: 'Standard Error',
+        dataType: 'string',
+        required: false,
+        description: 'Script error output',
+      },
+      {
+        id: 'result',
+        name: 'Return Value',
+        dataType: 'any',
+        required: false,
+        description: 'Script return value',
+      },
+    ],
+    properties: [
+      {
+        key: 'script',
+        name: 'PHP Script',
+        type: 'textarea',
+        required: true,
+        defaultValue: '<?php\necho "Hello World";\n$result = "success";',
+        description: 'PHP script to execute',
+      },
+      {
+        key: 'phpPath',
+        name: 'PHP Path',
+        type: 'text',
+        required: false,
+        defaultValue: 'php',
+        description: 'PHP executable path',
+      },
+      {
+        key: 'timeout',
+        name: 'Timeout (seconds)',
+        type: 'number',
+        required: false,
+        defaultValue: 30,
+        description: 'Script execution timeout',
+      },
+    ],
+    validation: {
+      required: ['script'],
+    },
+  },
+
+  'script-nodejs': {
+    type: 'script-nodejs',
+    name: 'Node.js Script',
+    category: 'script',
+    description: 'Execute Node.js/JavaScript scripts with input data',
+    inputs: [
+      {
+        id: 'input',
+        name: 'Input Data',
+        dataType: 'any',
+        required: false,
+        description: 'Input data for the script',
+      },
+      {
+        id: 'script',
+        name: 'Script Content',
+        dataType: 'string',
+        required: false,
+        description: 'Dynamic script content',
+      },
+    ],
+    outputs: [
+      {
+        id: 'stdout',
+        name: 'Standard Output',
+        dataType: 'string',
+        required: false,
+        description: 'Script standard output',
+      },
+      {
+        id: 'stderr',
+        name: 'Standard Error',
+        dataType: 'string',
+        required: false,
+        description: 'Script error output',
+      },
+      {
+        id: 'result',
+        name: 'Return Value',
+        dataType: 'any',
+        required: false,
+        description: 'Script return value',
+      },
+    ],
+    properties: [
+      {
+        key: 'script',
+        name: 'JavaScript Code',
+        type: 'textarea',
+        required: true,
+        defaultValue: 'console.log("Hello World");\nconst result = "success";',
+        description: 'JavaScript/Node.js script to execute',
+      },
+      {
+        key: 'nodePath',
+        name: 'Node.js Path',
+        type: 'text',
+        required: false,
+        defaultValue: 'node',
+        description: 'Node.js executable path',
+      },
+      {
+        key: 'timeout',
+        name: 'Timeout (seconds)',
+        type: 'number',
+        required: false,
+        defaultValue: 30,
+        description: 'Script execution timeout',
+      },
+      {
+        key: 'modules',
+        name: 'Required Modules',
+        type: 'array',
+        required: false,
+        description: 'Node.js modules to require',
+      },
+    ],
+    validation: {
+      required: ['script'],
     },
   },
 };

@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, FileText, Loader2 } from 'lucide-react';
 import { cn } from '../../utils';
-import { FileSystemService, type InstructionFile } from '../../services/fileSystem';
+import {
+  FileSystemService,
+  type InstructionFile,
+} from '../../services/fileSystem';
 
 interface InstructionDropdownProps {
   selectedInstructionId?: string;
@@ -21,7 +24,9 @@ export function InstructionDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedInstruction = instructions.find(i => i.id === selectedInstructionId);
+  const selectedInstruction = instructions.find(
+    i => i.id === selectedInstructionId
+  );
 
   useEffect(() => {
     loadInstructions();
@@ -34,7 +39,9 @@ export function InstructionDropdown({
       const loadedInstructions = await FileSystemService.getInstructionFiles();
       setInstructions(loadedInstructions);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load instructions');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load instructions'
+      );
     } finally {
       setLoading(false);
     }
@@ -47,11 +54,13 @@ export function InstructionDropdown({
 
   if (loading) {
     return (
-      <div className={cn(
-        'w-full px-3 py-2 border border-slate-200 rounded-md bg-white',
-        'flex items-center gap-2 text-sm text-slate-500',
-        className
-      )}>
+      <div
+        className={cn(
+          'w-full px-3 py-2 border border-slate-200 rounded-md bg-white',
+          'flex items-center gap-2 text-sm text-slate-500',
+          className
+        )}
+      >
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading instructions...
       </div>
@@ -60,11 +69,13 @@ export function InstructionDropdown({
 
   if (error) {
     return (
-      <div className={cn(
-        'w-full px-3 py-2 border border-red-200 rounded-md bg-red-50',
-        'flex items-center gap-2 text-sm text-red-600',
-        className
-      )}>
+      <div
+        className={cn(
+          'w-full px-3 py-2 border border-red-200 rounded-md bg-red-50',
+          'flex items-center gap-2 text-sm text-red-600',
+          className
+        )}
+      >
         <FileText className="w-4 h-4" />
         Error: {error}
       </div>
@@ -85,17 +96,21 @@ export function InstructionDropdown({
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <FileText className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <span className={cn(
-            'truncate',
-            selectedInstruction ? 'text-slate-900' : 'text-slate-500'
-          )}>
+          <span
+            className={cn(
+              'truncate',
+              selectedInstruction ? 'text-slate-900' : 'text-slate-500'
+            )}
+          >
             {selectedInstruction ? selectedInstruction.name : placeholder}
           </span>
         </div>
-        <ChevronDown className={cn(
-          'w-4 h-4 text-slate-400 transition-transform duration-200',
-          isOpen && 'transform rotate-180'
-        )} />
+        <ChevronDown
+          className={cn(
+            'w-4 h-4 text-slate-400 transition-transform duration-200',
+            isOpen && 'transform rotate-180'
+          )}
+        />
       </button>
 
       {isOpen && (
@@ -105,7 +120,7 @@ export function InstructionDropdown({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Dropdown Menu */}
           <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
             {instructions.length === 0 ? (
@@ -114,7 +129,7 @@ export function InstructionDropdown({
               </div>
             ) : (
               <>
-                {instructions.map((instruction) => (
+                {instructions.map(instruction => (
                   <button
                     key={instruction.id}
                     onClick={() => handleSelect(instruction)}
@@ -122,7 +137,8 @@ export function InstructionDropdown({
                       'w-full px-3 py-2 text-left hover:bg-slate-50 focus:bg-slate-50',
                       'focus:outline-none border-b border-slate-100 last:border-b-0',
                       'transition-colors duration-150',
-                      selectedInstructionId === instruction.id && 'bg-blue-50 text-blue-900'
+                      selectedInstructionId === instruction.id &&
+                        'bg-blue-50 text-blue-900'
                     )}
                   >
                     <div className="flex items-start gap-2">
@@ -136,7 +152,8 @@ export function InstructionDropdown({
                           {instruction.content.length > 100 && '...'}
                         </div>
                         <div className="text-xs text-slate-400 mt-1">
-                          Modified: {instruction.lastModified.toLocaleDateString()}
+                          Modified:{' '}
+                          {instruction.lastModified.toLocaleDateString()}
                         </div>
                       </div>
                     </div>

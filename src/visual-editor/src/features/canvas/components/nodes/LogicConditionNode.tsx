@@ -1,7 +1,6 @@
-import { Handle, type NodeProps, Position } from '@xyflow/react';
-import { useReactFlow } from '@xyflow/react';
-import { BaseNode, type BaseNodeData } from './BaseNode';
+import { Handle, type NodeProps, Position, useReactFlow } from '@xyflow/react';
 import { Badge } from '../../../../shared/components';
+import { BaseNode, type BaseNodeData } from './BaseNode';
 
 export interface LogicConditionNodeData extends BaseNodeData {
   properties: {
@@ -74,9 +73,9 @@ export function LogicConditionNode(props: NodeProps) {
         className="w-3 h-3 bg-red-400 border-2 border-white"
       />
 
-      <BaseNode 
-        {...props} 
-        variant="logic" 
+      <BaseNode
+        {...props}
+        variant="logic"
         showHandles={false}
         onLabelChange={handleLabelChange}
         onDescriptionChange={handleDescriptionChange}
@@ -84,8 +83,8 @@ export function LogicConditionNode(props: NodeProps) {
         <div className="space-y-2">
           {condition && (
             <div className="space-y-1">
-              <span className="text-xs font-medium">Condition:</span>
-              <code className="text-xs bg-muted px-2 py-1 rounded block truncate">
+              <span className="text-xs font-medium text-white">Condition:</span>
+              <code className="text-xs bg-black/20 text-white px-2 py-1 rounded block truncate">
                 {condition}
               </code>
             </div>
@@ -93,12 +92,12 @@ export function LogicConditionNode(props: NodeProps) {
 
           <div className="flex justify-between gap-2">
             <div className="flex flex-col items-center">
-              <Badge variant="success" className="text-xs py-0">
+              <Badge variant="success" className="text-xs py-0 text-white border-white/20">
                 {trueLabel}
               </Badge>
             </div>
             <div className="flex flex-col items-center">
-              <Badge variant="destructive" className="text-xs py-0">
+              <Badge variant="destructive" className="text-xs py-0 text-white border-white/20">
                 {falseLabel}
               </Badge>
             </div>

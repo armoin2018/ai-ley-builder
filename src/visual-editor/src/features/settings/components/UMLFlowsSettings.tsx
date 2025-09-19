@@ -1,12 +1,22 @@
-import React from 'react';
-import { Folder, Save, RotateCcw, FolderTree, FileText, Users, Database, Grid3X3, Terminal } from 'lucide-react';
-import { Button, Input, Label } from '../../../shared/components';
+import {
+    Database,
+    FileText,
+    Folder,
+    FolderTree,
+    Grid3X3,
+    Image,
+    RotateCcw,
+    Terminal,
+    Users
+} from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
-import { AI_LEY_DISPLAY_PATHS, AI_LEY_PATHS } from '../../../utils/paths';
+import { Button, Input, Label } from '../../../shared/components';
+import { AI_LEY_PATHS } from '../../../utils/paths';
 
 export function UMLFlowsSettings() {
-  const { settings, updateUMLFlowsSettings } = useSettings();
-  const { umlFlows } = settings;
+  const { settings, updateUMLFlowsSettings, updateAILeyPathSettings } =
+    useSettings();
+  const { umlFlows, aiLeyPaths } = settings;
 
   const handleStorageFolderChange = (value: string) => {
     updateUMLFlowsSettings({ storageFolder: value });
@@ -24,7 +34,10 @@ export function UMLFlowsSettings() {
     updateUMLFlowsSettings({ backupEnabled: enabled });
   };
 
-  const handleAutoArrangeSettingChange = (setting: string, value: number | boolean) => {
+  const handleAutoArrangeSettingChange = (
+    setting: string,
+    value: number | boolean
+  ) => {
     updateUMLFlowsSettings({
       autoArrange: {
         ...umlFlows.autoArrange,
@@ -42,17 +55,43 @@ export function UMLFlowsSettings() {
     });
   };
 
-  const handleExecutorChange = (executorId: string, field: string, value: any) => {
+  const handlePlantUMLSettingChange = (setting: string, value: any) => {
+    updateUMLFlowsSettings({
+      plantUML: {
+        ...umlFlows.plantUML,
+        [setting]: value,
+      },
+    });
+  };
+
+  const handleExecutorChange = (
+    executorId: string,
+    field: string,
+    value: any
+  ) => {
     const updatedExecutors = umlFlows.scriptNodes.executors.map(executor =>
-      executor.id === executorId
-        ? { ...executor, [field]: value }
-        : executor
+      executor.id === executorId ? { ...executor, [field]: value } : executor
     );
 
     handleScriptNodeSettingChange('executors', updatedExecutors);
   };
 
+  const handleAILeyPathChange = (
+    pathKey: keyof typeof aiLeyPaths,
+    value: string
+  ) => {
+    updateAILeyPathSettings({ [pathKey]: value });
+  };
+
   const resetToDefaults = () => {
+    updateAILeyPathSettings({
+      globalInstructions: '.ai-ley/shared/global-instructions.md',
+      instructions: '.ai-ley/shared/instructions',
+      personas: '.ai-ley/shared/personas',
+      variables: '.ai-ley/shared/variables',
+      prompts: '.ai-ley/shared/prompts',
+    });
+
     updateUMLFlowsSettings({
       storageFolder: AI_LEY_PATHS.UML_FLOWS_USER,
       autoSave: true,
@@ -116,6 +155,12 @@ export function UMLFlowsSettings() {
           },
         ],
       },
+      plantUML: {
+        validationEnabled: true,
+        renderUrl: 'https://www.plantuml.com/plantuml',
+        enableRichTextEditor: true,
+        enableValidationOnEdit: false,
+      },
     });
   };
 
@@ -124,8 +169,12 @@ export function UMLFlowsSettings() {
       <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
         <Folder className="w-5 h-5 text-blue-600" />
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">UML Flows Configuration</h3>
-          <p className="text-sm text-slate-600">Configure storage and backup settings for your UML flow files</p>
+          <h3 className="text-lg font-semibold text-slate-900">
+            UML Flows Configuration
+          </h3>
+          <p className="text-sm text-slate-600">
+            Configure storage and backup settings for your UML flow files
+          </p>
         </div>
       </div>
 
@@ -134,54 +183,124 @@ export function UMLFlowsSettings() {
         <div className="flex items-center gap-3 pb-2 border-b border-blue-200">
           <FolderTree className="w-5 h-5 text-blue-600" />
           <div>
-            <h4 className="text-base font-medium text-slate-900">AI-LEY Path Configuration</h4>
-            <p className="text-xs text-slate-600">Standard paths for AI-LEY system resources (read-only)</p>
+            <h4 className="text-base font-medium text-slate-900">
+              AI-LEY Path Configuration
+            </h4>
+            <p className="text-xs text-slate-600">
+              Configure paths for AI-LEY system resources
+            </p>
           </div>
         </div>
 
-        <div className="grid gap-3">
-          <div className="flex items-center gap-3 p-2 bg-white rounded border border-blue-100">
-            <FileText className="w-4 h-4 text-blue-500" />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">Global Instructions</div>
-              <div className="text-xs text-slate-500 font-mono truncate">{AI_LEY_DISPLAY_PATHS.GLOBAL_INSTRUCTIONS}</div>
-            </div>
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <Label
+              htmlFor="global-instructions"
+              className="text-sm font-medium text-slate-700 flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4 text-blue-500" />
+              Global Instructions
+            </Label>
+            <Input
+              id="global-instructions"
+              type="text"
+              value={aiLeyPaths.globalInstructions}
+              onChange={e =>
+                handleAILeyPathChange('globalInstructions', e.target.value)
+              }
+              placeholder="Path to global instructions file"
+              className="w-full font-mono text-sm"
+            />
           </div>
 
-          <div className="flex items-center gap-3 p-2 bg-white rounded border border-blue-100">
-            <FileText className="w-4 h-4 text-green-500" />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">Instructions</div>
-              <div className="text-xs text-slate-500 font-mono truncate">{AI_LEY_DISPLAY_PATHS.INSTRUCTIONS}</div>
-            </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="instructions"
+              className="text-sm font-medium text-slate-700 flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4 text-green-500" />
+              Instructions Directory
+            </Label>
+            <Input
+              id="instructions"
+              type="text"
+              value={aiLeyPaths.instructions}
+              onChange={e =>
+                handleAILeyPathChange('instructions', e.target.value)
+              }
+              placeholder="Path to instructions directory"
+              className="w-full font-mono text-sm"
+            />
           </div>
 
-          <div className="flex items-center gap-3 p-2 bg-white rounded border border-blue-100">
-            <Users className="w-4 h-4 text-purple-500" />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">Personas</div>
-              <div className="text-xs text-slate-500 font-mono truncate">{AI_LEY_DISPLAY_PATHS.PERSONAS}</div>
-            </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="personas"
+              className="text-sm font-medium text-slate-700 flex items-center gap-2"
+            >
+              <Users className="w-4 h-4 text-purple-500" />
+              Personas Directory
+            </Label>
+            <Input
+              id="personas"
+              type="text"
+              value={aiLeyPaths.personas}
+              onChange={e => handleAILeyPathChange('personas', e.target.value)}
+              placeholder="Path to personas directory"
+              className="w-full font-mono text-sm"
+            />
           </div>
 
-          <div className="flex items-center gap-3 p-2 bg-white rounded border border-blue-100">
-            <Database className="w-4 h-4 text-orange-500" />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-700">Variables</div>
-              <div className="text-xs text-slate-500 font-mono truncate">{AI_LEY_DISPLAY_PATHS.VARIABLES}</div>
-            </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="variables"
+              className="text-sm font-medium text-slate-700 flex items-center gap-2"
+            >
+              <Database className="w-4 h-4 text-orange-500" />
+              Variables Directory
+            </Label>
+            <Input
+              id="variables"
+              type="text"
+              value={aiLeyPaths.variables}
+              onChange={e => handleAILeyPathChange('variables', e.target.value)}
+              placeholder="Path to variables directory"
+              className="w-full font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label
+              htmlFor="prompts"
+              className="text-sm font-medium text-slate-700 flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4 text-indigo-500" />
+              Prompts Directory
+            </Label>
+            <Input
+              id="prompts"
+              type="text"
+              value={aiLeyPaths.prompts}
+              onChange={e => handleAILeyPathChange('prompts', e.target.value)}
+              placeholder="Path to prompts directory"
+              className="w-full font-mono text-sm"
+            />
           </div>
         </div>
 
         <div className="text-xs text-slate-500 italic">
-          Note: The .ai-ley folder is located at the root of the GitHub project and these paths are fixed.
+          Note: These paths are relative to your project root. Changes affect
+          how the system locates AI-LEY resources.
         </div>
       </div>
 
       <div className="grid gap-6">
         {/* Storage Folder */}
         <div className="space-y-2">
-          <Label htmlFor="storage-folder" className="text-sm font-medium text-slate-700">
+          <Label
+            htmlFor="storage-folder"
+            className="text-sm font-medium text-slate-700"
+          >
             Storage Folder
           </Label>
           <div className="space-y-1">
@@ -189,12 +308,13 @@ export function UMLFlowsSettings() {
               id="storage-folder"
               type="text"
               value={umlFlows.storageFolder}
-              onChange={(e) => handleStorageFolderChange(e.target.value)}
+              onChange={e => handleStorageFolderChange(e.target.value)}
               placeholder="Enter storage folder path"
               className="w-full"
             />
             <p className="text-xs text-slate-500">
-              Folder where UML flow files will be stored. Relative to project root.
+              Folder where UML flow files will be stored. Relative to project
+              root.
             </p>
           </div>
         </div>
@@ -202,7 +322,9 @@ export function UMLFlowsSettings() {
         {/* Auto Save */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <Label className="text-sm font-medium text-slate-700">Auto Save</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Auto Save
+            </Label>
             <p className="text-xs text-slate-500">
               Automatically save changes to UML flow files
             </p>
@@ -211,7 +333,7 @@ export function UMLFlowsSettings() {
             <input
               type="checkbox"
               checked={umlFlows.autoSave}
-              onChange={(e) => handleAutoSaveChange(e.target.checked)}
+              onChange={e => handleAutoSaveChange(e.target.checked)}
               className="sr-only peer"
             />
             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -222,7 +344,9 @@ export function UMLFlowsSettings() {
         <div className="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label className="text-sm font-medium text-slate-700">Enable Backups</Label>
+              <Label className="text-sm font-medium text-slate-700">
+                Enable Backups
+              </Label>
               <p className="text-xs text-slate-500">
                 Create backup copies of UML flow files
               </p>
@@ -231,7 +355,7 @@ export function UMLFlowsSettings() {
               <input
                 type="checkbox"
                 checked={umlFlows.backupEnabled}
-                onChange={(e) => handleBackupEnabledChange(e.target.checked)}
+                onChange={e => handleBackupEnabledChange(e.target.checked)}
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -240,7 +364,10 @@ export function UMLFlowsSettings() {
 
           {umlFlows.backupEnabled && (
             <div className="space-y-2">
-              <Label htmlFor="backup-folder" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="backup-folder"
+                className="text-sm font-medium text-slate-700"
+              >
                 Backup Folder
               </Label>
               <div className="space-y-1">
@@ -248,12 +375,13 @@ export function UMLFlowsSettings() {
                   id="backup-folder"
                   type="text"
                   value={umlFlows.backupFolder || ''}
-                  onChange={(e) => handleBackupFolderChange(e.target.value)}
+                  onChange={e => handleBackupFolderChange(e.target.value)}
                   placeholder="Enter backup folder path (optional)"
                   className="w-full"
                 />
                 <p className="text-xs text-slate-500">
-                  Folder for backup files. If empty, backups will be stored in the storage folder.
+                  Folder for backup files. If empty, backups will be stored in
+                  the storage folder.
                 </p>
               </div>
             </div>
@@ -265,15 +393,23 @@ export function UMLFlowsSettings() {
           <div className="flex items-center gap-3 pb-2 border-b border-green-200">
             <Grid3X3 className="w-5 h-5 text-green-600" />
             <div>
-              <h4 className="text-base font-medium text-slate-900">Auto-Arrange Settings</h4>
-              <p className="text-xs text-slate-600">Configure how nodes are automatically arranged based on connections</p>
+              <h4 className="text-base font-medium text-slate-900">
+                Auto-Arrange Settings
+              </h4>
+              <p className="text-xs text-slate-600">
+                Configure how nodes are automatically arranged based on
+                connections
+              </p>
             </div>
           </div>
 
           <div className="grid gap-4">
             {/* Connection Spacing */}
             <div className="space-y-2">
-              <Label htmlFor="connection-spacing" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="connection-spacing"
+                className="text-sm font-medium text-slate-700"
+              >
                 Connection Spacing (px)
               </Label>
               <div className="space-y-1">
@@ -281,7 +417,12 @@ export function UMLFlowsSettings() {
                   id="connection-spacing"
                   type="number"
                   value={umlFlows.autoArrange.connectionSpacing}
-                  onChange={(e) => handleAutoArrangeSettingChange('connectionSpacing', parseInt(e.target.value) || 50)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'connectionSpacing',
+                      parseInt(e.target.value) || 50
+                    )
+                  }
                   min="10"
                   max="200"
                   className="w-full"
@@ -295,7 +436,9 @@ export function UMLFlowsSettings() {
             {/* Enable Connection-Aware Spacing */}
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label className="text-sm font-medium text-slate-700">Connection-Aware Spacing</Label>
+                <Label className="text-sm font-medium text-slate-700">
+                  Connection-Aware Spacing
+                </Label>
                 <p className="text-xs text-slate-500">
                   Add extra spacing between nodes based on their connections
                 </p>
@@ -304,7 +447,12 @@ export function UMLFlowsSettings() {
                 <input
                   type="checkbox"
                   checked={umlFlows.autoArrange.enableConnectionAwareSpacing}
-                  onChange={(e) => handleAutoArrangeSettingChange('enableConnectionAwareSpacing', e.target.checked)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'enableConnectionAwareSpacing',
+                      e.target.checked
+                    )
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
@@ -313,7 +461,10 @@ export function UMLFlowsSettings() {
 
             {/* Horizontal Spacing */}
             <div className="space-y-2">
-              <Label htmlFor="horizontal-spacing" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="horizontal-spacing"
+                className="text-sm font-medium text-slate-700"
+              >
                 Horizontal Spacing (px)
               </Label>
               <div className="space-y-1">
@@ -321,7 +472,12 @@ export function UMLFlowsSettings() {
                   id="horizontal-spacing"
                   type="number"
                   value={umlFlows.autoArrange.horizontalSpacing}
-                  onChange={(e) => handleAutoArrangeSettingChange('horizontalSpacing', parseInt(e.target.value) || 300)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'horizontalSpacing',
+                      parseInt(e.target.value) || 300
+                    )
+                  }
                   min="100"
                   max="800"
                   className="w-full"
@@ -334,7 +490,10 @@ export function UMLFlowsSettings() {
 
             {/* Vertical Spacing */}
             <div className="space-y-2">
-              <Label htmlFor="vertical-spacing" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="vertical-spacing"
+                className="text-sm font-medium text-slate-700"
+              >
                 Vertical Spacing (px)
               </Label>
               <div className="space-y-1">
@@ -342,7 +501,12 @@ export function UMLFlowsSettings() {
                   id="vertical-spacing"
                   type="number"
                   value={umlFlows.autoArrange.verticalSpacing}
-                  onChange={(e) => handleAutoArrangeSettingChange('verticalSpacing', parseInt(e.target.value) || 150)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'verticalSpacing',
+                      parseInt(e.target.value) || 150
+                    )
+                  }
                   min="50"
                   max="400"
                   className="w-full"
@@ -355,7 +519,10 @@ export function UMLFlowsSettings() {
 
             {/* Minimum Spacing */}
             <div className="space-y-2">
-              <Label htmlFor="min-spacing" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="min-spacing"
+                className="text-sm font-medium text-slate-700"
+              >
                 Minimum Spacing (px)
               </Label>
               <div className="space-y-1">
@@ -363,7 +530,12 @@ export function UMLFlowsSettings() {
                   id="min-spacing"
                   type="number"
                   value={umlFlows.autoArrange.minSpacing}
-                  onChange={(e) => handleAutoArrangeSettingChange('minSpacing', parseInt(e.target.value) || 50)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'minSpacing',
+                      parseInt(e.target.value) || 50
+                    )
+                  }
                   min="10"
                   max="100"
                   className="w-full"
@@ -377,7 +549,9 @@ export function UMLFlowsSettings() {
             {/* Enable Collision Detection */}
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label className="text-sm font-medium text-slate-700">Collision Detection</Label>
+                <Label className="text-sm font-medium text-slate-700">
+                  Collision Detection
+                </Label>
                 <p className="text-xs text-slate-500">
                   Automatically adjust positions to prevent node overlaps
                 </p>
@@ -386,7 +560,12 @@ export function UMLFlowsSettings() {
                 <input
                   type="checkbox"
                   checked={umlFlows.autoArrange.enableCollisionDetection}
-                  onChange={(e) => handleAutoArrangeSettingChange('enableCollisionDetection', e.target.checked)}
+                  onChange={e =>
+                    handleAutoArrangeSettingChange(
+                      'enableCollisionDetection',
+                      e.target.checked
+                    )
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
@@ -400,8 +579,13 @@ export function UMLFlowsSettings() {
           <div className="flex items-center gap-3 pb-2 border-b border-orange-200">
             <Terminal className="w-5 h-5 text-orange-600" />
             <div>
-              <h4 className="text-base font-medium text-slate-900">Script Node Settings</h4>
-              <p className="text-xs text-slate-600">Configure script execution environments and node palette visibility</p>
+              <h4 className="text-base font-medium text-slate-900">
+                Script Node Settings
+              </h4>
+              <p className="text-xs text-slate-600">
+                Configure script execution environments and node palette
+                visibility
+              </p>
             </div>
           </div>
 
@@ -409,7 +593,9 @@ export function UMLFlowsSettings() {
             {/* Enable Script Nodes in Palette */}
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label className="text-sm font-medium text-slate-700">Enable Script Nodes</Label>
+                <Label className="text-sm font-medium text-slate-700">
+                  Enable Script Nodes
+                </Label>
                 <p className="text-xs text-slate-500">
                   Show script execution nodes in the node palette
                 </p>
@@ -418,7 +604,12 @@ export function UMLFlowsSettings() {
                 <input
                   type="checkbox"
                   checked={umlFlows.scriptNodes.enablePalette}
-                  onChange={(e) => handleScriptNodeSettingChange('enablePalette', e.target.checked)}
+                  onChange={e =>
+                    handleScriptNodeSettingChange(
+                      'enablePalette',
+                      e.target.checked
+                    )
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
@@ -427,7 +618,10 @@ export function UMLFlowsSettings() {
 
             {/* Default Timeout */}
             <div className="space-y-2">
-              <Label htmlFor="default-timeout" className="text-sm font-medium text-slate-700">
+              <Label
+                htmlFor="default-timeout"
+                className="text-sm font-medium text-slate-700"
+              >
                 Default Timeout (seconds)
               </Label>
               <div className="space-y-1">
@@ -435,7 +629,12 @@ export function UMLFlowsSettings() {
                   id="default-timeout"
                   type="number"
                   value={umlFlows.scriptNodes.defaultTimeout}
-                  onChange={(e) => handleScriptNodeSettingChange('defaultTimeout', parseInt(e.target.value) || 30)}
+                  onChange={e =>
+                    handleScriptNodeSettingChange(
+                      'defaultTimeout',
+                      parseInt(e.target.value) || 30
+                    )
+                  }
                   min="1"
                   max="300"
                   className="w-full"
@@ -448,24 +647,43 @@ export function UMLFlowsSettings() {
 
             {/* Script Executors */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-slate-700">Script Executors</Label>
-              <p className="text-xs text-slate-500">Configure commands and settings for each script type</p>
+              <Label className="text-sm font-medium text-slate-700">
+                Script Executors
+              </Label>
+              <p className="text-xs text-slate-500">
+                Configure commands and settings for each script type
+              </p>
 
               <div className="space-y-3">
-                {umlFlows.scriptNodes.executors.map((executor) => (
-                  <div key={executor.id} className="bg-white rounded border border-orange-100 p-3 space-y-3">
+                {umlFlows.scriptNodes.executors.map(executor => (
+                  <div
+                    key={executor.id}
+                    className="bg-white rounded border border-orange-100 p-3 space-y-3"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg" role="img" aria-label={executor.name}>
+                        <span
+                          className="text-lg"
+                          role="img"
+                          aria-label={executor.name}
+                        >
                           {executor.icon}
                         </span>
-                        <span className="font-medium text-slate-700">{executor.name}</span>
+                        <span className="font-medium text-slate-700">
+                          {executor.name}
+                        </span>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
                           checked={executor.enabled}
-                          onChange={(e) => handleExecutorChange(executor.id, 'enabled', e.target.checked)}
+                          onChange={e =>
+                            handleExecutorChange(
+                              executor.id,
+                              'enabled',
+                              e.target.checked
+                            )
+                          }
                           className="sr-only peer"
                         />
                         <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
@@ -474,20 +692,36 @@ export function UMLFlowsSettings() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <Label className="text-xs font-medium text-slate-600">Command</Label>
+                        <Label className="text-xs font-medium text-slate-600">
+                          Command
+                        </Label>
                         <Input
                           value={executor.command}
-                          onChange={(e) => handleExecutorChange(executor.id, 'command', e.target.value)}
+                          onChange={e =>
+                            handleExecutorChange(
+                              executor.id,
+                              'command',
+                              e.target.value
+                            )
+                          }
                           className="text-xs"
                           placeholder="e.g., python3"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs font-medium text-slate-600">Timeout (s)</Label>
+                        <Label className="text-xs font-medium text-slate-600">
+                          Timeout (s)
+                        </Label>
                         <Input
                           type="number"
                           value={executor.timeout}
-                          onChange={(e) => handleExecutorChange(executor.id, 'timeout', parseInt(e.target.value) || 30)}
+                          onChange={e =>
+                            handleExecutorChange(
+                              executor.id,
+                              'timeout',
+                              parseInt(e.target.value) || 30
+                            )
+                          }
                           min="1"
                           max="300"
                           className="text-xs"
@@ -496,20 +730,36 @@ export function UMLFlowsSettings() {
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-xs font-medium text-slate-600">Arguments</Label>
+                      <Label className="text-xs font-medium text-slate-600">
+                        Arguments
+                      </Label>
                       <Input
                         value={executor.args.join(' ')}
-                        onChange={(e) => handleExecutorChange(executor.id, 'args', e.target.value.split(' ').filter(Boolean))}
+                        onChange={e =>
+                          handleExecutorChange(
+                            executor.id,
+                            'args',
+                            e.target.value.split(' ').filter(Boolean)
+                          )
+                        }
                         className="text-xs font-mono"
                         placeholder="e.g., -c"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-xs font-medium text-slate-600">Description</Label>
+                      <Label className="text-xs font-medium text-slate-600">
+                        Description
+                      </Label>
                       <Input
                         value={executor.description}
-                        onChange={(e) => handleExecutorChange(executor.id, 'description', e.target.value)}
+                        onChange={e =>
+                          handleExecutorChange(
+                            executor.id,
+                            'description',
+                            e.target.value
+                          )
+                        }
                         className="text-xs"
                         placeholder="Brief description of this executor"
                       />
@@ -518,6 +768,156 @@ export function UMLFlowsSettings() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* PlantUML Settings */}
+        <div className="space-y-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="flex items-center gap-3 pb-2 border-b border-purple-200">
+            <Image className="w-5 h-5 text-purple-600" />
+            <div>
+              <h4 className="text-base font-medium text-slate-900">
+                PlantUML Settings
+              </h4>
+              <p className="text-xs text-slate-600">
+                Configure PlantUML validation, rendering, and editor preferences
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {/* Enable PlantUML Validation */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-slate-700">
+                  Enable PlantUML Validation
+                </Label>
+                <p className="text-xs text-slate-500">
+                  Validate PlantUML syntax before rendering diagrams
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={umlFlows.plantUML.validationEnabled}
+                  onChange={e =>
+                    handlePlantUMLSettingChange(
+                      'validationEnabled',
+                      e.target.checked
+                    )
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+
+            {/* PlantUML Render URL */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="plantuml-render-url"
+                className="text-sm font-medium text-slate-700"
+              >
+                PlantUML Render URL
+              </Label>
+              <div className="space-y-1">
+                <Input
+                  id="plantuml-render-url"
+                  type="text"
+                  value={umlFlows.plantUML.renderUrl}
+                  onChange={e =>
+                    handlePlantUMLSettingChange('renderUrl', e.target.value)
+                  }
+                  placeholder="https://www.plantuml.com/plantuml"
+                  className="w-full"
+                />
+                <p className="text-xs text-slate-500">
+                  Base URL for PlantUML rendering service (without trailing slash)
+                </p>
+              </div>
+            </div>
+
+            {/* Enable Rich Text Editor */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-slate-700">
+                  Enable Rich Text Editor
+                </Label>
+                <p className="text-xs text-slate-500">
+                  Use Trumbowyg rich text editor for enhanced PlantUML editing
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={umlFlows.plantUML.enableRichTextEditor}
+                  onChange={e =>
+                    handlePlantUMLSettingChange(
+                      'enableRichTextEditor',
+                      e.target.checked
+                    )
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+
+            {/* Enable Validation on Edit */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-slate-700">
+                  Real-time Validation
+                </Label>
+                <p className="text-xs text-slate-500">
+                  Validate PlantUML syntax as you type (may impact performance)
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={umlFlows.plantUML.enableValidationOnEdit}
+                  onChange={e =>
+                    handlePlantUMLSettingChange(
+                      'enableValidationOnEdit',
+                      e.target.checked
+                    )
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+
+            {/* Custom Validation Script */}
+            {umlFlows.plantUML.validationEnabled && (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="plantuml-validation-script"
+                  className="text-sm font-medium text-slate-700"
+                >
+                  Custom Validation Script (Optional)
+                </Label>
+                <div className="space-y-1">
+                  <Input
+                    id="plantuml-validation-script"
+                    type="text"
+                    value={umlFlows.plantUML.customValidationScript || ''}
+                    onChange={e =>
+                      handlePlantUMLSettingChange(
+                        'customValidationScript',
+                        e.target.value
+                      )
+                    }
+                    placeholder="plantuml -syntax -pipe"
+                    className="w-full font-mono text-sm"
+                  />
+                  <p className="text-xs text-slate-500">
+                    Custom command to validate PlantUML syntax (leave empty for built-in validation)
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

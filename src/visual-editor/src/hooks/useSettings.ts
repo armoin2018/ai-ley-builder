@@ -1,5 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { AppSettings, SettingsState, LocalAITool, AIEndpoint } from '../types/settings';
+import { useCallback, useEffect, useState } from 'react';
+import type {
+  AIEndpoint,
+  AppSettings,
+  LocalAITool,
+  SettingsState,
+} from '../types/settings';
 import { SettingsService } from '../services/settingsService';
 
 export function useSettings() {
@@ -26,7 +31,8 @@ export function useSettings() {
         setState(prev => ({
           ...prev,
           isLoading: false,
-          error: error instanceof Error ? error.message : 'Failed to load settings',
+          error:
+            error instanceof Error ? error.message : 'Failed to load settings',
         }));
       }
     };
@@ -66,7 +72,8 @@ export function useSettings() {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to save settings',
+        error:
+          error instanceof Error ? error.message : 'Failed to save settings',
       }));
       return false;
     }
@@ -90,7 +97,8 @@ export function useSettings() {
     } catch (error) {
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to export settings',
+        error:
+          error instanceof Error ? error.message : 'Failed to export settings',
       }));
     }
   }, [state.settings]);
@@ -112,26 +120,48 @@ export function useSettings() {
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to import settings',
+        error:
+          error instanceof Error ? error.message : 'Failed to import settings',
       }));
       return false;
     }
   }, []);
 
-  // Update UML flows settings
-  const updateUMLFlowsSettings = useCallback((updates: Partial<AppSettings['umlFlows']>) => {
-    setState(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        umlFlows: {
-          ...prev.settings.umlFlows,
-          ...updates,
+  // Update AI-LEY path settings
+  const updateAILeyPathSettings = useCallback(
+    (updates: Partial<AppSettings['aiLeyPaths']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          aiLeyPaths: {
+            ...prev.settings.aiLeyPaths,
+            ...updates,
+          },
         },
-      },
-      hasUnsavedChanges: true,
-    }));
-  }, []);
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
+
+  // Update UML flows settings
+  const updateUMLFlowsSettings = useCallback(
+    (updates: Partial<AppSettings['umlFlows']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          umlFlows: {
+            ...prev.settings.umlFlows,
+            ...updates,
+          },
+        },
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
 
   // Add or update local AI tool
   const saveLocalAITool = useCallback((tool: LocalAITool) => {
@@ -175,19 +205,22 @@ export function useSettings() {
   }, []);
 
   // Update local AI settings
-  const updateLocalAISettings = useCallback((updates: Partial<AppSettings['localAI']>) => {
-    setState(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        localAI: {
-          ...prev.settings.localAI,
-          ...updates,
+  const updateLocalAISettings = useCallback(
+    (updates: Partial<AppSettings['localAI']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          localAI: {
+            ...prev.settings.localAI,
+            ...updates,
+          },
         },
-      },
-      hasUnsavedChanges: true,
-    }));
-  }, []);
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
 
   // Add or update AI endpoint
   const saveAIEndpoint = useCallback((endpoint: AIEndpoint) => {
@@ -223,7 +256,9 @@ export function useSettings() {
         ...prev.settings,
         aiRest: {
           ...prev.settings.aiRest,
-          endpoints: prev.settings.aiRest.endpoints.filter(e => e.id !== endpointId),
+          endpoints: prev.settings.aiRest.endpoints.filter(
+            e => e.id !== endpointId
+          ),
         },
       },
       hasUnsavedChanges: true,
@@ -231,19 +266,22 @@ export function useSettings() {
   }, []);
 
   // Update AI REST settings
-  const updateAIRestSettings = useCallback((updates: Partial<AppSettings['aiRest']>) => {
-    setState(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        aiRest: {
-          ...prev.settings.aiRest,
-          ...updates,
+  const updateAIRestSettings = useCallback(
+    (updates: Partial<AppSettings['aiRest']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          aiRest: {
+            ...prev.settings.aiRest,
+            ...updates,
+          },
         },
-      },
-      hasUnsavedChanges: true,
-    }));
-  }, []);
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
 
   // Clear error
   const clearError = useCallback(() => {
@@ -260,6 +298,9 @@ export function useSettings() {
     resetSettings,
     exportSettings,
     importSettings,
+
+    // AI-LEY Paths
+    updateAILeyPathSettings,
 
     // UML Flows
     updateUMLFlowsSettings,
