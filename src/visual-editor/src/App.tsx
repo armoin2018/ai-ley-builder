@@ -1,36 +1,35 @@
-import './App.css';
-import { useEffect, useState } from 'react';
-import { Button, ThemeProvider } from '@shared/components';
-import { X } from 'lucide-react';
-import {
-  ContentArea,
-  Header,
-  Layout,
-  MainContent,
-  Panel,
-  Sidebar,
-} from '@features/ui-common/components';
-import {
-  FlowCanvas,
-  NodeInspector,
-  NodePalette,
-} from '@features/canvas/components';
-import { WorkflowControls } from '@features/workflow';
-import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { ExecutionPanel } from '@features/execution/components/ExecutionPanel';
+import {
+    DraggableLayoutEngine,
+    LayoutProvider,
+    LayoutQuickToggles,
+    LayoutTemplateSelector
+} from '@features/layout';
+import {
+    useTabState,
+    useWorkflowTabsContext,
+    WorkflowTabs,
+    WorkflowTabsProvider
+} from '@features/tabs';
 import { CommandPalette, QuickActions, StatusBar } from '@features/ui-advanced';
 import {
-  SourceEditor,
-  useWorkflowTabsContext,
-  WorkflowTabs,
-  WorkflowTabsProvider,
-} from '@features/tabs';
+    Header
+} from '@features/ui-common/components';
+import { ValidationPanel } from '@features/validation/components/ValidationPanel';
+import { WorkflowControls } from '@features/workflow';
+import { Button, ThemeProvider } from '@shared/components';
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
+import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import './App.css';
+import { AIDemo } from './components/ai';
+import { LayoutInitializer } from './components/LayoutInitializer';
+import { ChatPanel } from './features/chat/components/ChatPanel';
+import { FileEditorTabs } from './features/file-editor';
+import { Settings } from './features/settings';
+import { FlowStoreManager, NodeStoreManager } from './features/store';
 import { PromptService } from './services/promptService';
 import { flowToPlantUML, parsePlantUMLToFlow } from './utils/plantuml-parser';
-import { Settings } from './features/settings';
-import { AIDemo } from './components/ai';
-import { FileEditorTabs } from './features/file-editor';
 
 function AppContent() {
   const [showValidation, setShowValidation] = useState(false);
@@ -39,11 +38,26 @@ function AppContent() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAIDemo, setShowAIDemo] = useState(false);
   const [showFileEditor, setShowFileEditor] = useState(false);
-  const [isSourceView, setIsSourceView] = useState(false);
+  const [showNodeStore, setShowNodeStore] = useState(false);
+  const [showFlowStore, setShowFlowStore] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   const { getNodes, getEdges, setNodes, setEdges, setViewport } =
     useReactFlow();
   const { activeTab } = useWorkflowTabsContext();
+
+  // Use tab state hook for active tab - single source of truth for view state
+  const tabId = activeTab?.id || 'no-tab';
+  const tabState = useTabState(
+    tabId,
+    getNodes,
+    getEdges,
+    setNodes,
+    setEdges,
+    setViewport
+  );
+
+  // Determine current view mode from tab state (single source of truth)
+  const isSourceView = activeTab ? tabState.activeView === 'source' : false;
 
   const nodes = getNodes();
   const edges = getEdges();
@@ -73,21 +87,32 @@ function AppContent() {
       case 'file-editor':
         setShowFileEditor(true);
         break;
+      case 'node-store':
+        setShowNodeStore(true);
+        break;
+      case 'flow-store':
+        setShowFlowStore(true);
+        break;
       default:
         console.log('Quick action:', action);
     }
   };
 
   const handleViewModeChange = (sourceView: boolean) => {
-    setIsSourceView(sourceView);
-    // When switching to source view, we want to refresh the PlantUML content
-    if (sourceView) {
-      console.log('🔄 Switching to source view, will trigger PlantUML refresh');
-      // Wait a moment for the SourceEditor to mount, then trigger refresh
-      setTimeout(() => {
-        setLastSaved(new Date());
-        console.log('⚡ Triggered PlantUML refresh');
-      }, 100);
+    // Use tabState hook to switch views (single source of truth)
+    if (activeTab) {
+      const newView = sourceView ? 'source' : 'visual';
+      tabState.switchView(newView);
+      
+      // When switching to source view, trigger PlantUML refresh
+      if (sourceView) {
+        console.log('🔄 Switching to source view, will trigger PlantUML refresh');
+        // Wait a moment for the SourceEditor to mount, then trigger refresh
+        setTimeout(() => {
+          setLastSaved(new Date());
+          console.log('⚡ Triggered PlantUML refresh');
+        }, 100);
+      }
     }
   };
 
@@ -227,6 +252,13 @@ function AppContent() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showValidation, showExecution, showSettings]);
 
+  const handleImportFlow = (nodes: any[], edges: any[]) => {
+    setNodes(nodes);
+    setEdges(edges);
+    setViewport({ x: 0, y: 0, zoom: 1 });
+    setShowFlowStore(false);
+  };
+
   const commandPaletteCommands = [
     {
       id: 'toggle-validation',
@@ -288,27 +320,52 @@ function AppContent() {
     {
       id: 'file-editor',
       title: 'File Editor',
-      description: 'Open AI-LEY file editor for personas, instructions, and prompts',
+      description:
+        'Open AI-LEY file editor for personas, instructions, and prompts',
       category: 'Editor',
       shortcut: '⌘⇧F',
       action: () => setShowFileEditor(!showFileEditor),
-      keywords: ['file', 'editor', 'persona', 'instruction', 'prompt', 'plantuml'],
+      keywords: [
+        'file',
+        'editor',
+        'persona',
+        'instruction',
+        'prompt',
+        'plantuml',
+      ],
+    },
+    {
+      id: 'node-store',
+      title: 'Node Store',
+      description: 'Browse and manage custom nodes from the store',
+      category: 'Store',
+      shortcut: '⌘⇧N',
+      action: () => setShowNodeStore(!showNodeStore),
+      keywords: ['node', 'store', 'palette', 'custom', 'download'],
+    },
+    {
+      id: 'flow-store',
+      title: 'Flow Store',
+      description: 'Browse and manage workflow templates from the store',
+      category: 'Store',
+      shortcut: '⌘⇧W',
+      action: () => setShowFlowStore(!showFlowStore),
+      keywords: ['flow', 'store', 'workflow', 'template', 'download'],
     },
     // Add prompt commands dynamically from PromptService
     ...PromptService.getCommandPaletteEntries(),
   ];
 
   return (
-    <Layout>
-      <Sidebar side="left" width="w-80">
-        <NodePalette />
-      </Sidebar>
-
-      <MainContent>
+    <LayoutProvider>
+      <div className="flex flex-col h-screen">
+        {/* Fixed Header */}
         <Header>
           <div className="flex items-center justify-between w-full">
             <h1 className="text-lg font-semibold">AI-LEY Visual Flow Editor</h1>
             <div className="flex items-center gap-4">
+              <LayoutQuickToggles />
+              <LayoutTemplateSelector />
               <QuickActions onAction={handleQuickAction} />
               <WorkflowControls />
             </div>
@@ -320,46 +377,18 @@ function AppContent() {
           isSourceView={isSourceView}
         />
 
-        <ContentArea>
-          {isSourceView ? (
-            <SourceEditor
-              onUpdate={handlePlantUMLUpdate}
-              className="flex-1"
-              refreshTrigger={lastSaved}
-            />
-          ) : (
-            <div className="flex-1 bg-muted/50 p-4">
-              <Panel title="Canvas" className="h-full">
-                <FlowCanvas />
-              </Panel>
-            </div>
-          )}
-        </ContentArea>
-      </MainContent>
-
-      <Sidebar side="right" width="w-72">
-        <div className="p-3 border-b border-slate-200 bg-slate-50">
-          <div className="flex flex-col gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowValidation(!showValidation)}
-              className="w-full"
-            >
-              Validation Panel
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowExecution(!showExecution)}
-              className="w-full"
-            >
-              Execute Panel
-            </Button>
-          </div>
+        {/* Draggable Layout Area */}
+        <div className="flex-1 overflow-hidden">
+          <LayoutInitializer
+            nodes={nodes}
+            edges={edges}
+            isSourceView={isSourceView}
+            onPlantUMLUpdate={handlePlantUMLUpdate}
+            lastSaved={lastSaved}
+          />
+          <DraggableLayoutEngine className="h-full" />
         </div>
-        <NodeInspector />
-      </Sidebar>
+      </div>
 
       <ValidationPanel
         nodes={nodes}
@@ -428,6 +457,17 @@ function AppContent() {
         </div>
       )}
 
+      <NodeStoreManager
+        isOpen={showNodeStore}
+        onClose={() => setShowNodeStore(false)}
+      />
+
+      <FlowStoreManager
+        isOpen={showFlowStore}
+        onClose={() => setShowFlowStore(false)}
+        onImportFlow={handleImportFlow}
+      />
+
       <StatusBar
         nodeCount={nodes.length}
         connectionCount={edges.length}
@@ -437,7 +477,10 @@ function AppContent() {
         isOnline={true}
         className="fixed bottom-0 left-0 right-0 z-40"
       />
-    </Layout>
+
+      <ChatPanel />
+      {/* Fixed JSX structure */}
+    </LayoutProvider>
   );
 }
 

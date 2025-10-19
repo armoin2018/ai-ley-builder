@@ -52,7 +52,10 @@ export function LoopNode(props: NodeProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-1">
             <span className="text-xs font-medium text-white">Type:</span>
-            <Badge variant="outline" className="text-xs py-0 text-white border-white/20">
+            <Badge
+              variant="outline"
+              className="text-xs py-0 text-white border-white/20"
+            >
               {loopType}
             </Badge>
           </div>
@@ -60,7 +63,10 @@ export function LoopNode(props: NodeProps) {
           {maxIterations && (
             <div className="flex items-center gap-1">
               <span className="text-xs font-medium text-white">Max:</span>
-              <Badge variant="secondary" className="text-xs py-0 text-white border-white/20">
+              <Badge
+                variant="secondary"
+                className="text-xs py-0 text-white border-white/20"
+              >
                 {maxIterations}
               </Badge>
             </div>

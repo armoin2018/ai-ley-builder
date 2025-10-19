@@ -39,6 +39,8 @@ export const NodeType = {
   CONDITIONAL: 'conditional',
   OUTPUT_FORMATTER: 'output-formatter',
   DEFAULT: 'default',
+  // Trigger nodes
+  INJECTOR: 'injector',
 } as const;
 
 export type NodeType = (typeof NodeType)[keyof typeof NodeType];

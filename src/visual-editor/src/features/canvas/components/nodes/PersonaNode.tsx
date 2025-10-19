@@ -29,7 +29,10 @@ export function PersonaNode(props: NodeProps) {
         {personaType && (
           <div className="flex items-center gap-1">
             <span className="text-xs font-medium text-white">Role:</span>
-            <Badge variant="outline" className="text-xs py-0 text-white border-white/20">
+            <Badge
+              variant="outline"
+              className="text-xs py-0 text-white border-white/20"
+            >
               {personaType}
             </Badge>
           </div>

@@ -528,29 +528,155 @@ export function NodeInspector({ className }: NodeInspectorProps) {
           </div>
         );
 
-      case NodeType.OUTPUT_TYPE:
+      case NodeType.INJECTOR:
         return (
           <div className="space-y-4">
             <PropertyField
-              label="Output Type"
-              value={getProperty('outputType', 'text')}
-              onChange={value => updateNodeData('properties.outputType', value)}
+              label="Trigger Type"
+              value={getProperty('triggerType', 'manual')}
+              onChange={value =>
+                updateNodeData('properties.triggerType', value)
+              }
               type="select"
-              options={['text', 'json', 'xml', 'csv', 'markdown', 'html']}
+              options={['manual', 'interval', 'cron', 'webhook']}
             />
             <PropertyField
-              label="Format"
-              value={getProperty('format', 'structured')}
+              label="Payload"
+              value={getProperty('payload', '{}')}
+              onChange={value => updateNodeData('properties.payload', value)}
+              type="textarea"
+              placeholder="JSON payload to inject when triggered"
+            />
+            <PropertyField
+              label="Payload Type"
+              value={getProperty('payloadType', 'json')}
+              onChange={value =>
+                updateNodeData('properties.payloadType', value)
+              }
+              type="select"
+              options={[
+                'json',
+                'string',
+                'number',
+                'boolean',
+                'timestamp',
+                'buffer',
+              ]}
+            />
+            <PropertyField
+              label="Interval (seconds)"
+              value={getProperty('interval', 60)}
+              onChange={value => updateNodeData('properties.interval', value)}
+              type="number"
+            />
+            <PropertyField
+              label="Cron Expression"
+              value={getProperty('cronExpression', '0 * * * * *')}
+              onChange={value =>
+                updateNodeData('properties.cronExpression', value)
+              }
+              placeholder="e.g., '0 * * * * *' for every minute"
+            />
+            <PropertyField
+              label="Auto Start"
+              value={getProperty('autoStart', false)}
+              onChange={value => updateNodeData('properties.autoStart', value)}
+              type="boolean"
+            />
+            <PropertyField
+              label="Repeat Count"
+              value={getProperty('repeatCount', 0)}
+              onChange={value =>
+                updateNodeData('properties.repeatCount', value)
+              }
+              type="number"
+            />
+          </div>
+        );
+
+      case NodeType.OUTPUT_TYPE:
+      case NodeType.OUTPUT:
+        return (
+          <div className="space-y-4">
+            <PropertyField
+              label="Output Format"
+              value={getProperty('format', 'json')}
               onChange={value => updateNodeData('properties.format', value)}
               type="select"
-              options={['structured', 'raw', 'formatted', 'compressed']}
+              options={[
+                'json',
+                'csv',
+                'text',
+                'xml',
+                'yaml',
+                'html',
+                'markdown',
+                'pdf',
+                'binary',
+              ]}
             />
             <PropertyField
-              label="Template"
+              label="Output Template"
               value={getProperty('template', '')}
               onChange={value => updateNodeData('properties.template', value)}
               type="textarea"
-              placeholder="Output template..."
+              placeholder="Optional template for formatting output data. Use {{variable}} syntax for data interpolation."
+            />
+            <PropertyField
+              label="Template Type"
+              value={getProperty('templateType', 'mustache')}
+              onChange={value =>
+                updateNodeData('properties.templateType', value)
+              }
+              type="select"
+              options={[
+                'mustache',
+                'handlebars',
+                'jinja2',
+                'ejs',
+                'nunjucks',
+                'plain',
+              ]}
+            />
+            <PropertyField
+              label="Character Encoding"
+              value={getProperty('encoding', 'utf-8')}
+              onChange={value => updateNodeData('properties.encoding', value)}
+              type="select"
+              options={[
+                'utf-8',
+                'utf-16',
+                'ascii',
+                'iso-8859-1',
+                'base64',
+                'hex',
+              ]}
+            />
+            <PropertyField
+              label="Compression"
+              value={getProperty('compression', 'none')}
+              onChange={value =>
+                updateNodeData('properties.compression', value)
+              }
+              type="select"
+              options={['none', 'gzip', 'deflate', 'brotli']}
+            />
+            <PropertyField
+              label="Output Destination"
+              value={getProperty('destination', 'console')}
+              onChange={value =>
+                updateNodeData('properties.destination', value)
+              }
+              type="select"
+              options={['console', 'file', 'http', 'clipboard', 'variable']}
+            />
+            <PropertyField
+              label="Destination Path"
+              value={getProperty('destinationPath', '')}
+              onChange={value =>
+                updateNodeData('properties.destinationPath', value)
+              }
+              placeholder="File path or URL for output destination (when destination is file or http)"
             />
           </div>
         );

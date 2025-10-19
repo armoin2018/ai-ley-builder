@@ -66,8 +66,34 @@ const getDefaultNodeProperties = (nodeType: NodeType) => {
     case NodeType.OUTPUT_TYPE:
       return {
         outputType: 'text',
-        format: 'markdown',
+        format: 'structured',
         template: '',
+        templateType: 'mustache',
+        encoding: 'utf-8',
+        compression: 'none',
+        destination: 'console',
+        destinationPath: '',
+      };
+    case NodeType.OUTPUT:
+      return {
+        outputType: 'text',
+        format: 'structured',
+        template: '',
+        templateType: 'mustache',
+        encoding: 'utf-8',
+        compression: 'none',
+        destination: 'console',
+        destinationPath: '',
+      };
+    case NodeType.INJECTOR:
+      return {
+        triggerType: 'manual',
+        payload: '{}',
+        payloadType: 'json',
+        interval: 60,
+        cronExpression: '0 * * * * *',
+        autoStart: false,
+        repeatCount: 0,
       };
     case NodeType.SHELL_SCRIPT:
       return {
@@ -111,6 +137,7 @@ import { PythonScriptNode } from './nodes/PythonScriptNode';
 import { PhpScriptNode } from './nodes/PhpScriptNode';
 import { NodejsScriptNode } from './nodes/NodejsScriptNode';
 import { CanvasControls } from './CanvasControls';
+import { InjectorNode } from './nodes/InjectorNode';
 
 // Node type mapping
 const nodeTypes = {
@@ -126,6 +153,8 @@ const nodeTypes = {
   [NodeType.PYTHON_SCRIPT]: PythonScriptNode,
   [NodeType.PHP_SCRIPT]: PhpScriptNode,
   [NodeType.NODEJS_SCRIPT]: NodejsScriptNode,
+  // Trigger nodes
+  [NodeType.INJECTOR]: InjectorNode,
   // Additional types for PlantUML compatibility - using existing components as fallbacks
   [NodeType.CUSTOM_PROMPT]: CustomPromptTextNode,
   [NodeType.INPUT]: CommandPromptFileNode,
@@ -434,8 +463,9 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         'border border-slate-200 rounded-lg overflow-hidden',
         'transition-all duration-200',
         {
-          'border-blue-400 bg-blue-50/30': isDragOver,
-          'shadow-lg ring-2 ring-blue-200': isDragOver,
+          'border-2 border-dashed border-blue-400 bg-blue-50/40': isDragOver,
+          'shadow-xl ring-4 ring-blue-300 ring-opacity-50': isDragOver,
+          'bg-gradient-to-br from-blue-50/20 to-indigo-50/20': isDragOver,
         },
         className
       )}
@@ -516,23 +546,29 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
 
       {/* Drag Over Overlay */}
       {isDragOver && (
-        <div className="absolute inset-0 bg-blue-100/20 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-blue-200">
-            <div className="flex items-center gap-2 text-blue-700">
+        <div className="absolute inset-0 bg-blue-100/30 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center z-50 pointer-events-none animate-pulse">
+          <div className="bg-white/95 backdrop-blur-sm px-6 py-4 rounded-xl shadow-xl border border-blue-300 transform scale-105 transition-all duration-200">
+            <div className="flex items-center gap-3 text-blue-700">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="animate-bounce"
               >
                 <path d="M12 5v14" />
                 <path d="m19 12-7 7-7-7" />
               </svg>
-              <span className="text-sm font-medium">Drop node here</span>
+              <div className="text-center">
+                <span className="text-lg font-semibold">Drop Node Here</span>
+                <p className="text-xs text-blue-600 mt-1">
+                  Release to add to canvas
+                </p>
+              </div>
             </div>
           </div>
         </div>

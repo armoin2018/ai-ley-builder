@@ -154,7 +154,7 @@ expertise:
         snippet: `## Role Definition
 
 You are a **[Role Title]** - [brief description of the role and expertise].`,
-        description: 'Clearly defines the persona\'s primary role',
+        description: "Clearly defines the persona's primary role",
       },
       {
         label: 'Expertise Areas',
@@ -163,7 +163,7 @@ You are a **[Role Title]** - [brief description of the role and expertise].`,
 - **Primary**: [Main expertise]
 - **Secondary**: [Supporting areas]
 - **Tools**: [Relevant technologies]`,
-        description: 'Lists the persona\'s areas of knowledge',
+        description: "Lists the persona's areas of knowledge",
       },
       {
         label: 'Communication Guidelines',
@@ -188,7 +188,7 @@ You are a **[Role Title]** - [brief description of the role and expertise].`,
         snippet: `## Background Context
 
 [Detailed description of experience, training, and perspective]`,
-        description: 'Explains the persona\'s background and experience',
+        description: "Explains the persona's background and experience",
       },
     ],
   };

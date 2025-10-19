@@ -4,7 +4,12 @@ export interface FileEditorTab {
   id: string;
   title: string;
   filePath: string;
-  fileType: 'plantuml' | 'persona' | 'instruction' | 'global-instruction' | 'command-prompt';
+  fileType:
+    | 'plantuml'
+    | 'persona'
+    | 'instruction'
+    | 'global-instruction'
+    | 'command-prompt';
   content: string;
   hasChanges: boolean;
   lastModified?: Date;

@@ -427,7 +427,8 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
     type: 'output',
     name: 'Output',
     category: 'data',
-    description: 'Outputs data from the workflow',
+    description:
+      'Outputs data from the workflow with optional template and encoding',
     inputs: [
       {
         id: 'input',
@@ -454,9 +455,86 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
         required: false,
         defaultValue: 'json',
         validation: {
-          options: ['json', 'csv', 'text', 'xml'],
+          options: [
+            'json',
+            'csv',
+            'text',
+            'xml',
+            'yaml',
+            'html',
+            'markdown',
+            'pdf',
+            'binary',
+          ],
         },
         description: 'Format for the output data',
+      },
+      {
+        key: 'template',
+        name: 'Output Template',
+        type: 'textarea',
+        required: false,
+        description:
+          'Optional template for formatting output data. Use {{variable}} syntax for data interpolation.',
+      },
+      {
+        key: 'templateType',
+        name: 'Template Type',
+        type: 'select',
+        required: false,
+        defaultValue: 'mustache',
+        validation: {
+          options: [
+            'mustache',
+            'handlebars',
+            'jinja2',
+            'ejs',
+            'nunjucks',
+            'plain',
+          ],
+        },
+        description: 'Template engine type for processing the output template',
+      },
+      {
+        key: 'encoding',
+        name: 'Character Encoding',
+        type: 'select',
+        required: false,
+        defaultValue: 'utf-8',
+        validation: {
+          options: ['utf-8', 'utf-16', 'ascii', 'iso-8859-1', 'base64', 'hex'],
+        },
+        description: 'Character encoding for the output data',
+      },
+      {
+        key: 'compression',
+        name: 'Compression',
+        type: 'select',
+        required: false,
+        defaultValue: 'none',
+        validation: {
+          options: ['none', 'gzip', 'deflate', 'brotli'],
+        },
+        description: 'Compression method for the output data',
+      },
+      {
+        key: 'destination',
+        name: 'Output Destination',
+        type: 'select',
+        required: false,
+        defaultValue: 'console',
+        validation: {
+          options: ['console', 'file', 'http', 'clipboard', 'variable'],
+        },
+        description: 'Where to send the output data',
+      },
+      {
+        key: 'destinationPath',
+        name: 'Destination Path',
+        type: 'text',
+        required: false,
+        description:
+          'File path or URL for output destination (when destination is file or http)',
       },
     ],
     validation: {
@@ -744,6 +822,166 @@ export const NODE_TYPE_DEFINITIONS: Record<string, NodeTypeDefinition> = {
             nodeId: node.id,
             suggestedFix: 'Connect a data source to Input 2',
           });
+        }
+
+        return {
+          isValid: errors.length === 0,
+          errors,
+          warnings,
+        };
+      },
+    },
+  },
+
+  // Trigger Nodes
+  injector: {
+    type: 'injector',
+    name: 'Injector',
+    category: 'trigger',
+    description:
+      'Triggers workflow execution at scheduled intervals or manually',
+    inputs: [],
+    outputs: [
+      {
+        id: 'output',
+        name: 'Output',
+        dataType: 'any',
+        required: false,
+        description: 'Triggered payload output',
+      },
+    ],
+    properties: [
+      {
+        key: 'label',
+        name: 'Label',
+        type: 'text',
+        required: true,
+        defaultValue: 'Injector',
+        description: 'Display name for the injector node',
+      },
+      {
+        key: 'triggerType',
+        name: 'Trigger Type',
+        type: 'select',
+        required: true,
+        defaultValue: 'manual',
+        validation: {
+          options: ['manual', 'interval', 'cron', 'webhook'],
+        },
+        description: 'How the injector is triggered',
+      },
+      {
+        key: 'payload',
+        name: 'Payload',
+        type: 'textarea',
+        required: false,
+        defaultValue: '{}',
+        description: 'JSON payload to inject when triggered',
+      },
+      {
+        key: 'payloadType',
+        name: 'Payload Type',
+        type: 'select',
+        required: false,
+        defaultValue: 'json',
+        validation: {
+          options: [
+            'json',
+            'string',
+            'number',
+            'boolean',
+            'timestamp',
+            'buffer',
+          ],
+        },
+        description: 'Type of payload data',
+      },
+      {
+        key: 'interval',
+        name: 'Interval (seconds)',
+        type: 'number',
+        required: false,
+        defaultValue: 60,
+        description: 'Interval in seconds for interval trigger type',
+      },
+      {
+        key: 'cronExpression',
+        name: 'Cron Expression',
+        type: 'text',
+        required: false,
+        defaultValue: '0 * * * * *',
+        description:
+          'Cron expression for scheduled triggers (e.g., "0 * * * * *" for every minute)',
+      },
+      {
+        key: 'autoStart',
+        name: 'Auto Start',
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        description: 'Start trigger automatically when workflow runs',
+      },
+      {
+        key: 'repeatCount',
+        name: 'Repeat Count',
+        type: 'number',
+        required: false,
+        defaultValue: 0,
+        description: 'Number of times to repeat (0 = infinite)',
+      },
+    ],
+    validation: {
+      required: ['label', 'triggerType'],
+      custom: (node: any, _context: ValidationContext): ValidationResult => {
+        const errors: ValidationError[] = [];
+        const warnings: ValidationWarning[] = [];
+
+        const triggerType = node.data?.properties?.triggerType;
+        const interval = node.data?.properties?.interval;
+        const cronExpression = node.data?.properties?.cronExpression;
+        const payload = node.data?.properties?.payload;
+
+        // Validate interval for interval trigger
+        if (triggerType === 'interval' && (!interval || interval < 1)) {
+          errors.push({
+            id: `${node.id}_invalid_interval`,
+            type: 'INVALID_FORMAT' as const,
+            severity: 'error' as const,
+            message: 'Interval must be at least 1 second for interval trigger',
+            nodeId: node.id,
+            property: 'interval',
+            suggestedFix: 'Set interval to a positive number',
+          });
+        }
+
+        // Validate cron expression for cron trigger
+        if (triggerType === 'cron' && !cronExpression) {
+          errors.push({
+            id: `${node.id}_missing_cron`,
+            type: 'MISSING_REQUIRED_INPUT' as const,
+            severity: 'error' as const,
+            message: 'Cron expression is required for cron trigger',
+            nodeId: node.id,
+            property: 'cronExpression',
+            suggestedFix: 'Provide a valid cron expression',
+          });
+        }
+
+        // Validate JSON payload if provided
+        if (payload && payload.trim()) {
+          try {
+            JSON.parse(payload);
+          } catch (error) {
+            warnings.push({
+              id: `${node.id}_invalid_json`,
+              type: 'INVALID_FORMAT' as const,
+              severity: 'warning' as const,
+              message: 'Payload is not valid JSON',
+              nodeId: node.id,
+              property: 'payload',
+              suggestedFix: 'Check JSON syntax in payload',
+            });
+          }
         }
 
         return {

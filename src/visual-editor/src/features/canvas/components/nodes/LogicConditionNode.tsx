@@ -92,12 +92,18 @@ export function LogicConditionNode(props: NodeProps) {
 
           <div className="flex justify-between gap-2">
             <div className="flex flex-col items-center">
-              <Badge variant="success" className="text-xs py-0 text-white border-white/20">
+              <Badge
+                variant="success"
+                className="text-xs py-0 text-white border-white/20"
+              >
                 {trueLabel}
               </Badge>
             </div>
             <div className="flex flex-col items-center">
-              <Badge variant="destructive" className="text-xs py-0 text-white border-white/20">
+              <Badge
+                variant="destructive"
+                className="text-xs py-0 text-white border-white/20"
+              >
                 {falseLabel}
               </Badge>
             </div>

@@ -227,7 +227,7 @@ export function WorkflowManager({ isOpen, onClose }: WorkflowManagerProps) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-3/4 flex flex-col">
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl h-3/4 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <div className="flex-1">
@@ -288,7 +288,13 @@ export function WorkflowManager({ isOpen, onClose }: WorkflowManagerProps) {
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 p-0 hover:bg-slate-100 rounded-full"
+            title="Close"
+          >
             ×
           </Button>
         </div>

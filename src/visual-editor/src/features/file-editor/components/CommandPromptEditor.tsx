@@ -299,7 +299,8 @@ keywords: [automation, workflow]
 {{files.requirements}}
 {{input.context}}
 {{output.result}}`,
-        description: 'References variables from folder structure and command input/output',
+        description:
+          'References variables from folder structure and command input/output',
       },
       {
         label: 'Step Structure',

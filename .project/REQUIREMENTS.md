@@ -1535,3 +1535,114 @@ Each phase SHALL complete only after passing defined acceptance criteria and cod
 - Integration with external PlantUML renderers is handled by consuming applications
 - Multi-user collaboration features are not included in this release
 - Advanced PlantUML syntax features may not be fully supported in initial release
+
+---
+
+## R34. Persistent Tab Dropdown Menu Visibility
+
+**R34.1 Always-Visible Tab Actions**
+
+- **Description**: Modify WorkflowTabs component to display tab dropdown menu (three vertical dots) permanently instead of only on hover, improving feature discoverability and user experience
+- **Acceptance Criteria**:
+  - [ ] Three vertical dots (MoreVertical icon) are always visible on all tabs
+  - [ ] Dropdown functionality remains unchanged (click to open menu)
+  - [ ] Visual styling maintains professional appearance and consistency
+  - [ ] Keyboard navigation and accessibility standards are preserved (WCAG 2.1 AA)
+  - [ ] No performance impact from CSS styling changes
+  - [ ] Consistent behavior across all supported browsers
+- **Priority**: Medium
+- **Complexity**: Simple
+- **Dependencies**: None
+- **Source**: ASK-001 - 2025-01-21 - Tab UX improvement for dropdown visibility
+
+---
+
+## R35. Secure Path Construction and Scoping
+
+**R35.1 Path Separator and Security Validation**
+
+- **Description**: Implement secure path construction that ensures proper path separators and restricts all paths to be scoped below the detected project root, preventing path traversal vulnerabilities and ensuring system integrity
+- **Acceptance Criteria**:
+  - [ ] `getAiLeyRoot()` function properly joins paths with correct separators using `joinPath()` utility
+  - [ ] All paths are constrained to be within or below the detected project root directory
+  - [ ] No relative path traversals (../, ../../) are used in path construction functions
+  - [ ] Path joining utility handles edge cases (trailing/leading slashes, empty parts, cross-platform compatibility)
+  - [ ] Storage folder paths are validated to be within project scope in settings service
+  - [ ] Fallback paths maintain security constraints and log appropriate warnings
+  - [ ] Cross-platform path handling (Windows/Unix) works correctly with normalized separators
+- **Priority**: High
+- **Complexity**: Moderate
+- **Dependencies**: None
+- **Source**: ASK-002 - 2025-09-19 - Path construction security and proper separator issue
+
+
+---
+
+## R36. Model-Driven AI Agent Instruction System
+
+**R36.1 Model-Driven Architecture Implementation**
+
+- **Description**: Transform the visual editor from drag-and-drop visual nodes to a model-driven approach using markdown-based templates for nodes and flows, with compilation to PlantUML and AI system execution integration
+- **Business Value**: Revolutionizes AI agent instruction workflow by providing template-driven development, automated code generation, and seamless AI system integration while maintaining visual representation through PlantUML compilation
+- **Acceptance Criteria**:
+  - [ ] Create folder structure under `.ai-ley/models/` with `nodes/` and `flows/` subdirectories
+  - [ ] Implement node model schema with required fields: id, type, name, description, properties, inputs, outputs
+  - [ ] Implement flow model schema with required fields: id, name, description, nodes, connections, metadata
+  - [ ] Create template generators for all 7 node types (CommandPromptFile, LogicCondition, OutputType, Loop, CustomPromptText, Persona, Instruction)
+  - [ ] Implement form-based editors for creating and editing node and flow models from templates
+  - [ ] Build compilation system that converts models to PlantUML syntax with proper node and connection representation
+  - [ ] Add "Execute" dropdown with AI system integration options and /run-flow command support
+  - [ ] Create model validation engine ensuring required fields, type safety, and referential integrity
+  - [ ] Implement dependency management system for inter-model references
+  - [ ] Add version control support with semantic versioning for models
+  - [ ] Create migration path from current visual editor to model-driven approach
+  - [ ] Implement performance optimization for large model sets (100+ nodes/flows)
+- **Priority**: High
+- **Complexity**: Expert
+- **Dependencies**: File system architecture, PlantUML compilation engine, AI system integration, Form validation framework
+- **Source**: ASK-003 - 2025-01-21 - Model-driven AI agent instruction system transformation request
+
+---
+
+## R37. Auto-Arrangement of Visual Dialog Boxes
+
+**R37.1 Intelligent Node Layout Engine**
+
+- **Description**: Implement automatic arrangement of visual dialog boxes (nodes) based on connection points and graph structure to optimize workflow readability and minimize manual layout work
+- **Business Value**: Significantly reduces time spent on manual node positioning, improves workflow visualization quality, and enhances user productivity through intelligent auto-layout algorithms
+- **Acceptance Criteria**:
+  - [ ] Implement hierarchical layout algorithm that positions nodes based on connection flow (top-to-bottom, left-to-right)
+  - [ ] Add force-directed layout algorithm for complex interconnected nodes with optimal spacing
+  - [ ] Create grid-based alignment system ensuring minimum 10px spacing between all adjacent nodes
+  - [ ] Implement automatic collision detection and resolution for overlapping nodes
+  - [ ] Add layout optimization for different workflow patterns (linear, branching, circular, parallel)
+  - [ ] Create user preference system for layout style selection (hierarchical, force-directed, grid, manual)
+  - [ ] Implement undo/redo functionality for auto-arrangement operations
+  - [ ] Add layout performance optimization for large workflows (100+ nodes)
+  - [ ] Create layout preview system showing arrangement changes before application
+  - [ ] Implement incremental layout updates when nodes are added/removed/modified
+  - [ ] Add export/import functionality for saved layout templates
+  - [ ] Create accessibility support for auto-arranged layouts (screen reader compatibility)
+- **Priority**: High
+- **Complexity**: High
+- **Dependencies**: React Flow layout extensions, Graph layout algorithms, Node positioning system
+- **Source**: ASK-005 - 2025-09-17 - Auto-arrangement of visual dialog boxes
+
+**R37.2 Layout Control Interface**
+
+- **Description**: Provide user interface controls for triggering auto-arrangement, configuring layout preferences, and managing layout templates
+- **Business Value**: Gives users control over automatic layout behavior while providing easy access to arrangement functions
+- **Acceptance Criteria**:
+  - [ ] Add "Auto Arrange" button to canvas toolbar with dropdown for layout algorithm selection
+  - [ ] Create layout preferences panel in settings with algorithm-specific configuration options
+  - [ ] Implement layout template manager for saving and applying custom arrangements
+  - [ ] Add keyboard shortcuts for common layout operations (Ctrl+Shift+A for auto-arrange)
+  - [ ] Create layout status indicator showing current arrangement state
+  - [ ] Implement batch operations for selecting and arranging subsets of nodes
+  - [ ] Add context menu options for node-specific layout operations
+  - [ ] Create layout animation system with smooth transitions between arrangements
+- **Priority**: Medium
+- **Complexity**: Medium
+- **Dependencies**: R37.1 (Layout Engine), UI component framework, Animation library
+- **Source**: ASK-005 - 2025-09-17 - Auto-arrangement user interface requirements
+

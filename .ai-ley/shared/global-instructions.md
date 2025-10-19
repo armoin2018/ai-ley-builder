@@ -2,10 +2,165 @@
 
 This guide defines universal coding standards and project management workflows to account for clarity, traceability, compliance, and coordination practices for multi-language development projects. The following guidelines outline how requirements, plans, instructions, personas, documentation, testing and library usage are managed.
 
+## Prompt Engineering & Request Processing
+
+**Primary Optimization Agent**: Expert Prompt Engineer (`.ai-ley/shared/personas/engineer/expert-prompt-engineer.md`)
+
+### AI Agent Prompt Optimization Protocol
+
+**MANDATORY**: All AI agent interactions MUST utilize the **Expert Prompt Engineer** persona to optimize prompts before processing any user request. This ensures maximum effectiveness, appropriate resource selection, and optimal outcomes.
+
+1. **Automatic Prompt Optimization**
+
+   - **Invoke Expert Prompt Engineer**: Automatically engage the expert-prompt-engineer persona for every user request
+   - **Intelligent Resource Detection**: Automatically detect and apply relevant instruction sets from `.ai-ley/shared/instructions/**/*.md`
+   - **Dynamic Persona Selection**: Automatically select and apply appropriate personas from `.ai-ley/shared/personas/**/*.md`
+   - **Context Optimization**: Optimize prompts for model-specific behaviors, token efficiency, and user intent alignment
+
+2. **Enhanced Request Analysis**
+
+   - **Intent Recognition**: Parse user requests for domain keywords, complexity indicators, and expertise requirements
+   - **Resource Mapping**: Query instruction and persona indexes for optimal resource identification
+   - **Conflict Resolution**: Resolve contradictions across multiple instructions with `.my/` precedence handling
+   - **Composite Guidance**: Create unified approaches from multiple relevant sources with clear attribution
+
+3. **Intelligent Decomposition Strategy**
+
+   - **Smart Chunking**: Break complex requests into optimally-sized, logically coherent processing units
+   - **Boundary Detection**: Identify natural breakpoints based on:
+     - **File boundaries**: Process one file at a time for file operations
+     - **Function/class boundaries**: Handle individual components separately
+     - **Feature boundaries**: Implement one feature per processing pass
+     - **Documentation boundaries**: Generate docs section by section
+     - **Test boundaries**: Write tests module by module
+   - **Context Preservation**: Maintain consistent patterns, naming conventions, and architectural decisions across chunks
+
+4. **Advanced Resource Utilization**
+
+   - **Indexed Resource Access**: Leverage `.ai-ley/shared/indexes/instructions.md` and `.ai-ley/shared/indexes/personas.md` for rapid selection
+   - **Cross-Referenced Integration**: Seamlessly integrate multiple instruction sets from `.ai-ley/shared/instructions/**/*.md`
+   - **Specialized Persona Application**: Apply domain-specific personas from `.ai-ley/shared/personas/**/*.md` based on expertise requirements
+   - **Performance Optimization**: Continuously refine resource selection based on outcome tracking and success patterns
+
+5. **Enhanced Multi-Pass Processing Strategy**
+
+   - **Pass 1: Expert Analysis & Optimization**
+     - Invoke Expert Prompt Engineer for comprehensive request analysis
+     - Automatically detect and select relevant instructions and personas
+     - Optimize prompt structure for model-specific capabilities and constraints
+     - Create execution plan with intelligent chunking strategy and resource allocation
+   - **Pass 2: Guided Execution (Iterative)**
+     - Execute each chunk using expert-optimized prompts and selected resources
+     - Apply composite guidance from multiple instruction sets and personas
+     - Maintain architectural consistency through expert-defined patterns
+     - Validate integration after each chunk with expert evaluation criteria
+     - Provide progress updates with expert assessment of completion quality
+   - **Pass 3: Expert Integration & Validation**
+     - Conduct expert-guided cross-chunk compatibility verification
+     - Run integration tests with expert-defined success criteria
+     - Ensure consistency across all deliverables using expert validation frameworks
+     - Generate comprehensive summary with expert performance assessment
+
+6. **Continuous Prompt Optimization**
+
+   - **Performance Tracking**: Log prompt modifications, rationale, and observed outcomes
+   - **Pattern Recognition**: Identify successful prompt patterns and reuse strategies
+   - **Iterative Refinement**: Continuously improve prompts based on effectiveness metrics
+   - **Benchmarking**: Compare results against previous successful implementations
+   - **Model Adaptation**: Adjust prompts for different AI models and their specific capabilities
+   - **Pass 3: Integration & Verification**
+     - Verify cross-chunk compatibility
+     - Run integration tests
+     - Ensure consistency across all deliverables
+     - Generate comprehensive summary
+
+7. **Automatic Recovery & Resumption**
+
+   - If a chunk fails due to size/complexity:
+     - Further subdivide the failing chunk
+     - Retry with smaller scope
+     - Track partial progress for resumption
+   - Maintain state between interruptions
+   - Support resuming from last successful checkpoint
+
+8. **Context Window Management**
+   - Monitor token usage throughout processing
+   - Clear non-essential context between logical chunks
+   - Preserve critical architectural decisions and patterns
+   - Reset memory strategically to prevent context pollution
+
+### Prompt Reconstruction Framework
+
+When formulating prompts for AI systems:
+
+1. **Clarity & Specificity**
+
+   - State objectives explicitly with measurable success criteria
+   - Provide concrete examples and expected outputs
+   - Define scope boundaries and exclusions
+
+2. **Contextual Enrichment**
+
+   - Reference relevant instruction files by path
+   - Cite applicable personas and their expertise domains
+   - Include architectural patterns and standards
+
+3. **Structured Input Format**
+
+   ```
+   **Objective**: [Clear goal statement]
+   **Context**: [Background information, constraints, dependencies]
+   **Personas**: [Relevant expert personas from indexes]
+   **Instructions**: [Applicable instruction files]
+   **Expected Output**: [Format, structure, deliverables]
+   **Success Criteria**: [Measurable validation points]
+   **Chunking Strategy**: [If applicable, breakdown approach]
+   ```
+
+4. **Iterative Refinement**
+   - Start with broad strokes, refine iteratively
+   - Validate understanding after each pass
+   - Adjust strategy based on intermediate results
+
+### Session Management & Progress Reporting
+
+**Session Lifecycle Management**: Every AI agent session must follow standardized initialization, progress tracking, and session closure protocols to ensure continuity, documentation, and deliverable quality.
+
+1. **Session Initialization**
+
+   - **Expert Prompt Engineer Activation**: Automatically invoke expert-prompt-engineer persona at session start
+   - **Context Loading**: Load relevant project context, previous session state, and active requirements
+   - **Resource Preparation**: Pre-load instruction indexes and persona catalogs for rapid access
+   - **Objective Clarification**: Establish clear session goals and success criteria with user input
+
+2. **Continuous Progress Tracking**
+
+   - **Real-Time Documentation**: Maintain live progress updates throughout session execution
+   - **Milestone Validation**: Verify completion of intermediate steps and deliverable quality
+   - **Resource Utilization Logging**: Track which instructions and personas were applied and their effectiveness
+   - **Performance Metrics**: Monitor prompt effectiveness, user satisfaction, and objective achievement
+
+3. **Session Closure & Reporting**
+
+   - **Comprehensive Progress Report**: Generate `.project/PROGRESS.html` at the end of every session
+   - **Next Phase Planning**: Update or create `.project/NEXT.md` with clearly defined next steps and priorities
+   - **Documentation Updates**: Ensure all project documentation reflects current state and progress
+   - **Performance Assessment**: Evaluate session effectiveness and identify improvement opportunities
+
+4. **HTML Progress Report Standards**
+
+   - **Multi-Tab Interface**: Use Bootstrap.js, Markdown.js, Chart.js, and Mermaid libraries for comprehensive visualization
+   - **Required Tabs**: Progress, Plans, Next, Requirements, Architecture, Project Status, and related project documents
+   - **Visual Elements**: Charts for progress tracking, Mermaid diagrams for architecture, responsive Bootstrap design
+   - **Data Integration**: Pull from all relevant project files to provide complete project overview
+   - **Export Capability**: Enable export functionality for sharing and archival purposes
+
 ## Variables
 
 - Folders, Files and Indexes are defined in `.ai-ley/shared/variables/folder-structure.yaml`
 - Files and folders in this document will be referenced using the `folders`, `files`, and `indexes` variables defined in the folder structure YAML file using the mustache syntax such as `{{folders.plan}}`.
+- Instruction files are indexed in `.ai-ley/shared/indexes/instructions.md` with quality scores and keywords for rapid selection
+- Personas are cataloged in `.ai-ley/shared/indexes/personas.md` organized by domain expertise
 
 ## Requirements
 

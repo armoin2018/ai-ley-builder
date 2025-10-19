@@ -1,10 +1,11 @@
-Issue Type,Summary,Description,Story Points,Epic Link,Sprint,Assignee,Priority,Components,Labels
-Epic,Foundation Infrastructure,"Set up development environment, project structure, and build pipeline",16,,,,"High",Infrastructure,"epic-001,foundation"
-Story,Development Environment Setup,"Initialize React TypeScript project with Vite and essential tooling",5,Foundation Infrastructure,1,,"High",Infrastructure,"story-001,dev-setup"
-Task,Initialize React TypeScript App,"Create new React app with TypeScript template and configure basic settings",2,Foundation Infrastructure,1,,"High",Infrastructure,"task-001,react-init"
-Task,Configure Vite Build System,"Set up Vite for fast development and optimized production builds",2,Foundation Infrastructure,1,,"High",Infrastructure,"task-002,vite-config"
-Task,Setup Development Tools,"Configure ESLint, Prettier, TypeScript compiler and VSCode settings",1,Foundation Infrastructure,1,,"Medium",Infrastructure,"task-003,dev-tools"
-Story,Project Structure & Configuration,"Establish scalable project architecture and configuration management",5,Foundation Infrastructure,1,,"High",Infrastructure,"story-002,project-structure"
+Summary,Issue Type,Priority,Description,Epic Link,Story Points,Assignee,Labels,Components,Fix Version,Sprint,Dependencies
+"EPIC: Foundation & Model-Driven Enhancement",Epic,High,"Establish robust foundation and enhance model-driven system for advanced workflow capabilities",,"45",,"foundation,model-driven,optimization",,"2.0.0",,"None"
+"Enhanced Type System & Architecture",Story,High,"Implement comprehensive TypeScript types and optimize core architecture for performance",EPIC-001,"8",,"types,architecture,performance",,"2.0.0","Sprint 1","None"
+"Optimized Template Service",Story,High,"Enhance template loading with caching and dynamic capabilities for sub-100ms performance",EPIC-001,"8",,"templates,caching,performance",,"2.0.0","Sprint 1","Enhanced Type System"
+"Advanced Compilation Engine",Story,High,"Improve PlantUML compilation with metadata support and 100% accuracy",EPIC-001,"8",,"compilation,plantuml,metadata",,"2.0.0","Sprint 1","Template Service"
+"Robust Execution Service",Story,Medium,"Enhance execution engine with parallel processing and advanced workflow patterns",EPIC-001,"8",,"execution,parallel,workflows",,"2.0.0","Sprint 2","Compilation Engine"
+"Performance Monitoring & Optimization",Story,Medium,"Implement comprehensive performance monitoring and optimization systems",EPIC-001,"7",,"monitoring,metrics,optimization",,"2.0.0","Sprint 2","Execution Service"
+"Error Handling & Recovery Systems",Story,Medium,"Build robust error handling with graceful degradation and recovery capabilities",EPIC-001,"6",,"error-handling,recovery,resilience",,"2.0.0","Sprint 2","Performance Monitoring"
 Task,Create Folder Structure,"Organize components, hooks, utils, and assets in scalable directory structure",1,Foundation Infrastructure,1,,"Medium",Infrastructure,"task-004,folder-structure"
 Task,Configure TypeScript Strict Mode,"Enable strict TypeScript checking and configure path aliases",2,Foundation Infrastructure,1,,"High",Infrastructure,"task-005,typescript-config"
 Task,Setup Environment Configuration,"Configure environment variables and application settings management",2,Foundation Infrastructure,1,,"Medium",Infrastructure,"task-006,env-config"

@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { useSettings } from '../../../hooks/useSettings';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
-import { useSettings } from '../../../hooks/useSettings';
 import { AI_LEY_PATHS } from '../../../utils/paths';
 
 import { AILeyPathsSettings } from './AILeyPathsSettings';
-import { StorageBackupSettings } from './StorageBackupSettings';
 import { AutoArrangeSettings } from './AutoArrangeSettings';
+import { FeatureFlagsSettings } from './FeatureFlagsSettings';
 import { ScriptNodeSettings } from './ScriptNodeSettings';
+import { StorageBackupSettings } from './StorageBackupSettings';
 
-type UMLFlowsSubTab = 'paths' | 'storage' | 'autoArrange' | 'scriptNodes';
+type UMLFlowsSubTab =
+  | 'paths'
+  | 'storage'
+  | 'autoArrange'
+  | 'scriptNodes'
+  | 'featureFlags';
 
 export function TabbedUMLFlowsSettings() {
   const [activeSubTab, setActiveSubTab] = useState<UMLFlowsSubTab>('paths');
@@ -94,6 +100,10 @@ export function TabbedUMLFlowsSettings() {
             },
           ],
         },
+        featureFlags: {
+          useTabStateHook: true,
+          enableExperimentalFeatures: false,
+        },
       });
     }
   };
@@ -103,6 +113,7 @@ export function TabbedUMLFlowsSettings() {
     { id: 'storage', label: 'Storage & Backup', icon: '💾' },
     { id: 'autoArrange', label: 'Auto-Arrange', icon: '🔄' },
     { id: 'scriptNodes', label: 'Script Nodes', icon: '⚡' },
+    { id: 'featureFlags', label: 'Feature Flags', icon: '🚩' },
   ] as const;
 
   return (
@@ -134,6 +145,7 @@ export function TabbedUMLFlowsSettings() {
         {activeSubTab === 'storage' && <StorageBackupSettings />}
         {activeSubTab === 'autoArrange' && <AutoArrangeSettings />}
         {activeSubTab === 'scriptNodes' && <ScriptNodeSettings />}
+        {activeSubTab === 'featureFlags' && <FeatureFlagsSettings />}
       </div>
 
       {/* Reset to Defaults Action */}

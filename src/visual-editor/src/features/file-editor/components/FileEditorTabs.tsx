@@ -1,6 +1,14 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from '../../../shared/components/Button';
-import { X, Plus, FileText, User, BookOpen, Settings, Code2 } from 'lucide-react';
+import {
+  BookOpen,
+  Code2,
+  FileText,
+  Plus,
+  Settings,
+  User,
+  X,
+} from 'lucide-react';
 import { cn } from '../../../utils';
 import { PlantUMLEditor } from './PlantUMLEditor';
 import { PersonaEditor } from './PersonaEditor';
@@ -12,7 +20,12 @@ interface FileEditorTab {
   id: string;
   title: string;
   filePath: string;
-  fileType: 'plantuml' | 'persona' | 'instruction' | 'global-instruction' | 'command-prompt';
+  fileType:
+    | 'plantuml'
+    | 'persona'
+    | 'instruction'
+    | 'global-instruction'
+    | 'command-prompt';
   content: string;
   hasChanges: boolean;
 }
@@ -61,11 +74,13 @@ export function FileEditorTabs({
 
   const closeTab = useCallback(
     (tabId: string) => {
-      const newTabs = tabs.filter((tab) => tab.id !== tabId);
+      const newTabs = tabs.filter(tab => tab.id !== tabId);
       updateTabs(newTabs);
 
       if (activeTabId === tabId) {
-        setActiveTabId(newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null);
+        setActiveTabId(
+          newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null
+        );
       }
     },
     [tabs, activeTabId, updateTabs]
@@ -73,7 +88,7 @@ export function FileEditorTabs({
 
   const updateTabContent = useCallback(
     (tabId: string, content: string) => {
-      const newTabs = tabs.map((tab) =>
+      const newTabs = tabs.map(tab =>
         tab.id === tabId
           ? { ...tab, content, hasChanges: content !== tab.content }
           : tab
@@ -85,14 +100,14 @@ export function FileEditorTabs({
 
   const saveTab = useCallback(
     async (tabId: string) => {
-      const tab = tabs.find((t) => t.id === tabId);
+      const tab = tabs.find(t => t.id === tabId);
       if (!tab) return;
 
       // Here you would implement actual file saving
       console.log(`Saving ${tab.fileType} file:`, tab.filePath, tab.content);
 
       // Mark as saved
-      const newTabs = tabs.map((t) =>
+      const newTabs = tabs.map(t =>
         t.id === tabId ? { ...t, hasChanges: false } : t
       );
       updateTabs(newTabs);
@@ -118,7 +133,7 @@ export function FileEditorTabs({
   };
 
   const renderEditor = () => {
-    const activeTab = tabs.find((tab) => tab.id === activeTabId);
+    const activeTab = tabs.find(tab => tab.id === activeTabId);
     if (!activeTab) {
       return (
         <div className="flex-1 flex items-center justify-center bg-slate-50">
@@ -177,7 +192,8 @@ export function FileEditorTabs({
 
     const editorProps = {
       className: 'h-full',
-      onContentChange: (content: string) => updateTabContent(activeTab.id, content),
+      onContentChange: (content: string) =>
+        updateTabContent(activeTab.id, content),
       onSave: () => saveTab(activeTab.id),
     };
 
@@ -258,7 +274,7 @@ export function FileEditorTabs({
       {/* Tab Bar */}
       <div className="flex items-center border-b bg-slate-50">
         <div className="flex items-center flex-1 min-w-0">
-          {tabs.map((tab) => {
+          {tabs.map(tab => {
             const Icon = getTabIcon(tab.fileType);
             return (
               <div
@@ -280,7 +296,7 @@ export function FileEditorTabs({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     closeTab(tab.id);
                   }}

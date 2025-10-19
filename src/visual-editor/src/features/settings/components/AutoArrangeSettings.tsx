@@ -163,7 +163,7 @@ export function AutoArrangeSettings() {
               onChange={e =>
                 handleAutoArrangeSettingChange(
                   'minSpacing',
-                  parseInt(e.target.value) || 50
+                  parseInt(e.target.value) || 10
                 )
               }
               min="10"

@@ -10,7 +10,15 @@ interface NodePaletteItem {
   label: string;
   description: string;
   icon: string;
-  category: 'input' | 'logic' | 'output' | 'control' | 'custom' | 'ai-local' | 'ai-rest';
+  category:
+    | 'input'
+    | 'logic'
+    | 'output'
+    | 'control'
+    | 'custom'
+    | 'trigger'
+    | 'ai-local'
+    | 'ai-rest';
   color: string;
 }
 
@@ -71,6 +79,14 @@ const nodeItems: NodePaletteItem[] = [
     category: 'output',
     color: 'bg-green-50/50 border-green-100 hover:border-green-200',
   },
+  {
+    type: NodeType.INJECTOR,
+    label: 'Injector',
+    description: 'Timer/trigger node',
+    icon: '⚡',
+    category: 'trigger',
+    color: 'bg-red-50/50 border-red-100 hover:border-red-200',
+  },
 ];
 
 const categoryLabels = {
@@ -78,6 +94,7 @@ const categoryLabels = {
   logic: 'Logic Nodes',
   output: 'Output Nodes',
   control: 'Control Nodes',
+  trigger: 'Trigger Nodes',
   custom: 'Custom Nodes',
   'ai-local': 'Local AI Tools',
   'ai-rest': 'AI REST APIs',
@@ -235,7 +252,12 @@ export function NodePalette({ className }: NodePaletteProps) {
     });
 
   // Combine static nodes with dynamic nodes
-  const allNodeItems = [...nodeItems, ...scriptNodeItems, ...localAINodeItems, ...aiRestNodeItems];
+  const allNodeItems = [
+    ...nodeItems,
+    ...scriptNodeItems,
+    ...localAINodeItems,
+    ...aiRestNodeItems,
+  ];
 
   // Filter nodes based on search term and group by category
   const filteredAndGroupedNodes = useMemo(() => {
@@ -327,9 +349,10 @@ export function NodePalette({ className }: NodePaletteProps) {
                       key={item.type}
                       className={cn(
                         'p-3 border-2 border-dashed rounded-lg cursor-grab',
-                        'transition-all duration-200 hover:shadow-sm',
+                        'transition-all duration-200 hover:shadow-md hover:border-solid',
                         'active:cursor-grabbing active:scale-95',
-                        'select-none',
+                        'select-none group hover:bg-opacity-80',
+                        'hover:transform hover:scale-102',
                         item.color
                       )}
                       draggable
@@ -341,7 +364,7 @@ export function NodePalette({ className }: NodePaletteProps) {
                       <div className="flex items-start gap-3">
                         {/* Icon */}
                         <span
-                          className="text-lg flex-shrink-0"
+                          className="text-lg flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
                           role="img"
                           aria-label={item.label}
                         >

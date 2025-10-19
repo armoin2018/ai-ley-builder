@@ -13,13 +13,20 @@ import { useSettings } from '../../../hooks/useSettings';
 import { TabbedUMLFlowsSettings } from './TabbedUMLFlowsSettings';
 import { LocalAISettings } from './LocalAISettings';
 import { AIRestSettings } from './AIRestSettings';
+import { NodeStoreSettings } from './NodeStoreSettings';
+import { FlowStoreSettings } from './FlowStoreSettings';
 
 interface SettingsProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type SettingsTab = 'umlFlows' | 'localAI' | 'aiRest';
+type SettingsTab =
+  | 'umlFlows'
+  | 'localAI'
+  | 'aiRest'
+  | 'nodeStore'
+  | 'flowStore';
 
 export function Settings({ isOpen, onClose }: SettingsProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>('umlFlows');
@@ -82,6 +89,8 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
     { id: 'umlFlows', label: 'UML Flows', icon: '📁' },
     { id: 'localAI', label: 'Local AI Tools', icon: '⚡' },
     { id: 'aiRest', label: 'AI REST APIs', icon: '🌐' },
+    { id: 'nodeStore', label: 'Node Store', icon: '📦' },
+    { id: 'flowStore', label: 'Flow Store', icon: '🌿' },
   ] as const;
 
   return (
@@ -139,6 +148,8 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
           {activeTab === 'umlFlows' && <TabbedUMLFlowsSettings />}
           {activeTab === 'localAI' && <LocalAISettings />}
           {activeTab === 'aiRest' && <AIRestSettings />}
+          {activeTab === 'nodeStore' && <NodeStoreSettings />}
+          {activeTab === 'flowStore' && <FlowStoreSettings />}
         </div>
 
         {/* Footer */}

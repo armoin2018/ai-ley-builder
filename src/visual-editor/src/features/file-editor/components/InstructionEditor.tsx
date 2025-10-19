@@ -225,7 +225,7 @@ scope:
 
 ### Must Not Do
 - ❌ [Prohibited action]`,
-        description: 'Defines clear do\'s and don\'ts',
+        description: "Defines clear do's and don'ts",
       },
       {
         label: 'Example Scenario',

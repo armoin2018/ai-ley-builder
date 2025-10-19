@@ -39,6 +39,11 @@ export interface PlantUMLSettings {
   customValidationScript?: string;
 }
 
+export interface FeatureFlagsSettings {
+  useTabStateHook: boolean;
+  enableExperimentalFeatures: boolean;
+}
+
 export interface AILeyPathSettings {
   globalInstructions: string;
   instructions: string;
@@ -55,6 +60,7 @@ export interface UMLFlowsSettings {
   autoArrange: AutoArrangeSettings;
   scriptNodes: ScriptNodeSettings;
   plantUML: PlantUMLSettings;
+  featureFlags: FeatureFlagsSettings;
 }
 
 export interface LocalAITool {
@@ -91,11 +97,62 @@ export interface AIRestSettings {
   timeout: number; // in seconds
 }
 
+export interface NodeStoreSettings {
+  storeUrl: string;
+  enabled: boolean;
+  autoUpdate: boolean;
+  cacheDuration: number; // in minutes
+  retryAttempts: number;
+}
+
+export interface FlowStoreSettings {
+  storeUrl: string;
+  enabled: boolean;
+  autoUpdate: boolean;
+  cacheDuration: number; // in minutes
+  retryAttempts: number;
+}
+
+export interface StoreItem {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  author: string;
+  tags: string[];
+  downloadUrl: string;
+  thumbnailUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+  downloads: number;
+  rating: number;
+  enabled: boolean;
+  installed: boolean;
+}
+
+export interface NodeStoreItem extends StoreItem {
+  nodeType: string;
+  category: string;
+  inputs: { name: string; type: string; required: boolean }[];
+  outputs: { name: string; type: string }[];
+  configuration: Record<string, any>;
+}
+
+export interface FlowStoreItem extends StoreItem {
+  flowType: string;
+  category: string;
+  nodes: string[];
+  connections: number;
+  complexity: 'simple' | 'medium' | 'complex';
+}
+
 export interface AppSettings {
   aiLeyPaths: AILeyPathSettings;
   umlFlows: UMLFlowsSettings;
   localAI: LocalAISettings;
   aiRest: AIRestSettings;
+  nodeStore: NodeStoreSettings;
+  flowStore: FlowStoreSettings;
   version: string;
   lastUpdated: string;
 }
@@ -127,7 +184,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
       enableConnectionAwareSpacing: true,
       horizontalSpacing: 300,
       verticalSpacing: 150,
-      minSpacing: 50,
+      minSpacing: 10,
       enableCollisionDetection: true,
     },
     scriptNodes: {
@@ -185,6 +242,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
       renderUrl: 'https://www.plantuml.com/plantuml',
       enableRichTextEditor: true,
       enableValidationOnEdit: false,
+    },
+    featureFlags: {
+      useTabStateHook: true,
+      enableExperimentalFeatures: false,
     },
   },
   localAI: {
@@ -259,6 +320,20 @@ export const DEFAULT_SETTINGS: AppSettings = {
     ],
     retryAttempts: 3,
     timeout: 60,
+  },
+  nodeStore: {
+    storeUrl: 'https://github.com/armoin2018/ai-ley-nodes',
+    enabled: true,
+    autoUpdate: false,
+    cacheDuration: 60, // 1 hour
+    retryAttempts: 3,
+  },
+  flowStore: {
+    storeUrl: 'https://github.com/armoin2018/ai-ley-flows',
+    enabled: true,
+    autoUpdate: false,
+    cacheDuration: 60, // 1 hour
+    retryAttempts: 3,
   },
   version: '1.0.0',
   lastUpdated: new Date().toISOString(),

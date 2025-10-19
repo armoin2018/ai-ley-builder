@@ -1,27 +1,27 @@
+import { useReactFlow } from '@xyflow/react';
+import {
+    Code,
+    Download,
+    Edit2,
+    Eye,
+    Layout,
+    MoreVertical,
+    Play,
+    Plus,
+    Save,
+    Upload,
+    X,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Code,
-  Download,
-  Edit2,
-  Eye,
-  Layout,
-  MoreVertical,
-  Play,
-  Plus,
-  Save,
-  Upload,
-  X,
-} from 'lucide-react';
-import { useReactFlow } from '@xyflow/react';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
-import { useWorkflowTabsContext } from './WorkflowTabsProvider';
 import {
-  flowToPlantUML,
-  parsePlantUMLToFlow,
+    parsePlantUMLToFlow
 } from '../../../utils/plantuml-parser';
+import { useTabState } from '../hooks/useTabState';
 import type { WorkflowTab } from '../types/tab';
+import { useWorkflowTabsContext } from './WorkflowTabsProvider';
 
 interface WorkflowTabsProps {
   className?: string;
@@ -53,11 +53,17 @@ export function WorkflowTabs({
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [dropdownTabId, setDropdownTabId] = useState<string | null>(null);
-  const [internalSourceView, setInternalSourceView] = useState(isSourceView);
   const [dropdownPosition, setDropdownPosition] = useState<{
     top: number;
     right: number;
   } | null>(null);
+
+  // Initialize useTabState hook for active tab (single source of truth)
+  const tabId = activeTabId || 'no-tab';
+  const tabState = useTabState(tabId, getNodes, getEdges, setNodes, setEdges, setViewport);
+  
+  // Derive source view state from hook (remove duplicate internalSourceView state)
+  const internalSourceView = activeTabId ? tabState.state.activeView === 'source' : false;
 
   const dropdownButtonRefs = useRef<{
     [key: string]: HTMLButtonElement | null;
@@ -109,70 +115,29 @@ export function WorkflowTabs({
           `💾 Saving tab: ${tab.name} (${internalSourceView ? 'source' : 'visual'} mode)`
         );
 
-        if (internalSourceView) {
-          // In source mode: save PlantUML content first, then try workflow save
-          const storageKey = tab.path || `tab-${tab.id}`;
+        // useWorkflowTabs saves file metadata (owns tab collection)
+        await saveTab(tabId);
+        console.log(`✅ Workflow tab save completed for: ${tab.name}`);
+        
+        // useTabState marks content as saved (owns content state)
+        tabState.markSaved();
+        console.log(`✅ Tab state marked as saved for: ${tab.name}`);
 
-          // Get current PlantUML content from the source editor
-          const sourceEditorContent =
-            localStorage.getItem(`puml-content-${storageKey}`) ||
-            localStorage.getItem(`puml-content-tab-plantuml-${tab.id}`);
-
-          if (sourceEditorContent) {
-            // Save PlantUML content with multiple keys for consistency
-            localStorage.setItem(
-              `puml-content-${storageKey}`,
-              sourceEditorContent
-            );
-            localStorage.setItem(
-              `puml-content-tab-plantuml-${tab.id}`,
-              sourceEditorContent
-            );
-            console.log(`✅ Saved PlantUML content for tab: ${tab.name}`);
-          }
-        } else {
-          // In visual mode: save current canvas state first
-          console.log(`💾 Saving visual workflow for tab: ${tab.name}`);
-        }
-
-        // Try to save through the tab system, but don't fail if workflow structure is incomplete
-        try {
-          await saveTab(tabId);
-          console.log(`✅ Workflow tab save completed for: ${tab.name}`);
-        } catch (tabSaveError) {
-          console.warn(
-            `⚠️ Workflow save failed for tab "${tab.name}":`,
-            tabSaveError
-          );
-
-          if (internalSourceView) {
-            // For source mode, PlantUML content save is sufficient - don't fail the operation
-            console.log(
-              `✅ PlantUML content was saved successfully for: ${tab.name}`
-            );
-          } else {
-            // For visual mode, we need the workflow save to work
-            throw tabSaveError;
-          }
-        }
-
-        console.log(`✅ Successfully saved tab: ${tab.name}`);
-
-        // Show user feedback
+        // Parent shows UI feedback (UI coordination)
         const savedIndicator = document.createElement('div');
         savedIndicator.textContent = `✅ Saved "${tab.name}"!`;
         savedIndicator.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        z-index: 9999;
-        font-size: 14px;
-        font-weight: 500;
-      `;
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #10b981;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 4px;
+          z-index: 9999;
+          font-size: 14px;
+          font-weight: 500;
+        `;
         document.body.appendChild(savedIndicator);
         setTimeout(() => {
           if (document.body.contains(savedIndicator)) {
@@ -189,7 +154,7 @@ export function WorkflowTabs({
         setDropdownPosition(null);
       }
     },
-    [saveTab, tabs, internalSourceView]
+    [saveTab, tabs, tabState, internalSourceView]
   );
 
   const handleDelete = useCallback(
@@ -205,162 +170,40 @@ export function WorkflowTabs({
 
   const handleToggleViewForTab = useCallback(
     async (tabId: string) => {
-      const newSourceView = !internalSourceView;
-
-      // Use the currently active tab, not the dropdown tab
-      const currentActiveTab = tabs.find(t => t.id === activeTabId);
-
-      if (!currentActiveTab) {
+      if (!activeTabId) {
         console.warn('No active tab found for view toggle');
         return;
       }
 
-      console.log('🎯 Toggling view for active tab:', {
-        clickedTabId: tabId,
-        activeTabId: activeTabId,
-        activeTabName: currentActiveTab.name,
-        newSourceView,
-      });
+      const currentActiveTab = tabs.find(t => t.id === activeTabId);
+      if (!currentActiveTab) {
+        console.warn('Active tab not found in tabs array');
+        return;
+      }
 
       try {
-        if (newSourceView) {
-          // Switching to source view - convert current visual flow to PlantUML
-          console.log(
-            '🔄 Converting visual flow to PlantUML for tab:',
-            currentActiveTab.name
-          );
+        // Determine new view mode
+        const newView = tabState.state.activeView === 'source' ? 'visual' : 'source';
+        
+        console.log('🎯 Toggling view for active tab:', {
+          tabId: activeTabId,
+          tabName: currentActiveTab.name,
+          currentView: tabState.state.activeView,
+          newView,
+        });
 
-          const currentNodes = getNodes();
-          const currentEdges = getEdges();
-
-          if (currentNodes.length > 0) {
-            const plantumlContent = flowToPlantUML(
-              currentNodes,
-              currentEdges,
-              currentActiveTab.name
-            );
-
-            // Store the PlantUML content for this tab
-            const storageKey =
-              currentActiveTab.path || `tab-plantuml-${currentActiveTab.id}`;
-            localStorage.setItem(`puml-content-${storageKey}`, plantumlContent);
-
-            console.log('✅ Visual flow converted to PlantUML and stored');
-          } else {
-            console.log(
-              '📝 No nodes in visual flow, will show default PlantUML template'
-            );
-          }
+        // Delegate to useTabState hook - handles conversion & persistence
+        if (newView === 'source') {
+          await tabState.switchToSource();
+          console.log('✅ Switched to source view via hook');
         } else {
-          // Switching to visual view - convert current PlantUML content to visual flow
-          console.log(
-            '🔄 Converting PlantUML to visual flow for tab:',
-            currentActiveTab.name
-          );
-
-          // Get the most current PlantUML content from multiple sources
-          const storageKey =
-            currentActiveTab.path || `tab-plantuml-${currentActiveTab.id}`;
-
-          // Try to get the latest content from various storage locations
-          const sourcePaths = [
-            `puml-content-${storageKey}`,
-            `puml-content-tab-plantuml-${currentActiveTab.id}`,
-            `puml-content-${currentActiveTab.path}`,
-          ];
-
-          let plantumlContent = '';
-          for (const path of sourcePaths) {
-            const content = localStorage.getItem(path);
-            if (content && content.length > plantumlContent.length) {
-              plantumlContent = content;
-            }
-          }
-
-          // Also check if there's content in the DOM (if source editor is currently showing)
-          const sourceTextarea = document.querySelector(
-            'textarea'
-          ) as HTMLTextAreaElement;
-          if (
-            sourceTextarea &&
-            sourceTextarea.value &&
-            sourceTextarea.value.includes('@startuml')
-          ) {
-            console.log(
-              '📝 Found current content in source editor, using that instead of stored content'
-            );
-            plantumlContent = sourceTextarea.value;
-
-            // Save this current content to localStorage for future reference
-            localStorage.setItem(`puml-content-${storageKey}`, plantumlContent);
-            localStorage.setItem(
-              `puml-content-tab-plantuml-${currentActiveTab.id}`,
-              plantumlContent
-            );
-          }
-
-          if (plantumlContent && plantumlContent.trim()) {
-            try {
-              console.log(
-                `📄 Using PlantUML content (${plantumlContent.length} characters)`
-              );
-
-              const { nodes: parsedNodes, edges: parsedEdges } =
-                parsePlantUMLToFlow(plantumlContent);
-
-              // Update the React Flow canvas
-              setNodes(parsedNodes);
-              setEdges(parsedEdges);
-              setViewport({ x: 0, y: 0, zoom: 1 });
-
-              console.log('✅ PlantUML converted to visual flow:', {
-                nodes: parsedNodes.length,
-                edges: parsedEdges.length,
-              });
-
-              // Save the updated PlantUML content with any missing visualization metadata
-              if (parsedNodes.length > 0) {
-                const enhancedPlantuml = flowToPlantUML(
-                  parsedNodes,
-                  parsedEdges,
-                  currentActiveTab.name
-                );
-                localStorage.setItem(
-                  `puml-content-${storageKey}`,
-                  enhancedPlantuml
-                );
-                localStorage.setItem(
-                  `puml-content-tab-plantuml-${currentActiveTab.id}`,
-                  enhancedPlantuml
-                );
-                console.log('💾 Enhanced PlantUML with visualization metadata');
-              }
-            } catch (parseError) {
-              console.error('❌ Failed to parse PlantUML content:', parseError);
-              alert(
-                `Failed to parse PlantUML content: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
-              );
-
-              // Don't switch view if parsing failed
-              setDropdownTabId(null);
-              setDropdownPosition(null);
-              return;
-            }
-          } else {
-            console.log('📝 No PlantUML content found, clearing visual canvas');
-            setNodes([]);
-            setEdges([]);
-            setViewport({ x: 0, y: 0, zoom: 1 });
-          }
+          await tabState.switchToVisual();
+          console.log('✅ Switched to visual view via hook');
         }
 
-        // Update view state
-        setInternalSourceView(newSourceView);
+        // Notify parent component (UI coordination responsibility)
+        onViewModeChange?.(newView === 'source');
 
-        // Add a small delay to ensure state synchronization before triggering view change
-        setTimeout(() => {
-          onViewModeChange?.(newSourceView);
-        }, 100);
       } catch (error) {
         console.error('❌ Failed to toggle view:', error);
         alert(
@@ -371,17 +214,7 @@ export function WorkflowTabs({
         setDropdownPosition(null);
       }
     },
-    [
-      internalSourceView,
-      onViewModeChange,
-      tabs,
-      activeTabId,
-      getNodes,
-      getEdges,
-      setNodes,
-      setEdges,
-      setViewport,
-    ]
+    [activeTabId, tabs, tabState, onViewModeChange]
   );
 
   const handleAutoArrange = useCallback(
@@ -505,10 +338,9 @@ export function WorkflowTabs({
         setEdges(parsedEdges);
         setViewport({ x: 0, y: 0, zoom: 1 });
 
-        // Store the PlantUML content for this new tab
-        const storageKey = `tab-plantuml-${newTabId}`;
-        localStorage.setItem(`puml-content-${storageKey}`, content);
-
+        // Note: After tab creation, the hook for the new tab will be initialized
+        // The content will be stored via useTabState when the tab becomes active
+        // For now, store in the visual state which the hook will persist
         console.log(
           `✅ Successfully imported "${workflowName}" into new tab with visual conversion`
         );
@@ -563,10 +395,8 @@ export function WorkflowTabs({
     }
   }, [createNewTab]);
 
-  // Sync external source view changes
-  useEffect(() => {
-    setInternalSourceView(isSourceView);
-  }, [isSourceView]);
+  // Note: internalSourceView now derived from tabState.state.activeView
+  // External prop sync handled via hook's state management
 
   // Close dropdown when clicking outside
   useEffect(() => {

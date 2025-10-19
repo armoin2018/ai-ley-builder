@@ -1,107 +1,132 @@
 @startgantt
 !theme plain
-title AI-Ley Builder Visual Flow Editor - Project Timeline (14-Week Development Cycle)
+title AI-Ley Visual Flow Editor - Comprehensive Project Timeline
+caption 16-Week Development Schedule with Intelligent Resource Allocation (January-May 2025)
 
-Project starts 2026-01-06
+projectstart 2025-01-13
+printscale weekly zoom 2
 
--- Phase 1: Foundation Infrastructure (Weeks 1-2) --
-[Epic 1: Foundation Infrastructure] lasts 10 days
-[Epic 1: Foundation Infrastructure] starts 2026-01-06
+-- Phase 1: Foundation Infrastructure (Weeks 1-4) --
+[EPIC 1: Foundation Infrastructure] starts 2025-01-13 and lasts 4 weeks
+[EPIC 1: Foundation Infrastructure] is colored in Orange
 
-[Story 1.1: Development Environment Setup] lasts 3 days
-[Story 1.1: Development Environment Setup] starts at [Epic 1: Foundation Infrastructure]'s start
-[Story 1.2: Project Structure & Configuration] lasts 3 days
-[Story 1.2: Project Structure & Configuration] starts at [Story 1.1: Development Environment Setup]'s end
-[Story 1.3: Build Pipeline & CI/CD] lasts 4 days
-[Story 1.3: Build Pipeline & CI/CD] starts at [Story 1.2: Project Structure & Configuration]'s end
+[Setup Development Environment] starts at [EPIC 1: Foundation Infrastructure]'s start and lasts 1 week
+[Setup Development Environment] is assigned to DevOps Engineer
 
--- Phase 2: Visual Editor Core (Weeks 3-7) --
-[Epic 2: Visual Editor Core] lasts 25 days
-[Epic 2: Visual Editor Core] starts at [Story 1.3: Build Pipeline & CI/CD]'s end
+[Core Architecture Design] starts at [Setup Development Environment]'s end and lasts 2 weeks
+[Core Architecture Design] is assigned to Technical Architect
 
-[Story 2.1: Canvas Implementation] lasts 5 days
-[Story 2.1: Canvas Implementation] starts at [Epic 2: Visual Editor Core]'s start
-[Story 2.2: Component Palette] lasts 5 days
-[Story 2.2: Component Palette] starts at [Story 2.1: Canvas Implementation]'s end
-[Story 2.3: Inspector Panel] lasts 5 days
-[Story 2.3: Inspector Panel] starts at [Story 2.2: Component Palette]'s end
-[Story 2.4: Tab Management] lasts 5 days
-[Story 2.4: Tab Management] starts at [Story 2.3: Inspector Panel]'s end
-[Story 2.5: Node Styling & Connection Enhancement] lasts 5 days
-[Story 2.5: Node Styling & Connection Enhancement] starts at [Story 2.4: Tab Management]'s end
+[Security Foundation Setup] starts at [Core Architecture Design]'s start and lasts 1.5 weeks
+[Security Foundation Setup] is assigned to Security Expert
 
--- Phase 3: Flow Logic & Validation (Weeks 8-10) --
-[Epic 3: Flow Logic & Validation] lasts 15 days
-[Epic 3: Flow Logic & Validation] starts at [Story 2.5: Node Styling & Connection Enhancement]'s end
+[Performance Monitoring Setup] starts at [Security Foundation Setup]'s end and lasts 0.5 weeks
+[Performance Monitoring Setup] is assigned to QA Engineer
 
-[Story 3.1: Connection System] lasts 4 days
-[Story 3.1: Connection System] starts at [Epic 3: Flow Logic & Validation]'s start
-[Story 3.2: Business Rule Validation] lasts 4 days
-[Story 3.2: Business Rule Validation] starts at [Story 3.1: Connection System]'s end
-[Story 3.3: Cycle Detection] lasts 3 days
-[Story 3.3: Cycle Detection] starts at [Story 3.2: Business Rule Validation]'s end
-[Story 3.4: Flow Linting System] lasts 4 days
-[Story 3.4: Flow Linting System] starts at [Story 3.3: Cycle Detection]'s end
+-- Phase 2: Visual Editor Core (Weeks 5-10) --
+[EPIC 2: Visual Editor Core] starts at [EPIC 1: Foundation Infrastructure]'s end and lasts 6 weeks
+[EPIC 2: Visual Editor Core] is colored in Green
 
--- Phase 4: Export & Integration (Weeks 11-13) --
-[Epic 4: Export & Integration] lasts 15 days
-[Epic 4: Export & Integration] starts at [Story 3.4: Flow Linting System]'s end
+[Canvas Implementation] starts at [EPIC 2: Visual Editor Core]'s start and lasts 2 weeks
+[Canvas Implementation] is assigned to Frontend Lead
 
-[Story 4.1: PlantUML Export] lasts 4 days
-[Story 4.1: PlantUML Export] starts at [Epic 4: Export & Integration]'s start
-[Story 4.2: PlantUML Auto-Loading] lasts 5 days
-[Story 4.2: PlantUML Auto-Loading] starts at [Story 4.1: PlantUML Export]'s end
-[Story 4.3: Auto-Save Integration] lasts 4 days
-[Story 4.3: Auto-Save Integration] starts at [Story 4.2: PlantUML Auto-Loading]'s end
-[Story 4.4: JSON Serialization] lasts 2 days
-[Story 4.4: JSON Serialization] starts at [Story 4.3: Auto-Save Integration]'s end
-[Story 4.5: CLI Integration] lasts 2 days
-[Story 4.5: CLI Integration] starts at [Story 4.4: JSON Serialization]'s end
+[Node System Implementation] starts at [Canvas Implementation]'s start and lasts 3 weeks
+[Node System Implementation] is assigned to Frontend Lead
 
--- Phase 5: Polish & Documentation (Weeks 14-15) --
-[Epic 5: Polish & Documentation] lasts 10 days
-[Epic 5: Polish & Documentation] starts at [Story 4.5: CLI Integration]'s end
+[Connection System] starts at [Node System Implementation]'s start and lasts 3 weeks
+[Connection System] is assigned to Technical Architect
 
-[Story 5.1: Testing Suite] lasts 4 days
-[Story 5.1: Testing Suite] starts at [Epic 5: Polish & Documentation]'s start
-[Story 5.2: Accessibility Features] lasts 3 days
-[Story 5.2: Accessibility Features] starts at [Story 5.1: Testing Suite]'s end
-[Story 5.3: Documentation] lasts 3 days
-[Story 5.3: Documentation] starts at [Story 5.2: Accessibility Features]'s end
+[PlantUML Integration] starts at [Connection System]'s start and lasts 2.5 weeks
+[PlantUML Integration] is assigned to PlantUML Expert
 
--- Critical Path and Dependencies --
-[Task 1.1.1: Initialize React TypeScript App] lasts 1 day
-[Task 1.1.1: Initialize React TypeScript App] starts at [Story 1.1: Development Environment Setup]'s start
-[Task 2.1.1: Setup React Flow Canvas] lasts 2 days
-[Task 2.1.1: Setup React Flow Canvas] starts at [Story 2.1: Canvas Implementation]'s start
-[Task 3.1.1: Implement Port System] lasts 2 days
-[Task 3.1.1: Implement Port System] starts at [Story 3.1: Connection System]'s start
-[Task 4.1.1: Create Export Engine] lasts 2 days
-[Task 4.1.1: Create Export Engine] starts at [Story 4.1: PlantUML Export]'s start
+-- Phase 3: Node-RED Style Features (Weeks 11-14) --
+[EPIC 3: Node-RED Style Features] starts at [EPIC 2: Visual Editor Core]'s end and lasts 4 weeks
+[EPIC 3: Node-RED Style Features] is colored in Purple
+
+[Panel Management System] starts at [EPIC 3: Node-RED Style Features]'s start and lasts 1.5 weeks
+[Panel Management System] is assigned to UI/UX Designer
+
+[Auto-Arrangement System] starts at [Panel Management System]'s start and lasts 2.5 weeks
+[Auto-Arrangement System] is assigned to Technical Architect
+
+[Scoped Storage System] starts at [Auto-Arrangement System]'s start and lasts 2 weeks
+[Scoped Storage System] is assigned to Backend Engineer
+
+[AI Tool Integrations] starts at [Scoped Storage System]'s start and lasts 1.5 weeks
+[AI Tool Integrations] is assigned to Backend Engineer
+
+-- Phase 4: Advanced Capabilities (Weeks 15-16) --
+[EPIC 4: Advanced Capabilities] starts at [EPIC 3: Node-RED Style Features]'s end and lasts 2 weeks
+[EPIC 4: Advanced Capabilities] is colored in Red
+
+[GitHub Repository Import] starts at [EPIC 4: Advanced Capabilities]'s start and lasts 1 week
+[GitHub Repository Import] is assigned to Backend Engineer
+
+[Rich Text Editor Integration] starts at [GitHub Repository Import]'s start and lasts 0.5 weeks
+[Rich Text Editor Integration] is assigned to Frontend Lead
+
+[Performance Optimization] starts at [Rich Text Editor Integration]'s start and lasts 1.5 weeks
+[Performance Optimization] is assigned to Technical Architect
+
+[Model-Driven System Foundation] starts at [Performance Optimization]'s start and lasts 1 week
+[Model-Driven System Foundation] is assigned to Technical Architect
+
+-- Quality Assurance & Testing (Continuous) --
+[Quality Assurance & Testing] starts at [EPIC 2: Visual Editor Core]'s start and lasts 12 weeks
+[Quality Assurance & Testing] is colored in Gray
+[Quality Assurance & Testing] is assigned to QA Engineer
+
+[Security Review] starts at [EPIC 3: Node-RED Style Features]'s start and lasts 2 weeks
+[Security Review] is colored in DarkRed
+[Security Review] is assigned to Security Expert
+
+[Performance Testing] starts at [EPIC 4: Advanced Capabilities]'s start and lasts 2 weeks
+[Performance Testing] is colored in DarkBlue
+[Performance Testing] is assigned to QA Engineer
+
+-- Risk Mitigation Activities --
+[PlantUML Parser Prototype] starts at [Core Architecture Design]'s start and lasts 1 week
+[PlantUML Parser Prototype] is colored in Pink
+[PlantUML Parser Prototype] is assigned to PlantUML Expert
+
+[React Flow Performance Testing] starts at [Canvas Implementation]'s start and lasts 0.5 weeks
+[React Flow Performance Testing] is colored in Pink
+[React Flow Performance Testing] is assigned to QA Engineer
+
+[Backward Compatibility Validation] starts at [EPIC 4: Advanced Capabilities]'s start and lasts 1 week
+[Backward Compatibility Validation] is colored in Pink
+[Backward Compatibility Validation] is assigned to QA Engineer
 
 -- Sprint Boundaries --
-[Sprint 1] happens 2026-01-06
-[Sprint 2] happens 2026-01-20
-[Sprint 3] happens 2026-02-03
-[Sprint 4] happens 2026-02-17
-[Sprint 5] happens 2026-03-03
-[Sprint 6] happens 2026-03-17
-[Sprint 7] happens 2026-03-31
+[Sprint 1] happens 2025-01-13
+[Sprint 2] happens 2025-01-27
+[Sprint 3] happens 2025-02-10
+[Sprint 4] happens 2025-02-24
+[Sprint 5] happens 2025-03-10
+[Sprint 6] happens 2025-03-24
+[Sprint 7] happens 2025-04-07
+[Sprint 8] happens 2025-04-21
 
 -- Major Milestones --
-milestone : Foundation Complete
-milestone happens at [Epic 1: Foundation Infrastructure]'s end
+milestone "M1: Foundation Complete" happens at [EPIC 1: Foundation Infrastructure]'s end
+milestone "M2: Visual Editor MVP" happens at [EPIC 2: Visual Editor Core]'s end
+milestone "M3: Node-RED Features Complete" happens at [EPIC 3: Node-RED Style Features]'s end
+milestone "M4: Project Complete" happens at [EPIC 4: Advanced Capabilities]'s end
 
-milestone : Visual Editor Complete
-milestone happens at [Epic 2: Visual Editor Core]'s end
+-- Resource Utilization Summary --
+note top
+**Resource Allocation Summary:**
+- **Technical Architect**: 95% utilization (Architecture, complex implementations)
+- **Frontend Lead**: 92% utilization (Canvas, node system, React components)
+- **UI/UX Designer**: 75% utilization (Panel design, user experience)
+- **Backend Engineer**: 88% utilization (Storage, AI integrations, GitHub import)
+- **DevOps Engineer**: 60% utilization (Infrastructure, CI/CD, optimization)
+- **QA Engineer**: 85% utilization (Testing, performance validation, security)
+- **Security Expert**: 50% utilization (Foundation security, reviews)
+- **PlantUML Expert**: 60% utilization (Parser development, integration support)
 
-milestone : Flow Logic Complete
-milestone happens at [Epic 3: Flow Logic & Validation]'s end
-
-milestone : Export System Complete
-milestone happens at [Epic 4: Export & Integration]'s end
-
-milestone : Production Ready
-milestone happens at [Epic 5: Polish & Documentation]'s end
+**Critical Path**: Foundation → Visual Editor Core → Node-RED Features → Advanced Capabilities
+**Total Project Duration**: 16 weeks
+**Risk Mitigation**: Early prototypes and parallel testing activities
+end note
 
 @endgantt

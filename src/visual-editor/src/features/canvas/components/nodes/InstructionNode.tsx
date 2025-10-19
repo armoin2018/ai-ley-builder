@@ -34,10 +34,7 @@ export function InstructionNode(props: NodeProps) {
       <div className="space-y-2">
         <div className="flex items-center gap-1">
           <span className="text-xs font-medium text-white">Type:</span>
-          <Badge
-            className={`text-xs py-0 ${getTypeColor()}`}
-            variant="outline"
-          >
+          <Badge className={`text-xs py-0 ${getTypeColor()}`} variant="outline">
             {instructionType}
           </Badge>
         </div>

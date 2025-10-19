@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
@@ -20,6 +20,15 @@ export function CanvasControls({ className }: CanvasControlsProps) {
     setNodes,
   } = useReactFlow();
   const { settings } = useSettings();
+
+  // Draggable state
+  const [position, setPosition] = useState({
+    x: 20,
+    y: window.innerHeight - 300,
+  });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const controlsRef = useRef<HTMLDivElement>(null);
 
   const handleZoomIn = useCallback(() => {
     zoomIn({ duration: 300 });
@@ -87,17 +96,84 @@ export function CanvasControls({ className }: CanvasControlsProps) {
     }
   }, [getNodes, getEdges, setNodes, settings.umlFlows.autoArrange]);
 
+  // Drag handlers
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!controlsRef.current) return;
+
+    setIsDragging(true);
+    const rect = controlsRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+
+    e.preventDefault();
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      const newX = Math.max(
+        0,
+        Math.min(window.innerWidth - 200, e.clientX - dragOffset.x)
+      );
+      const newY = Math.max(
+        0,
+        Math.min(window.innerHeight - 300, e.clientY - dragOffset.y)
+      );
+
+      setPosition({ x: newX, y: newY });
+    },
+    [isDragging, dragOffset]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Add global event listeners for drag
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
   const currentZoom = Math.round(getZoom() * 100);
 
   return (
     <div
+      ref={controlsRef}
       className={cn(
-        'absolute top-4 left-4 z-10 flex flex-col gap-2 p-2',
+        'fixed z-20 flex flex-col gap-2 p-2',
         'bg-white border border-slate-200 rounded-lg shadow-lg',
         'backdrop-blur-sm bg-white/95',
+        'select-none',
+        isDragging && 'cursor-grabbing',
         className
       )}
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+      }}
     >
+      {/* Drag Handle */}
+      <div
+        className={cn(
+          'w-full h-2 rounded-t bg-slate-100 hover:bg-slate-200',
+          'cursor-grab active:cursor-grabbing',
+          'flex items-center justify-center'
+        )}
+        onMouseDown={handleMouseDown}
+        title="Drag to move"
+      >
+        <div className="w-6 h-0.5 bg-slate-400 rounded-full" />
+      </div>
       {/* Zoom In */}
       <Button
         variant="ghost"

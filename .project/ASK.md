@@ -102,19 +102,21 @@ _Last Updated: 2025-09-18_
   - [ ] Settings component references need updating
   - [ ] Testing required for functionality preservation
 
-#### ASK-005: Auto-Arrangement of Visual Dialog Boxes
+#### ASK-005: Auto-Arrangement of Visual Dialog Boxes - INTEGRATED ✅
 
 - **Date**: 2025-09-17
 - **Requestor**: User
 - **Description**: the visual dialog boxes should be able to be auto arranged based on the connection points
 - **Business Impact**: Essential UX improvement that will significantly reduce manual layout work and improve workflow readability through intelligent automatic positioning
-- **Status**: New - ready for requirements integration
+- **Status**: Complete - integrated into requirements
 - **Integration Status**:
-  - [ ] Requirements analysis needed for auto-layout algorithms
-  - [ ] Technical research required for React Flow layout integration
-  - [ ] UI/UX design needed for layout controls and options
-  - [ ] Performance considerations for large workflow graphs
-  - [ ] User preference handling for manual vs automatic positioning
+  - [x] Added to requirements as R37 (Auto-Arrangement of Visual Dialog Boxes)
+  - [x] Requirements analysis completed for intelligent node layout engine
+  - [x] Sub-requirements defined for layout algorithms, control interface, and user preferences
+  - [ ] Technical implementation needed for React Flow layout extensions and graph algorithms
+  - [ ] UI component development for auto-arrange controls and layout preferences
+  - [ ] Performance optimization implementation for large workflow handling
+  - [ ] Testing required for layout algorithm accuracy and performance
 
 #### ASK-004: AI Integration Node Modules - INTEGRATED ✅
 

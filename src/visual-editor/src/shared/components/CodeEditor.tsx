@@ -1,4 +1,12 @@
-import { Code2, Edit3, Eye, FileText, FolderOpen, RefreshCw, Save } from 'lucide-react';
+import {
+  Code2,
+  Edit3,
+  Eye,
+  FileText,
+  FolderOpen,
+  RefreshCw,
+  Save,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { cn } from '../../utils';
 import { Button } from './Button';
@@ -99,28 +107,34 @@ export function CodeEditor({
     }
   }, [onLoad]);
 
-  const insertSnippet = useCallback((snippet: string) => {
-    const textarea = document.querySelector(
-      `textarea[data-editor="${title}"]`
-    ) as HTMLTextAreaElement;
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const newContent =
-        localContent.substring(0, start) +
-        snippet +
-        localContent.substring(end);
-      setLocalContent(newContent);
-      setHasChanges(true);
-      onContentChange?.(newContent);
+  const insertSnippet = useCallback(
+    (snippet: string) => {
+      const textarea = document.querySelector(
+        `textarea[data-editor="${title}"]`
+      ) as HTMLTextAreaElement;
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const newContent =
+          localContent.substring(0, start) +
+          snippet +
+          localContent.substring(end);
+        setLocalContent(newContent);
+        setHasChanges(true);
+        onContentChange?.(newContent);
 
-      // Set cursor position after the inserted snippet
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + snippet.length, start + snippet.length);
-      }, 0);
-    }
-  }, [localContent, onContentChange, title]);
+        // Set cursor position after the inserted snippet
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(
+            start + snippet.length,
+            start + snippet.length
+          );
+        }, 0);
+      }
+    },
+    [localContent, onContentChange, title]
+  );
 
   const getLanguageLabel = () => {
     switch (language) {
@@ -152,7 +166,12 @@ export function CodeEditor({
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-white rounded-lg border', className)}>
+    <div
+      className={cn(
+        'flex flex-col h-full bg-white rounded-lg border',
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-slate-50 rounded-t-lg">
         <div className="flex items-center gap-3">
@@ -168,7 +187,9 @@ export function CodeEditor({
                   {fileInfo.lastModified && (
                     <>
                       <span>•</span>
-                      <span>Modified {fileInfo.lastModified.toLocaleDateString()}</span>
+                      <span>
+                        Modified {fileInfo.lastModified.toLocaleDateString()}
+                      </span>
                     </>
                   )}
                 </>
@@ -176,7 +197,10 @@ export function CodeEditor({
             </div>
           </div>
           {hasChanges && (
-            <div className="w-2 h-2 bg-orange-400 rounded-full" title="Unsaved changes" />
+            <div
+              className="w-2 h-2 bg-orange-400 rounded-full"
+              title="Unsaved changes"
+            />
           )}
         </div>
 
@@ -187,9 +211,17 @@ export function CodeEditor({
               size="sm"
               onClick={() => setIsRichTextMode(!isRichTextMode)}
               className="text-slate-600"
-              title={isRichTextMode ? 'Switch to plain text' : 'Switch to rich text editor'}
+              title={
+                isRichTextMode
+                  ? 'Switch to plain text'
+                  : 'Switch to rich text editor'
+              }
             >
-              {isRichTextMode ? <Code2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+              {isRichTextMode ? (
+                <Code2 className="w-4 h-4" />
+              ) : (
+                <FileText className="w-4 h-4" />
+              )}
             </Button>
           )}
 
@@ -213,7 +245,11 @@ export function CodeEditor({
               className="text-slate-600"
               title={showPreview ? 'Show editor' : 'Show preview'}
             >
-              {showPreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPreview ? (
+                <Edit3 className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
             </Button>
           )}
 
@@ -266,10 +302,15 @@ export function CodeEditor({
         {/* Syntax Help Sidebar - only show in plain text mode */}
         {syntaxHelp && showHelp && !isRichTextMode && (
           <div className="w-80 border-r bg-slate-50 p-4 overflow-y-auto">
-            <h4 className="font-semibold text-slate-900 mb-3">{syntaxHelp.title}</h4>
+            <h4 className="font-semibold text-slate-900 mb-3">
+              {syntaxHelp.title}
+            </h4>
             <div className="space-y-3">
               {syntaxHelp.examples.map((example, index) => (
-                <div key={index} className="border border-slate-200 rounded-lg p-3 bg-white">
+                <div
+                  key={index}
+                  className="border border-slate-200 rounded-lg p-3 bg-white"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-slate-700">
                       {example.label}
@@ -287,7 +328,9 @@ export function CodeEditor({
                     {example.snippet}
                   </pre>
                   {example.description && (
-                    <p className="text-xs text-slate-500 mt-1">{example.description}</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {example.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -301,6 +344,7 @@ export function CodeEditor({
             <div className="flex items-center justify-center h-full text-gray-500">
               Rich Text Editor temporarily disabled
             </div>
+          ) : (
             /* <RichTextEditor
               title={title}
               content={localContent}
@@ -316,7 +360,6 @@ export function CodeEditor({
               plantUMLSettings={plantUMLSettings}
               className="h-full border-0 rounded-none"
             /> */
-          ) : (
             <div className="p-4 h-full">
               <textarea
                 data-editor={title}
@@ -343,16 +386,20 @@ export function CodeEditor({
         <div className="flex items-center gap-4">
           <span>Lines: {localContent.split('\n').length}</span>
           <span>Characters: {localContent.length}</span>
-          {fileInfo?.size && <span>Size: {Math.round(fileInfo.size / 1024)}KB</span>}
+          {fileInfo?.size && (
+            <span>Size: {Math.round(fileInfo.size / 1024)}KB</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          {hasChanges && <span className="text-orange-600">Unsaved changes</span>}
-          <span className="text-slate-400">{getLanguageLabel()}</span>
-          {enableRichTextMode && (
-            <span className="text-slate-400">•</span>
+          {hasChanges && (
+            <span className="text-orange-600">Unsaved changes</span>
           )}
+          <span className="text-slate-400">{getLanguageLabel()}</span>
+          {enableRichTextMode && <span className="text-slate-400">•</span>}
           {enableRichTextMode && (
-            <span className="text-slate-400">{isRichTextMode ? 'Rich Text' : 'Plain Text'}</span>
+            <span className="text-slate-400">
+              {isRichTextMode ? 'Rich Text' : 'Plain Text'}
+            </span>
           )}
         </div>
       </div>

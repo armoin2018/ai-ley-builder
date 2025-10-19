@@ -19,20 +19,29 @@ interface BaseNodeProps extends NodeProps {
     | 'loop'
     | 'custom'
     | 'persona'
-    | 'instruction';
+    | 'instruction'
+    | 'trigger';
   showHandles?: boolean;
   onLabelChange?: (newLabel: string) => void;
   onDescriptionChange?: (newDescription: string) => void;
 }
 
 const variantClasses = {
-  command: 'border border-blue-500 bg-blue-500 text-white shadow-sm',
-  logic: 'border border-purple-500 bg-purple-500 text-white shadow-sm',
-  output: 'border border-green-500 bg-green-500 text-white shadow-sm',
-  loop: 'border border-orange-500 bg-orange-500 text-white shadow-sm',
-  custom: 'border border-indigo-500 bg-indigo-500 text-white shadow-sm',
-  persona: 'border border-pink-500 bg-pink-500 text-white shadow-sm',
-  instruction: 'border border-teal-500 bg-teal-500 text-white shadow-sm',
+  command:
+    'border-2 border-blue-500 bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  logic:
+    'border-2 border-purple-500 bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  output:
+    'border-2 border-green-500 bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  loop: 'border-2 border-orange-500 bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  custom:
+    'border-2 border-indigo-500 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  persona:
+    'border-2 border-pink-500 bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  instruction:
+    'border-2 border-teal-500 bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
+  trigger:
+    'border-2 border-red-500 bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-200',
 };
 
 export function BaseNode({
@@ -105,10 +114,13 @@ export function BaseNode({
 
       <Card
         className={cn(
-          'min-w-[180px] max-w-[250px] transition-all duration-200',
+          'min-w-[180px] max-w-[250px] transition-all duration-200 cursor-pointer',
+          'hover:scale-102 hover:shadow-2xl',
           variantClasses[variant],
           {
-            'ring-4 ring-blue-500 ring-offset-2 shadow-xl scale-105': selected,
+            'ring-4 ring-blue-400 ring-offset-2 shadow-2xl scale-105 transform':
+              selected,
+            'hover:ring-2 hover:ring-white hover:ring-opacity-50': !selected,
           },
           className
         )}

@@ -1,5 +1,6 @@
 import type { AIEndpoint, AppSettings, LocalAITool } from '../types/settings';
 import { DEFAULT_SETTINGS } from '../types/settings';
+import { getGitRoot, isPathWithinRoot } from '../utils/paths';
 
 const SETTINGS_STORAGE_KEY = 'ai-ley-visual-editor-settings';
 
@@ -65,6 +66,10 @@ export class SettingsService {
       umlFlows: {
         ...DEFAULT_SETTINGS.umlFlows,
         ...loaded.umlFlows,
+        featureFlags: {
+          ...DEFAULT_SETTINGS.umlFlows.featureFlags,
+          ...loaded.umlFlows?.featureFlags,
+        },
       },
       localAI: {
         ...DEFAULT_SETTINGS.localAI,
@@ -76,6 +81,14 @@ export class SettingsService {
         ...loaded.aiRest,
         endpoints:
           loaded.aiRest?.endpoints || DEFAULT_SETTINGS.aiRest.endpoints,
+      },
+      nodeStore: {
+        ...DEFAULT_SETTINGS.nodeStore,
+        ...loaded.nodeStore,
+      },
+      flowStore: {
+        ...DEFAULT_SETTINGS.flowStore,
+        ...loaded.flowStore,
       },
       version: loaded.version || DEFAULT_SETTINGS.version,
       lastUpdated: loaded.lastUpdated || DEFAULT_SETTINGS.lastUpdated,
@@ -94,6 +107,14 @@ export class SettingsService {
     // Validate UML flows settings
     if (!settings.umlFlows.storageFolder?.trim()) {
       errors.push('UML flows storage folder cannot be empty');
+    } else {
+      // Validate storage folder path is within project root
+      const gitRoot = getGitRoot();
+      if (!isPathWithinRoot(settings.umlFlows.storageFolder, gitRoot)) {
+        errors.push(
+          'UML flows storage folder must be within the project root directory'
+        );
+      }
     }
 
     // Validate AI endpoints

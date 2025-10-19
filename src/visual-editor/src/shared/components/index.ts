@@ -13,7 +13,7 @@ export * from './PromptDropdown';
 
 // Advanced Components
 export * from './CodeEditor';
-// export * from './RichTextEditor';
+export * from './RichTextEditor';
 
 // Theme Provider
 export * from '../hooks';

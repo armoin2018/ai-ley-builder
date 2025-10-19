@@ -4,12 +4,9 @@ import {
   Download,
   Keyboard,
   MoreVertical,
-  Play,
-  Search,
   Settings,
   Trash2,
   Upload,
-  Zap,
 } from 'lucide-react';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
@@ -29,11 +26,13 @@ export function QuickActions({ className, onAction }: QuickActionsProps) {
     }
   };
 
-  const primaryActions = [
-    { id: 'execute', icon: Play, label: 'Execute', shortcut: '⌘↵' },
-    { id: 'validate', icon: Zap, label: 'Validate', shortcut: '⌘K' },
-    { id: 'search', icon: Search, label: 'Search', shortcut: '⌘F' },
-  ];
+  // Removed execute, validate, search from primary actions as per requirements
+  const primaryActions: {
+    id: string;
+    icon: any;
+    label: string;
+    shortcut: string;
+  }[] = [];
 
   const secondaryActions = [
     { id: 'copy', icon: Copy, label: 'Duplicate', shortcut: '⌘D' },
@@ -47,28 +46,7 @@ export function QuickActions({ className, onAction }: QuickActionsProps) {
   return (
     <div className={cn('relative', className)}>
       <div className="flex items-center gap-1 p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-        {/* Primary Actions */}
-        {primaryActions.map(action => {
-          const Icon = action.icon;
-          return (
-            <Button
-              key={action.id}
-              variant="ghost"
-              size="sm"
-              onClick={() => handleAction(action.id)}
-              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
-              title={`${action.label} (${action.shortcut})`}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="hidden sm:inline text-xs">{action.label}</span>
-            </Button>
-          );
-        })}
-
-        {/* Separator */}
-        <div className="w-px h-6 bg-slate-200 mx-1" />
-
-        {/* More Actions Button */}
+        {/* More Actions Button - now the only primary action */}
         <Button
           variant="ghost"
           size="sm"

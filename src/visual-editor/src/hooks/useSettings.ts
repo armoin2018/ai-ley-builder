@@ -283,6 +283,42 @@ export function useSettings() {
     []
   );
 
+  // Update node store settings
+  const updateNodeStoreSettings = useCallback(
+    (updates: Partial<AppSettings['nodeStore']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          nodeStore: {
+            ...prev.settings.nodeStore,
+            ...updates,
+          },
+        },
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
+
+  // Update flow store settings
+  const updateFlowStoreSettings = useCallback(
+    (updates: Partial<AppSettings['flowStore']>) => {
+      setState(prev => ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          flowStore: {
+            ...prev.settings.flowStore,
+            ...updates,
+          },
+        },
+        hasUnsavedChanges: true,
+      }));
+    },
+    []
+  );
+
   // Clear error
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));
@@ -314,6 +350,10 @@ export function useSettings() {
     saveAIEndpoint,
     removeAIEndpoint,
     updateAIRestSettings,
+
+    // Store Settings
+    updateNodeStoreSettings,
+    updateFlowStoreSettings,
 
     // Utilities
     clearError,

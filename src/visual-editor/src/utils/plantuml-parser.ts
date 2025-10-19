@@ -62,6 +62,17 @@ function getDefaultPropertiesForNodeType(
         label: 'Output Node',
         format: 'json',
       };
+    case 'injector':
+      return {
+        label: 'Injector',
+        triggerType: 'manual',
+        payload: '{}',
+        payloadType: 'json',
+        interval: 60,
+        cronExpression: '0 * * * * *',
+        autoStart: false,
+        repeatCount: 0,
+      };
     case 'group':
       return {
         label: 'Transform Node',
@@ -125,6 +136,19 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
       } catch (error) {
         console.warn('⚠️ Invalid node metadata JSON:', line);
         currentNodeMetadata = null;
+        continue;
+      }
+    }
+
+    // Parse workflow-level metadata
+    if (line.startsWith("'@workflow-meta ")) {
+      try {
+        const metadataJson = line.substring("'@workflow-meta ".length);
+        const workflowMetadata = JSON.parse(metadataJson);
+        console.log('🎯 Found workflow metadata:', workflowMetadata);
+        continue;
+      } catch (error) {
+        console.warn('⚠️ Invalid workflow metadata JSON:', line);
         continue;
       }
     }
@@ -561,6 +585,15 @@ function getActivityNodeType(activityName: string): string {
   ) {
     return 'output-formatter';
   }
+  if (
+    activity.includes('trigger') ||
+    activity.includes('timer') ||
+    activity.includes('inject') ||
+    activity.includes('schedule') ||
+    activity.includes('cron')
+  ) {
+    return 'injector';
+  }
 
   // Default to instruction for most activities
   return 'instruction';
@@ -617,6 +650,18 @@ export function flowToPlantUML(
   // Add metadata header with execution details
   lines.push('!-- AI-LEY Workflow Execution Metadata --!');
   lines.push('!-- This PlantUML file contains all execution details --!');
+  lines.push(
+    '!-- Visual Editor Compatibility: Enhanced with node positions, types, and properties --!'
+  );
+  lines.push(
+    `'@workflow-meta ${JSON.stringify({
+      name: workflowName,
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      generatedAt: new Date().toISOString(),
+      version: '2.1.0',
+    })}`
+  );
   lines.push('');
 
   // Add nodes with complete execution details
@@ -744,6 +789,29 @@ export function flowToPlantUML(
           const priority = node.data.priority || 'medium';
           lines.push(`  **Execution:** Follow instruction`);
           lines.push(`  **Priority:** ${priority}`);
+          break;
+        case 'injector':
+          const triggerType = node.data.properties?.triggerType || 'manual';
+          const interval = node.data.properties?.interval || 60;
+          const cronExpression =
+            node.data.properties?.cronExpression || '0 * * * * *';
+          const autoStart = node.data.properties?.autoStart || false;
+          const payload = node.data.properties?.payload || '{}';
+          const payloadType = node.data.properties?.payloadType || 'json';
+          lines.push(`  **Execution:** ${triggerType} trigger`);
+          if (triggerType === 'interval') {
+            lines.push(`  **Interval:** ${interval} seconds`);
+          }
+          if (triggerType === 'cron') {
+            lines.push(`  **Cron Expression:** ${cronExpression}`);
+          }
+          lines.push(`  **Auto Start:** ${autoStart ? 'Yes' : 'No'}`);
+          lines.push(`  **Payload Type:** ${payloadType}`);
+          if (payload && payload !== '{}') {
+            const payloadPreview =
+              payload.length > 50 ? `${payload.substring(0, 50)}...` : payload;
+            lines.push(`  **Payload:** ${payloadPreview}`);
+          }
           break;
       }
 

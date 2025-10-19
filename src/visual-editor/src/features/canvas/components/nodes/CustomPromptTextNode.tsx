@@ -33,7 +33,9 @@ export function CustomPromptTextNode(props: NodeProps) {
           {typeof temperature === 'number' && (
             <div className="flex flex-col">
               <span className="text-xs text-white">Temp</span>
-              <span className="text-xs font-mono text-white">{temperature}</span>
+              <span className="text-xs font-mono text-white">
+                {temperature}
+              </span>
             </div>
           )}
 

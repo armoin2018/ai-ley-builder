@@ -99,7 +99,8 @@ stop
       },
       {
         label: 'Conditional',
-        snippet: 'if (condition?) then (yes)\n  :action;\nelse (no)\n  :other action;\nendif',
+        snippet:
+          'if (condition?) then (yes)\n  :action;\nelse (no)\n  :other action;\nendif',
         description: 'Creates a decision point with true/false paths',
       },
       {
@@ -119,8 +120,10 @@ stop
       },
       {
         label: 'AI-LEY Metadata',
-        snippet: '\'@node-meta {"type":"custom-prompt","properties":{"promptText":"example"}}',
-        description: 'Adds AI-LEY specific metadata for visual editor integration',
+        snippet:
+          '\'@node-meta {"type":"custom-prompt","properties":{"promptText":"example"}}',
+        description:
+          'Adds AI-LEY specific metadata for visual editor integration',
       },
     ],
   };

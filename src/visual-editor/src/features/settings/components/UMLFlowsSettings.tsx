@@ -1,13 +1,13 @@
 import {
-    Database,
-    FileText,
-    Folder,
-    FolderTree,
-    Grid3X3,
-    Image,
-    RotateCcw,
-    Terminal,
-    Users
+  Database,
+  FileText,
+  Folder,
+  FolderTree,
+  Grid3X3,
+  Image,
+  RotateCcw,
+  Terminal,
+  Users,
 } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import { Button, Input, Label } from '../../../shared/components';
@@ -832,7 +832,8 @@ export function UMLFlowsSettings() {
                   className="w-full"
                 />
                 <p className="text-xs text-slate-500">
-                  Base URL for PlantUML rendering service (without trailing slash)
+                  Base URL for PlantUML rendering service (without trailing
+                  slash)
                 </p>
               </div>
             </div>
@@ -913,7 +914,8 @@ export function UMLFlowsSettings() {
                     className="w-full font-mono text-sm"
                   />
                   <p className="text-xs text-slate-500">
-                    Custom command to validate PlantUML syntax (leave empty for built-in validation)
+                    Custom command to validate PlantUML syntax (leave empty for
+                    built-in validation)
                   </p>
                 </div>
               </div>

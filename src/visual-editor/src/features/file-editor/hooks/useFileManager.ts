@@ -1,11 +1,16 @@
-import { useState, useCallback } from 'react';
-import { getAiLeyRoot, AI_LEY_PATHS } from '../../../utils/paths';
+import { useCallback, useState } from 'react';
+import { AI_LEY_PATHS, getAiLeyRoot } from '../../../utils/paths';
 
 interface FileEditorTab {
   id: string;
   title: string;
   filePath: string;
-  fileType: 'plantuml' | 'persona' | 'instruction' | 'global-instruction' | 'command-prompt';
+  fileType:
+    | 'plantuml'
+    | 'persona'
+    | 'instruction'
+    | 'global-instruction'
+    | 'command-prompt';
   content: string;
   hasChanges: boolean;
   lastModified?: Date;
@@ -16,7 +21,11 @@ export interface FileManagerHook {
   activeTabId: string | null;
   isLoading: boolean;
   error: string | null;
-  createTab: (fileType: FileEditorTab['fileType'], title?: string, filePath?: string) => void;
+  createTab: (
+    fileType: FileEditorTab['fileType'],
+    title?: string,
+    filePath?: string
+  ) => void;
   openFile: (filePath: string) => Promise<void>;
   saveFile: (tabId: string) => Promise<void>;
   closeTab: (tabId: string) => void;
@@ -32,7 +41,11 @@ export function useFileManager(): FileManagerHook {
   const [error, setError] = useState<string | null>(null);
 
   const createTab = useCallback(
-    (fileType: FileEditorTab['fileType'], title?: string, filePath?: string) => {
+    (
+      fileType: FileEditorTab['fileType'],
+      title?: string,
+      filePath?: string
+    ) => {
       const newTab: FileEditorTab = {
         id: `tab-${Date.now()}`,
         title: title || getDefaultTitle(fileType),
@@ -42,7 +55,7 @@ export function useFileManager(): FileManagerHook {
         hasChanges: false,
       };
 
-      setTabs((prevTabs) => [...prevTabs, newTab]);
+      setTabs(prevTabs => [...prevTabs, newTab]);
       setActiveTabId(newTab.id);
     },
     []
@@ -72,7 +85,7 @@ export function useFileManager(): FileManagerHook {
         lastModified: new Date(),
       };
 
-      setTabs((prevTabs) => [...prevTabs, newTab]);
+      setTabs(prevTabs => [...prevTabs, newTab]);
       setActiveTabId(newTab.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to open file');
@@ -81,37 +94,47 @@ export function useFileManager(): FileManagerHook {
     }
   }, []);
 
-  const saveFile = useCallback(async (tabId: string) => {
-    const tab = tabs.find((t) => t.id === tabId);
-    if (!tab) return;
+  const saveFile = useCallback(
+    async (tabId: string) => {
+      const tab = tabs.find(t => t.id === tabId);
+      if (!tab) return;
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      // In a real implementation, you would save to the actual file system
-      await simulateFileSave(tab.filePath || generateFilePath(tab), tab.content);
+      try {
+        // In a real implementation, you would save to the actual file system
+        await simulateFileSave(
+          tab.filePath || generateFilePath(tab),
+          tab.content
+        );
 
-      setTabs((prevTabs) =>
-        prevTabs.map((t) =>
-          t.id === tabId ? { ...t, hasChanges: false, lastModified: new Date() } : t
-        )
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save file');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [tabs]);
+        setTabs(prevTabs =>
+          prevTabs.map(t =>
+            t.id === tabId
+              ? { ...t, hasChanges: false, lastModified: new Date() }
+              : t
+          )
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to save file');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [tabs]
+  );
 
   const closeTab = useCallback(
     (tabId: string) => {
-      setTabs((prevTabs) => {
-        const newTabs = prevTabs.filter((tab) => tab.id !== tabId);
+      setTabs(prevTabs => {
+        const newTabs = prevTabs.filter(tab => tab.id !== tabId);
 
         // Update active tab if the closed tab was active
         if (activeTabId === tabId) {
-          setActiveTabId(newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null);
+          setActiveTabId(
+            newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null
+          );
         }
 
         return newTabs;
@@ -125,8 +148,8 @@ export function useFileManager(): FileManagerHook {
   }, []);
 
   const updateTabContent = useCallback((tabId: string, content: string) => {
-    setTabs((prevTabs) =>
-      prevTabs.map((tab) =>
+    setTabs(prevTabs =>
+      prevTabs.map(tab =>
         tab.id === tabId
           ? { ...tab, content, hasChanges: content !== tab.content }
           : tab
@@ -146,7 +169,9 @@ export function useFileManager(): FileManagerHook {
         await openFile(file.path);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load recent files');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load recent files'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +211,10 @@ function getDefaultTitle(fileType: FileEditorTab['fileType']): string {
   }
 }
 
-function getDefaultContent(fileType: FileEditorTab['fileType'], title?: string): string {
+function getDefaultContent(
+  fileType: FileEditorTab['fileType'],
+  title?: string
+): string {
   const name = title || getDefaultTitle(fileType);
 
   switch (fileType) {
@@ -247,13 +275,20 @@ author: AI-LEY
 function getFileTypeFromPath(filePath: string): FileEditorTab['fileType'] {
   const fileName = filePath.toLowerCase();
 
-  if (fileName.includes('plantuml') || fileName.endsWith('.puml') || fileName.endsWith('.plantuml')) {
+  if (
+    fileName.includes('plantuml') ||
+    fileName.endsWith('.puml') ||
+    fileName.endsWith('.plantuml')
+  ) {
     return 'plantuml';
   }
   if (fileName.includes('persona')) {
     return 'persona';
   }
-  if (fileName.includes('global-instruction') || fileName === 'global-instructions.md') {
+  if (
+    fileName.includes('global-instruction') ||
+    fileName === 'global-instructions.md'
+  ) {
     return 'global-instruction';
   }
   if (fileName.includes('instruction')) {
@@ -294,19 +329,28 @@ async function simulateFileLoad(filePath: string): Promise<string> {
 
   // Return mock content based on file type
   const fileType = getFileTypeFromPath(filePath);
-  const fileName = filePath.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'File';
+  const fileName =
+    filePath
+      .split('/')
+      .pop()
+      ?.replace(/\.[^/.]+$/, '') || 'File';
 
   return getDefaultContent(fileType, fileName);
 }
 
-async function simulateFileSave(filePath: string, content: string): Promise<void> {
+async function simulateFileSave(
+  filePath: string,
+  content: string
+): Promise<void> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
 
-  console.log(`Saving file to ${filePath}:`, content.substring(0, 100) + '...');
+  console.log(`Saving file to ${filePath}:`, `${content.substring(0, 100)}...`);
 }
 
-async function simulateLoadRecentFiles(): Promise<Array<{ path: string; lastModified: Date }>> {
+async function simulateLoadRecentFiles(): Promise<
+  Array<{ path: string; lastModified: Date }>
+> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 200));
 

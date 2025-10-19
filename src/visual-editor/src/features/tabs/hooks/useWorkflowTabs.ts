@@ -369,11 +369,66 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
           setViewport({ x: 0, y: 0, zoom: 1 });
         }
       } else {
-        // Clear canvas for empty workflow
-        console.log('No workflow data, clearing canvas');
-        setNodes([]);
-        setEdges([]);
-        setViewport({ x: 0, y: 0, zoom: 1 });
+        // Try to load PlantUML content from storage if no workflow data exists
+        console.log(
+          'No workflow data, attempting to load PlantUML from storage'
+        );
+
+        const storageKey = tab.path || `tab-plantuml-${tab.id}`;
+        const sourcePaths = [
+          `puml-content-${storageKey}`,
+          `puml-content-tab-plantuml-${tab.id}`,
+          `puml-content-${tab.path}`,
+        ];
+
+        let plantumlContent = '';
+        for (const path of sourcePaths) {
+          const content = localStorage.getItem(path);
+          if (content && content.length > plantumlContent.length) {
+            plantumlContent = content;
+            console.log(
+              `📄 Found PlantUML content in storage: ${path} (${content.length} characters)`
+            );
+          }
+        }
+
+        if (plantumlContent && plantumlContent.trim()) {
+          // Use dynamic import and then() instead of await since this is not an async function
+          import('@/utils/plantuml-parser')
+            .then(({ parsePlantUMLToFlow }) => {
+              try {
+                console.log('🔄 Converting PlantUML to visual elements...');
+                const { nodes: parsedNodes, edges: parsedEdges } =
+                  parsePlantUMLToFlow(plantumlContent);
+
+                console.log(
+                  `✅ PlantUML parsed: ${parsedNodes.length} nodes, ${parsedEdges.length} edges`
+                );
+                setNodes(parsedNodes);
+                setEdges(parsedEdges);
+                setViewport({ x: 0, y: 0, zoom: 1 });
+              } catch (error) {
+                console.error('❌ Failed to parse PlantUML content:', error);
+                // Clear canvas on parse error
+                setNodes([]);
+                setEdges([]);
+                setViewport({ x: 0, y: 0, zoom: 1 });
+              }
+            })
+            .catch(error => {
+              console.error('❌ Failed to import PlantUML parser:', error);
+              // Clear canvas on import error
+              setNodes([]);
+              setEdges([]);
+              setViewport({ x: 0, y: 0, zoom: 1 });
+            });
+        } else {
+          // Clear canvas for empty workflow with no PlantUML content
+          console.log('No PlantUML content found, clearing canvas');
+          setNodes([]);
+          setEdges([]);
+          setViewport({ x: 0, y: 0, zoom: 1 });
+        }
       }
     },
     [state.tabs, setNodes, setEdges, setViewport]

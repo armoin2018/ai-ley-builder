@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Button, CodeEditor } from '../../../shared/components';
-import { Download, RefreshCw, Save } from 'lucide-react';
-import { cn } from '../../../utils';
-import { useWorkflowTabsContext } from './WorkflowTabsProvider';
-import { exportWorkflowToPUML } from '../../../utils/export';
 import { useReactFlow } from '@xyflow/react';
+import { useCallback, useEffect, useState } from 'react';
+import { CodeEditor } from '../../../shared/components';
+import { cn } from '../../../utils';
 import { flowToPlantUML } from '../../../utils/plantuml-parser';
+import { useTabState } from '../../tabs/hooks/useTabState';
+import { useWorkflowTabsContext } from './WorkflowTabsProvider';
 
 interface SourceEditorProps {
   className?: string;
@@ -25,10 +24,57 @@ export function SourceEditor({
     tabs,
     createNewTab,
   } = useWorkflowTabsContext();
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, setNodes, setEdges, setViewport } =
+    useReactFlow();
+
+  // Initialize tab state hook - always call it, but use the ID conditionally
+  // This ensures hooks are called in the same order every render
+  const tabId = activeTab?.id || 'no-tab';
+  const tabState = useTabState(
+    tabId,
+    getNodes,
+    getEdges,
+    setNodes,
+    setEdges,
+    setViewport
+  );
+
+  // Only use tab state if we have an active tab
+  const effectiveTabState = activeTab ? tabState : null;
+
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Helper: Get tab content from new storage (hook) or old storage (migration support)
+  const getTabContent = useCallback((tabId: string): string | null => {
+    // Try new hook storage first
+    const newKey = `ailey-tab-state-${tabId}`;
+    const newState = localStorage.getItem(newKey);
+    if (newState) {
+      try {
+        const parsed = JSON.parse(newState);
+        return parsed.sourceState || null;
+      } catch (e) {
+        console.error('Failed to parse tab state:', e);
+      }
+    }
+
+    // Fall back to old storage patterns for migration
+    const oldKeys = [
+      `puml-content-tab-plantuml-${tabId}`,
+      `puml-content-${tabId}`,
+    ];
+
+    for (const key of oldKeys) {
+      const content = localStorage.getItem(key);
+      if (content) {
+        return content;
+      }
+    }
+
+    return null;
+  }, []);
 
   // Don't auto-create tabs in SourceEditor - let the main app handle initial tab creation
 
@@ -46,21 +92,14 @@ export function SourceEditor({
             firstTab.name
           );
 
-          // Use the first tab's data
-          if (
-            firstTab.path &&
-            localStorage.getItem(`puml-content-${firstTab.path}`)
-          ) {
-            const originalContent = localStorage.getItem(
-              `puml-content-${firstTab.path}`
-            );
+          // Use the first tab's data - check hook storage first, then old storage
+          const firstTabContent = getTabContent(firstTab.id);
+          if (firstTabContent) {
             console.log(
-              '✅ Using original PlantUML content from first tab:',
-              firstTab.path
+              '✅ Using PlantUML content from storage for first tab:',
+              firstTab.name
             );
-            setContent(
-              originalContent || getDefaultPlantUMLContent(firstTab.name)
-            );
+            setContent(firstTabContent);
             return;
           } else if (firstTab.workflow) {
             // Generate content from first tab's workflow data
@@ -98,36 +137,25 @@ export function SourceEditor({
 
       setIsLoading(true);
       try {
-        // First, check if this tab was loaded from a PlantUML file and show original source
-        if (activeTab.path) {
-          console.log(
-            '📁 Tab has PlantUML source path, loading original content:',
-            activeTab.path
-          );
-          const originalContent = localStorage.getItem(
-            `puml-content-${activeTab.path}`
-          );
-
-          if (originalContent) {
-            console.log(
-              '✅ Found original PlantUML content from path:',
-              activeTab.path
-            );
-            console.log(
-              '📝 Original content preview:',
-              `${originalContent.substring(0, 200)}...`
-            );
-            setContent(originalContent);
-            return; // Early return - use original source
-          } else {
-            console.warn(
-              '⚠️ Tab has path but no original content found in localStorage:',
-              activeTab.path
-            );
-          }
+        // Primary: Use tab state hook if available
+        if (effectiveTabState) {
+          console.log('✅ Loading content from tab state hook');
+          setContent(effectiveTabState.state.sourceState);
+          return;
         }
 
-        // Get current nodes and edges from the canvas
+        // Fallback: Try to load from storage (hook storage or old storage)
+        const storedContent = getTabContent(activeTab.id);
+        if (storedContent) {
+          console.log(
+            '✅ Found stored PlantUML content for tab:',
+            activeTab.name
+          );
+          setContent(storedContent);
+          return;
+        }
+
+        // Last resort: Get current nodes and edges from the canvas
         const currentNodes = getNodes();
         const currentEdges = getEdges();
 
@@ -292,37 +320,43 @@ title ${workflowName}
   };
 
   // PlantUML validation function
-  const validatePlantUML = useCallback(async (content: string): Promise<boolean> => {
-    try {
-      // Basic validation - check for @startuml and @enduml
-      const hasStart = content.includes('@startuml');
-      const hasEnd = content.includes('@enduml');
+  const validatePlantUML = useCallback(
+    async (content: string): Promise<boolean> => {
+      try {
+        // Basic validation - check for @startuml and @enduml
+        const hasStart = content.includes('@startuml');
+        const hasEnd = content.includes('@enduml');
 
-      if (!hasStart || !hasEnd) {
+        if (!hasStart || !hasEnd) {
+          return false;
+        }
+
+        // Additional validation could be added here
+        // For now, we'll just check basic syntax
+        return true;
+      } catch (error) {
+        console.error('PlantUML validation error:', error);
         return false;
       }
-
-      // Additional validation could be added here
-      // For now, we'll just check basic syntax
-      return true;
-    } catch (error) {
-      console.error('PlantUML validation error:', error);
-      return false;
-    }
-  }, []);
+    },
+    []
+  );
 
   // PlantUML rendering function using web service
-  const renderPlantUML = useCallback(async (content: string): Promise<string> => {
-    try {
-      // Use PlantUML web service for rendering
-      const encodedContent = btoa(unescape(encodeURIComponent(content)));
-      const renderUrl = `https://www.plantuml.com/plantuml/svg/${encodedContent}`;
-      return renderUrl;
-    } catch (error) {
-      console.error('PlantUML rendering error:', error);
-      throw new Error('Failed to render PlantUML diagram');
-    }
-  }, []);
+  const renderPlantUML = useCallback(
+    async (content: string): Promise<string> => {
+      try {
+        // Use PlantUML web service for rendering
+        const encodedContent = btoa(unescape(encodeURIComponent(content)));
+        const renderUrl = `https://www.plantuml.com/plantuml/svg/${encodedContent}`;
+        return renderUrl;
+      } catch (error) {
+        console.error('PlantUML rendering error:', error);
+        throw new Error('Failed to render PlantUML diagram');
+      }
+    },
+    []
+  );
 
   const handleContentChange = useCallback(
     (newContent: string) => {
@@ -368,15 +402,16 @@ title ${workflowName}
 
     setIsSaving(true);
     try {
-      // Save the PlantUML content to localStorage for this tab
-      const storageKey = activeTab.path || `tab-${activeTab.id}`;
-      localStorage.setItem(`puml-content-${storageKey}`, content);
-
-      // Also save to the specific tab storage key for consistency
-      localStorage.setItem(
-        `puml-content-tab-plantuml-${activeTab.id}`,
-        content
-      );
+      // Primary: Update through tab state hook
+      if (effectiveTabState) {
+        console.log('✅ Saving content through tab state hook');
+        effectiveTabState.updateSourceState(content);
+      } else {
+        // Fallback: Direct localStorage (during migration only)
+        console.warn('Tab state hook not available, using fallback storage');
+        const storageKey = activeTab.path || `tab-${activeTab.id}`;
+        localStorage.setItem(`puml-content-${storageKey}`, content);
+      }
 
       // Try to call the tab save function, but don't fail if it has issues
       try {
@@ -499,7 +534,9 @@ title ${workflowName}
   return (
     <CodeEditor
       className={className}
-      title={activeTab ? `PlantUML Source: ${activeTab.name}` : 'PlantUML Source'}
+      title={
+        activeTab ? `PlantUML Source: ${activeTab.name}` : 'PlantUML Source'
+      }
       language="plantuml"
       content={content}
       onContentChange={handleContentChange}
