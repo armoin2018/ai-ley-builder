@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  exportWorkflowToPUML,
+  getAvailablePUMLFiles,
+  importFromPUML,
+} from '../../../utils/export';
+import {
+  deserializeWorkflow,
+  serializeWorkflow,
+} from '../../workflow/utils/serialization';
 import type {
   TabState,
   UMLFileInfo,
   UseWorkflowTabsReturn,
   WorkflowTab,
 } from '../types/tab';
-import {
-  deserializeWorkflow,
-  serializeWorkflow,
-} from '../../workflow/utils/serialization';
-import {
-  exportWorkflowToPUML,
-  getAvailablePUMLFiles,
-  importFromPUML,
-} from '../../../utils/export';
 
 export function useWorkflowTabs(): UseWorkflowTabsReturn {
   const { getNodes, getEdges, getViewport, setNodes, setEdges, setViewport } =
@@ -147,10 +147,15 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
             ? {
                 hasName: !!updatedTab.workflow.name,
                 hasNodes: !!updatedTab.workflow.nodes,
-                hasCanvas: !!updatedTab.workflow.canvas,
+                hasCanvas: !!(
+                  'canvas' in updatedTab.workflow &&
+                  (updatedTab.workflow as any).canvas
+                ),
                 nodeCount:
                   updatedTab.workflow.nodes?.length ||
-                  updatedTab.workflow.canvas?.nodes?.length ||
+                  ('canvas' in updatedTab.workflow
+                    ? (updatedTab.workflow as any).canvas?.nodes?.length
+                    : 0) ||
                   0,
               }
             : null,
@@ -268,11 +273,16 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
           // Check if workflow has canvas data directly or needs deserialization
           let nodes, edges, viewport;
 
-          if (tab.workflow.canvas) {
-            // Workflow has canvas data (from our serialization)
-            nodes = tab.workflow.canvas.nodes || [];
-            edges = tab.workflow.canvas.edges || [];
-            viewport = tab.workflow.canvas.viewport || { x: 0, y: 0, zoom: 1 };
+          if ('canvas' in tab.workflow && (tab.workflow as any).canvas) {
+            // Workflow has canvas data (from our serialization - legacy)
+            const legacyWorkflow = tab.workflow as any;
+            nodes = legacyWorkflow.canvas.nodes || [];
+            edges = legacyWorkflow.canvas.edges || [];
+            viewport = legacyWorkflow.canvas.viewport || {
+              x: 0,
+              y: 0,
+              zoom: 1,
+            };
           } else if (tab.workflow.nodes && tab.workflow.edges) {
             // Workflow has direct nodes/edges (from PlantUML import)
             nodes = tab.workflow.nodes || [];
@@ -298,22 +308,24 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
           // Log sample node data if available
           if (nodes.length > 0) {
             console.log('📊 Sample node data (first 3 nodes):');
-            const sampleNodes = nodes.slice(0, 3).map((node, index) => ({
-              index: index + 1,
-              id: node.id,
-              type: node.type,
-              label: node.data?.label || 'No label',
-              position: node.position,
-              dimensions:
-                node.width && node.height
-                  ? { width: node.width, height: node.height }
-                  : 'auto',
-            }));
+            const sampleNodes = nodes
+              .slice(0, 3)
+              .map((node: any, index: number) => ({
+                index: index + 1,
+                id: node.id,
+                type: node.type,
+                label: node.data?.label || 'No label',
+                position: node.position,
+                dimensions:
+                  node.width && node.height
+                    ? { width: node.width, height: node.height }
+                    : 'auto',
+              }));
             console.table(sampleNodes);
 
             // Log PlantUML-specific data if present
             const plantUMLNodes = nodes.filter(
-              node =>
+              (node: any) =>
                 node.data?.source === 'plantuml' ||
                 node.data?.originalText ||
                 node.data?.umlType
@@ -324,7 +336,7 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
               );
               console.log(
                 'PlantUML node details:',
-                plantUMLNodes.slice(0, 2).map(node => ({
+                plantUMLNodes.slice(0, 2).map((node: any) => ({
                   id: node.id,
                   type: node.type,
                   umlType: node.data?.umlType,
@@ -338,14 +350,16 @@ export function useWorkflowTabs(): UseWorkflowTabsReturn {
           // Log edge data if available
           if (edges.length > 0) {
             console.log('🔗 Edge data (first 3 edges):');
-            const sampleEdges = edges.slice(0, 3).map((edge, index) => ({
-              index: index + 1,
-              id: edge.id,
-              source: edge.source,
-              target: edge.target,
-              type: edge.type,
-              label: edge.label || 'No label',
-            }));
+            const sampleEdges = edges
+              .slice(0, 3)
+              .map((edge: any, index: number) => ({
+                index: index + 1,
+                id: edge.id,
+                source: edge.source,
+                target: edge.target,
+                type: edge.type,
+                label: edge.label || 'No label',
+              }));
             console.table(sampleEdges);
           }
 
@@ -746,10 +760,10 @@ stop
             console.log(`    ✅ Successfully imported workflow: "${tabName}"`);
             console.log(`    🆔 Generated tab ID: ${tabId}`);
             console.log(
-              `    📈 Workflow nodes: ${workflow.canvas?.nodes?.length || 0}`
+              `    📈 Workflow nodes: ${workflow.nodes?.length || 0}`
             );
             console.log(
-              `    🔗 Workflow edges: ${workflow.canvas?.edges?.length || 0}`
+              `    🔗 Workflow edges: ${workflow.edges?.length || 0}`
             );
 
             const tab: WorkflowTab = {
@@ -761,9 +775,7 @@ stop
               saved: true,
               isNew: false,
               lastSaved: file.lastModified,
-              createdAt: new Date(
-                workflow.metadata?.createdAt || file.lastModified
-              ),
+              createdAt: new Date(workflow.createdAt || file.lastModified),
             };
 
             newTabs.push(tab);

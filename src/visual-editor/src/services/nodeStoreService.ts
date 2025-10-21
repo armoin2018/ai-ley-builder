@@ -255,7 +255,7 @@ export class NodeStoreService {
     }
 
     // Convert GitHub files to NodeStoreItems
-    const nodes: NodeStoreItem[] = await Promise.all(
+    const nodes: (NodeStoreItem | null)[] = await Promise.all(
       files
         .filter(file => file.type === 'file' && file.name.endsWith('.json'))
         .map(async file => {

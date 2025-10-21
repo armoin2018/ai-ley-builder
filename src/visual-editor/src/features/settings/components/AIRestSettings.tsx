@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { Edit2, Eye, EyeOff, Globe, Key, Plus, Trash2 } from 'lucide-react';
-import { Button, Input, Label } from '../../../shared/components';
+import { useState } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
+import { Button, Input, Label } from '../../../shared/components';
 import type { AIEndpoint } from '../../../types/settings';
 
 export function AIRestSettings() {
@@ -487,7 +487,7 @@ export function AIRestSettings() {
                 Cancel
               </Button>
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={handleSaveEndpoint}
                 disabled={

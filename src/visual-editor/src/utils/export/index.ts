@@ -1,14 +1,8 @@
 // PlantUML export utilities
 
 import type { Edge, Node } from '@xyflow/react';
-import type {
-  ExportResult,
-  PlantUMLEdge,
-  PlantUMLExportOptions,
-  PlantUMLNode,
-  PlantUMLWorkflow,
-} from '../../types/export';
 import type { SerializedWorkflow } from '../../features/workflow/utils/serialization';
+import type { ExportResult, PlantUMLExportOptions } from '../../types/export';
 
 export class PlantUMLExporter {
   /**
@@ -52,10 +46,11 @@ export class PlantUMLExporter {
         // Direct nodes/edges format (SerializedWorkflow)
         nodes = workflow.nodes || [];
         edges = workflow.edges || [];
-      } else if (workflow.canvas?.nodes) {
-        // Canvas format
-        nodes = workflow.canvas.nodes || [];
-        edges = workflow.canvas.edges || [];
+      } else if ('canvas' in workflow) {
+        // Canvas format (legacy)
+        const legacyWorkflow = workflow as any;
+        nodes = legacyWorkflow.canvas?.nodes || [];
+        edges = legacyWorkflow.canvas?.edges || [];
       } else {
         // Empty workflow
         console.warn('Workflow has no nodes or canvas structure:', workflow);
@@ -73,7 +68,7 @@ export class PlantUMLExporter {
     }
 
     // Add nodes
-    nodes.forEach(node => {
+    nodes.forEach((node: Node) => {
       const nodeId = this.sanitizeId(node.id);
       const label = (node.data.label as string) || node.id;
       const nodeType = node.type || 'unknown';
@@ -99,7 +94,7 @@ export class PlantUMLExporter {
     puml += '\n';
 
     // Add edges
-    edges.forEach(edge => {
+    edges.forEach((edge: Edge) => {
       const sourceId = this.sanitizeId(edge.source);
       const targetId = this.sanitizeId(edge.target);
 
@@ -385,13 +380,15 @@ export class PlantUMLExporter {
         id: this.generateWorkflowId(),
         name: title,
         description,
+        version: '1.0.0',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         nodes,
         edges,
+        viewport: { x: 0, y: 0, zoom: 1 },
         metadata: {
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          version: '1.0.0',
-          importedFrom: filePath,
+          nodeCount: nodes.length,
+          edgeCount: edges.length,
         },
       };
     } catch (error) {

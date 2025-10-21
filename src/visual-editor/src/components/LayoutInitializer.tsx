@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react';
-import { useLayout } from '@features/layout';
-import type { Panel as LayoutPanel } from '@features/layout';
 import {
-  FlowCanvas,
-  NodeInspector,
-  NodePalette,
+    FlowCanvas,
+    NodePalette,
 } from '@features/canvas/components';
-import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { ExecutionPanel } from '@features/execution/components/ExecutionPanel';
+import type { Panel as LayoutPanel } from '@features/layout';
+import { useLayout } from '@features/layout';
 import { SourceEditor, TabbedRightPanel } from '@features/tabs';
+import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { CheckSquare, Code, Layers, Palette, Play, Search } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 interface LayoutInitializerProps {
   nodes: any[];
@@ -141,6 +140,7 @@ export function LayoutInitializer({
           id: 'default',
           name: 'Default',
           description: 'Default layout',
+          icon: <Layers className="w-4 h-4" />,
           layout: {
             id: 'default-root',
             type: 'horizontal',
@@ -148,19 +148,19 @@ export function LayoutInitializer({
               {
                 id: 'left-sidebar',
                 type: 'vertical',
-                children: [{ id: 'node-palette' }],
+                children: [samplePanels[0]],
                 size: 15,
               },
               {
                 id: 'main-content',
                 type: 'vertical',
-                children: [{ id: 'main-canvas' }],
+                children: [samplePanels[1]],
                 size: 70,
               },
               {
                 id: 'right-panel',
                 type: 'vertical',
-                children: [{ id: 'node-inspector' }],
+                children: [samplePanels[2]],
                 size: 15,
               },
             ],

@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
 import {
-  AlertCircle,
-  Check,
-  Clock,
-  Globe,
-  Send,
-  TestTube,
-  X,
-  Zap,
+    AlertCircle,
+    Check,
+    Clock,
+    Globe,
+    Send,
+    TestTube,
+    X,
+    Zap,
 } from 'lucide-react';
-import { Button, Input, Label } from '../../shared/components';
-import { cn } from '../../utils';
+import { useEffect, useState } from 'react';
 import {
-  type AIApiRequest,
-  type AIApiResponse,
-  AIApiService,
+    type AIApiRequest,
+    type AIApiResponse,
+    AIApiService,
 } from '../../services/aiApiService';
+import { Button, Input, Label } from '../../shared/components';
 import type { AIEndpoint } from '../../types/settings';
+import { cn } from '../../utils';
 
 interface AIApiSelectorProps {
   onResponse?: (response: AIApiResponse) => void;

@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from 'react';
 import {
   Calendar,
   Copy,
   Download,
   ExternalLink,
-  Filter,
   Package,
   Power,
   RefreshCw,
   Search,
   Share,
   Star,
-  Tag,
   Trash2,
-  User,
 } from 'lucide-react';
-import { Badge, Button, Input } from '../../../shared/components';
-import { cn } from '../../../utils';
+import { useEffect, useState } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
 import { NodeStoreService } from '../../../services/nodeStoreService';
+import { Badge, Button, Input } from '../../../shared/components';
 import type { NodeStoreItem } from '../../../types/settings';
+import { cn } from '../../../utils';
 
 interface NodeStoreManagerProps {
   isOpen: boolean;
@@ -271,16 +268,16 @@ export function NodeStoreManager({ isOpen, onClose }: NodeStoreManagerProps) {
                   </p>
 
                   <div className="flex flex-wrap gap-1 mb-3">
-                    <Badge variant="outline" size="sm">
+                    <Badge variant="outline" className="text-xs">
                       {node.category}
                     </Badge>
                     {node.tags.slice(0, 2).map(tag => (
-                      <Badge key={tag} variant="secondary" size="sm">
+                      <Badge key={tag} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>
                     ))}
                     {node.tags.length > 2 && (
-                      <Badge variant="secondary" size="sm">
+                      <Badge variant="secondary" className="text-xs">
                         +{node.tags.length - 2}
                       </Badge>
                     )}

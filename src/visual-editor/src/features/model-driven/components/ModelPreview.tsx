@@ -175,7 +175,7 @@ function NodePropertiesPreview({
             {formData.icon && (
               <div className="flex items-center space-x-1">
                 <span>Icon:</span>
-                <span className="font-medium">{String(formData.icon)}</span>
+                <span className="font-medium">{String(formData.icon) as React.ReactNode}</span>
               </div>
             )}
             {formData.color && (
@@ -185,13 +185,13 @@ function NodePropertiesPreview({
                   className="w-4 h-4 rounded border border-gray-300"
                   style={{ backgroundColor: String(formData.color) }}
                 ></div>
-                <span className="font-medium">{String(formData.color)}</span>
+                <span className="font-medium">{String(formData.color) as React.ReactNode}</span>
               </div>
             )}
             {formData.category && (
               <div className="flex items-center space-x-1">
                 <span>Category:</span>
-                <span className="font-medium">{String(formData.category)}</span>
+                <span className="font-medium">{String(formData.category) as React.ReactNode}</span>
               </div>
             )}
           </div>

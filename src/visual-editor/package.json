@@ -22,6 +22,8 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
     "preview": "VITE_AI_LEY_GIT_ROOT=$(git rev-parse --show-toplevel) vite preview",
+    "lighthouse": "lhci autorun",
+    "lighthouse:local": "npm run build && npm run preview & sleep 5 && lhci autorun --config=lighthouserc.js && kill %1",
     "quality": "npm run type-check && npm run lint:check && npm run format:check",
     "ci": "npm run quality && npm run test:run",
     "prepare": "husky"

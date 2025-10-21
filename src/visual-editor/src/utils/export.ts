@@ -1,4 +1,4 @@
-import type { SerializedWorkflow } from '../features/workflow/types/workflow';
+import type { SerializedWorkflow } from '../features/workflow/utils/serialization';
 import { flowToPlantUML, parsePlantUMLToFlow } from './plantuml-parser';
 
 export interface UMLFile {
@@ -280,17 +280,15 @@ export const importFromPUML = async (
       id: `workflow_${Date.now()}`,
       name: workflowName,
       description: 'Imported from PlantUML',
+      version: '1.0.0',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      nodes,
+      edges,
+      viewport: { x: 0, y: 0, zoom: 1 },
       metadata: {
-        version: '1.0.0',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      canvas: {
-        nodes,
-        edges,
-        viewport: { x: 0, y: 0, zoom: 1 },
+        nodeCount: nodes.length,
+        edgeCount: edges.length,
       },
     };
 
@@ -308,12 +306,21 @@ export const exportWorkflowToPUML = async (
   workflow: SerializedWorkflow
 ): Promise<ExportResult> => {
   try {
+    // Get nodes and edges from workflow (support both direct and legacy canvas structure)
+    let nodes, edges;
+    if (workflow.nodes) {
+      nodes = workflow.nodes;
+      edges = workflow.edges;
+    } else if ('canvas' in workflow) {
+      const legacyWorkflow = workflow as any;
+      nodes = legacyWorkflow.canvas.nodes;
+      edges = legacyWorkflow.canvas.edges;
+    } else {
+      throw new Error('Workflow has no nodes or canvas structure');
+    }
+
     // Generate PlantUML content using the parser
-    const content = flowToPlantUML(
-      workflow.canvas.nodes,
-      workflow.canvas.edges,
-      workflow.name
-    );
+    const content = flowToPlantUML(nodes, edges, workflow.name);
 
     // Generate file path
     const fileName = `${workflow.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.puml`;
@@ -375,26 +382,44 @@ export const autoLoadLatestPUML =
   };
 
 export class PlantUMLExporter {
+  static getDefaultExportPath(): string {
+    return '../../.ai-ley/shared/uml-flows/user/';
+  }
+
+  static convertWorkflowToPlantUML(
+    workflow: SerializedWorkflow,
+    nodes: any[],
+    edges: any[],
+    name: string
+  ): string {
+    // Simple wrapper - delegates to flowToPlantUML
+    return flowToPlantUML(nodes, edges, name);
+  }
+
+  static async importFromPUML(
+    filePath: string
+  ): Promise<SerializedWorkflow | null> {
+    return importFromPUML(filePath);
+  }
+
   static async exportWorkflowToPUML(
     workflow: any,
-    options?: any
+    _options?: any
   ): Promise<ExportResult> {
     const serializedWorkflow: SerializedWorkflow = {
       id: workflow.id || `workflow_${Date.now()}`,
       name: workflow.name || 'Untitled Workflow',
       description: workflow.description || '',
+      version: '1.0.0',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       metadata: {
-        version: '1.0.0',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        nodeCount: workflow.nodes?.length || 0,
+        edgeCount: workflow.edges?.length || 0,
       },
-      canvas: {
-        nodes: workflow.nodes || [],
-        edges: workflow.edges || [],
-        viewport: workflow.viewport || { x: 0, y: 0, zoom: 1 },
-      },
+      nodes: workflow.nodes || [],
+      edges: workflow.edges || [],
+      viewport: workflow.viewport || { x: 0, y: 0, zoom: 1 },
     };
 
     return exportWorkflowToPUML(serializedWorkflow);

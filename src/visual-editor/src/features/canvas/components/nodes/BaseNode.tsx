@@ -1,17 +1,55 @@
-import { type ReactNode, useState } from 'react';
 import { Handle, type NodeProps, Position } from '@xyflow/react';
+import { type ReactNode, useState } from 'react';
 import { Card, CardContent, CardHeader } from '../../../../shared/components';
 import { cn } from '../../../../utils';
 
+/**
+ * Base data structure for all node types
+ */
 export interface BaseNodeData {
+  /** Display label for the node */
   label: string;
+  /** Optional description shown below the label */
   description?: string;
+  /** Node-specific properties (varies by node type) */
   properties: Record<string, unknown>;
 }
 
-interface BaseNodeProps extends NodeProps {
-  children?: ReactNode;
+/**
+ * Configuration for individual connection handles (R19)
+ *
+ * @example
+ * ```tsx
+ * const handleConfig: HandleConfig = {
+ *   id: 'primary-input',
+ *   position: Position.Left,
+ *   className: 'w-3 h-3 bg-blue-400',
+ *   label: 'Primary Input'
+ * };
+ * ```
+ */
+export interface HandleConfig {
+  /** Unique identifier for the handle (optional for single handles) */
+  id?: string;
+  /** Position on the node edge (Top, Bottom, Left, Right) */
+  position: Position;
+  /** Custom CSS classes for styling */
   className?: string;
+  /** Tooltip label shown on hover */
+  label?: string;
+}
+
+/**
+ * Props for BaseNode component with R19 flexible connection points
+ *
+ * @see {@link https://github.com/ai-ley-builder Requirements R19}
+ */
+interface BaseNodeProps extends NodeProps {
+  /** Child elements rendered inside the node card */
+  children?: ReactNode;
+  /** Additional CSS classes for the node container */
+  className?: string;
+  /** Visual variant determining node colors and styling */
   variant?:
     | 'command'
     | 'logic'
@@ -21,8 +59,63 @@ interface BaseNodeProps extends NodeProps {
     | 'persona'
     | 'instruction'
     | 'trigger';
+  /** Whether to show connection handles (default: true) */
   showHandles?: boolean;
+  /**
+   * R19: Flexible input handle positions
+   *
+   * @example
+   * ```tsx
+   * // Single input from top (default)
+   * inputPositions={[Position.Top]}
+   *
+   * // Multiple inputs from top and left
+   * inputPositions={[Position.Top, Position.Left]}
+   * ```
+   */
+  inputPositions?: Position[];
+  /**
+   * R19: Flexible output handle positions
+   *
+   * @example
+   * ```tsx
+   * // Single output to bottom (default)
+   * outputPositions={[Position.Bottom]}
+   *
+   * // Multiple outputs to bottom and right
+   * outputPositions={[Position.Bottom, Position.Right]}
+   * ```
+   */
+  outputPositions?: Position[];
+  /**
+   * R19: Advanced handle configuration for complex nodes
+   *
+   * Use this for full control over handle IDs, positions, styling, and labels.
+   * Takes precedence over inputPositions/outputPositions.
+   *
+   * @example
+   * ```tsx
+   * handleConfig={{
+   *   inputs: [
+   *     { id: 'data-in', position: Position.Left, label: 'Data Input' },
+   *     { id: 'control-in', position: Position.Top, label: 'Control' }
+   *   ],
+   *   outputs: [
+   *     { id: 'success', position: Position.Right, label: 'Success', className: 'bg-green-400' },
+   *     { id: 'error', position: Position.Bottom, label: 'Error', className: 'bg-red-400' }
+   *   ]
+   * }}
+   * ```
+   */
+  handleConfig?: {
+    /** Input handle configurations */
+    inputs?: HandleConfig[];
+    /** Output handle configurations */
+    outputs?: HandleConfig[];
+  };
+  /** Callback when node label is changed */
   onLabelChange?: (newLabel: string) => void;
+  /** Callback when node description is changed */
   onDescriptionChange?: (newDescription: string) => void;
 }
 
@@ -50,6 +143,9 @@ export function BaseNode({
   className,
   variant = 'command',
   showHandles = true,
+  inputPositions,
+  outputPositions,
+  handleConfig,
   children,
   onLabelChange,
   onDescriptionChange,
@@ -61,6 +157,46 @@ export function BaseNode({
   const [tempDescription, setTempDescription] = useState(
     nodeData.description || ''
   );
+
+  // R19: Determine handle positions - use custom config, or positions array, or defaults
+  const getInputHandles = (): HandleConfig[] => {
+    if (handleConfig?.inputs) return handleConfig.inputs;
+    if (inputPositions) {
+      return inputPositions.map((pos, idx) => ({
+        id: inputPositions.length > 1 ? `input-${idx}` : undefined,
+        position: pos,
+        className: 'w-3 h-3 bg-gray-400 border-2 border-white',
+      }));
+    }
+    // Default: single input at top (backward compatible)
+    return [
+      {
+        position: Position.Top,
+        className: 'w-3 h-3 bg-gray-400 border-2 border-white',
+      },
+    ];
+  };
+
+  const getOutputHandles = (): HandleConfig[] => {
+    if (handleConfig?.outputs) return handleConfig.outputs;
+    if (outputPositions) {
+      return outputPositions.map((pos, idx) => ({
+        id: outputPositions.length > 1 ? `output-${idx}` : undefined,
+        position: pos,
+        className: 'w-3 h-3 bg-gray-400 border-2 border-white',
+      }));
+    }
+    // Default: single output at bottom (backward compatible)
+    return [
+      {
+        position: Position.Bottom,
+        className: 'w-3 h-3 bg-gray-400 border-2 border-white',
+      },
+    ];
+  };
+
+  const inputHandles = getInputHandles();
+  const outputHandles = getOutputHandles();
 
   const handleLabelSave = () => {
     if (onLabelChange && tempLabel.trim()) {
@@ -99,16 +235,28 @@ export function BaseNode({
     <>
       {showHandles && (
         <>
-          <Handle
-            type="target"
-            position={Position.Top}
-            className="w-3 h-3 bg-gray-400 border-2 border-white"
-          />
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            className="w-3 h-3 bg-gray-400 border-2 border-white"
-          />
+          {/* R19: Render input handles at flexible positions */}
+          {inputHandles.map((handle, idx) => (
+            <Handle
+              key={`input-${handle.id || idx}`}
+              type="target"
+              id={handle.id}
+              position={handle.position}
+              className={handle.className}
+              title={handle.label || 'Input'}
+            />
+          ))}
+          {/* R19: Render output handles at flexible positions */}
+          {outputHandles.map((handle, idx) => (
+            <Handle
+              key={`output-${handle.id || idx}`}
+              type="source"
+              id={handle.id}
+              position={handle.position}
+              className={handle.className}
+              title={handle.label || 'Output'}
+            />
+          ))}
         </>
       )}
 

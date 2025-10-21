@@ -1,4 +1,4 @@
-import React from 'react';
+// React import removed
 import { Clock, GitBranch, Globe, RefreshCw, RotateCcw } from 'lucide-react';
 import { Button, Input, Label } from '../../../shared/components';
 import { useSettings } from '../../../hooks/useSettings';

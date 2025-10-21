@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Bug,
   Calendar,
@@ -11,8 +10,9 @@ import {
   Settings,
   Upload,
 } from 'lucide-react';
-import { cn } from '../../../utils';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../../../shared/components';
+import { cn } from '../../../utils';
 
 interface TabbedRightPanelProps {
   className?: string;

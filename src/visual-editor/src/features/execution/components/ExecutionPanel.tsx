@@ -1,26 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
 import {
-  BarChart3,
-  CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Pause,
-  Play,
-  RotateCcw,
-  Settings,
-  Square,
-  XCircle,
-  Zap,
+    BarChart3,
+    CheckCircle2,
+    ChevronDown,
+    ChevronRight,
+    Clock,
+    Pause,
+    Play,
+    RotateCcw,
+    Settings,
+    Square,
+    XCircle,
+    Zap,
 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../../../shared/components';
+import { cn } from '../../../utils';
 import { useExecution } from '../hooks/useExecution';
 import {
-  ExecutionEventType,
-  ExecutionStatus,
-  NodeExecutionStatus,
+    ExecutionEventType,
+    ExecutionStatus,
+    NodeExecutionStatus,
 } from '../types/execution';
-import { cn } from '../../../utils';
 
 interface ExecutionPanelProps {
   nodes: any[];
@@ -521,7 +521,7 @@ export function ExecutionPanel({
                           <div className="bg-red-100 p-2 rounded border border-red-200">
                             <div className="text-red-700 mb-1">Error:</div>
                             <pre className="text-red-800 whitespace-pre-wrap font-mono text-xs">
-                              {nodeState.error}
+                              {nodeState.error.message}
                             </pre>
                           </div>
                         )}

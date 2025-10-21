@@ -44,7 +44,8 @@ export type ValidationWarningType =
   | 'DEPRECATED_NODE_TYPE'
   | 'SUBOPTIMAL_CONFIGURATION'
   | 'POTENTIAL_DATA_LOSS'
-  | 'MISSING_OPTIONAL_FIELD';
+  | 'MISSING_OPTIONAL_FIELD'
+  | 'INVALID_FORMAT';
 
 export interface ValidationContext {
   nodes: any[];
@@ -108,7 +109,10 @@ export type PropertyType =
   | 'color'
   | 'date'
   | 'file'
-  | 'json';
+  | 'json'
+  | 'array'
+  | 'password'
+  | 'object';
 
 export interface PropertyValidation {
   min?: number;

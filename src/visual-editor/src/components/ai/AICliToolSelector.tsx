@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
 import {
-  AlertCircle,
-  Check,
-  Clock,
-  Play,
-  Terminal,
-  TestTube,
-  X,
+    AlertCircle,
+    Check,
+    Clock,
+    Play,
+    Terminal,
+    TestTube,
+    X,
 } from 'lucide-react';
-import { Button, Input, Label } from '../../shared/components';
-import { cn } from '../../utils';
+import { useEffect, useState } from 'react';
 import {
-  type AICliRequest,
-  type AICliResponse,
-  AICliService,
+    type AICliRequest,
+    type AICliResponse,
+    AICliService,
 } from '../../services/aiCliService';
+import { Button, Input, Label } from '../../shared/components';
 import type { LocalAITool } from '../../types/settings';
+import { cn } from '../../utils';
 
 interface AICliToolSelectorProps {
   onExecute?: (response: AICliResponse) => void;

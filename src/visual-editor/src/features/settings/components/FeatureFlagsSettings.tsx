@@ -1,8 +1,8 @@
 import { AlertTriangle, CheckCircle, Shield } from 'lucide-react';
 import { useSettings } from '../../../hooks/useSettings';
 import {
-    FEATURE_FLAG_METADATA,
-    FeatureFlag,
+  FEATURE_FLAG_METADATA,
+  FeatureFlag,
 } from '../../../utils/featureFlags';
 
 export function FeatureFlagsSettings() {
@@ -188,9 +188,7 @@ export function FeatureFlagsSettings() {
         <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
           <li>Toggle features on/off without code changes</li>
           <li>Changes take effect after reloading the page</li>
-          <li>
-            Disabled features revert to legacy behavior (safe rollback)
-          </li>
+          <li>Disabled features revert to legacy behavior (safe rollback)</li>
           <li>Settings are saved locally in browser storage</li>
         </ul>
       </div>

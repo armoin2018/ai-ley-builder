@@ -4,6 +4,7 @@ import { CodeEditor } from '../../../shared/components';
 import { cn } from '../../../utils';
 import { flowToPlantUML } from '../../../utils/plantuml-parser';
 import { useTabState } from '../../tabs/hooks/useTabState';
+import { deserializeWorkflow } from '../../workflow/utils/serialization';
 import { useWorkflowTabsContext } from './WorkflowTabsProvider';
 
 interface SourceEditorProps {
@@ -22,7 +23,6 @@ export function SourceEditor({
     saveTab,
     isLoading: tabsLoading,
     tabs,
-    createNewTab,
   } = useWorkflowTabsContext();
   const { getNodes, getEdges, setNodes, setEdges, setViewport } =
     useReactFlow();
@@ -103,10 +103,8 @@ export function SourceEditor({
             return;
           } else if (firstTab.workflow) {
             // Generate content from first tab's workflow data
-            const workflowNodes =
-              firstTab.workflow.canvas?.nodes || firstTab.workflow.nodes || [];
-            const workflowEdges =
-              firstTab.workflow.canvas?.edges || firstTab.workflow.edges || [];
+            const { nodes: workflowNodes, edges: workflowEdges } =
+              deserializeWorkflow(firstTab.workflow);
 
             console.log('🔄 Using first tab workflow data:', {
               tabName: firstTab.name,
@@ -183,16 +181,10 @@ export function SourceEditor({
             `${plantumlContent.substring(0, 200)}...`
           );
           setContent(plantumlContent);
-        } else if (
-          activeTab.workflow &&
-          (activeTab.workflow.canvas?.nodes?.length > 0 ||
-            activeTab.workflow.nodes?.length > 0)
-        ) {
+        } else if (activeTab.workflow && activeTab.workflow.nodes?.length > 0) {
           // Canvas is empty but workflow has nodes - use workflow data directly
-          const workflowNodes =
-            activeTab.workflow.canvas?.nodes || activeTab.workflow.nodes || [];
-          const workflowEdges =
-            activeTab.workflow.canvas?.edges || activeTab.workflow.edges || [];
+          const { nodes: workflowNodes, edges: workflowEdges } =
+            deserializeWorkflow(activeTab.workflow);
 
           console.log('🔄 Canvas empty, converting from workflow data:', {
             nodes: workflowNodes.length,
@@ -240,16 +232,9 @@ export function SourceEditor({
       hasWorkflow: !!activeTab?.workflow,
       workflowStructure: activeTab?.workflow
         ? {
-            hasCanvas: !!activeTab.workflow.canvas,
             hasNodes: !!activeTab.workflow.nodes,
-            nodeCount:
-              activeTab.workflow.canvas?.nodes?.length ||
-              activeTab.workflow.nodes?.length ||
-              0,
-            edgeCount:
-              activeTab.workflow.canvas?.edges?.length ||
-              activeTab.workflow.edges?.length ||
-              0,
+            nodeCount: activeTab.workflow.nodes?.length || 0,
+            edgeCount: activeTab.workflow.edges?.length || 0,
           }
         : null,
     });
@@ -268,38 +253,27 @@ export function SourceEditor({
     });
   }, [activeTab, getNodes, getEdges]);
 
-  // Manual refresh function to update PlantUML from current canvas
-  const refreshFromCanvas = useCallback(async () => {
-    if (!activeTab) return;
-
-    setIsLoading(true);
-    try {
-      const currentNodes = getNodes();
-      const currentEdges = getEdges();
-
-      console.log('🔄 Manually refreshing PlantUML from canvas:', {
-        tabName: activeTab.name,
-        nodes: currentNodes.length,
-        edges: currentEdges.length,
-      });
-
-      if (currentNodes.length > 0) {
-        const plantumlContent = flowToPlantUML(
-          currentNodes,
-          currentEdges,
-          activeTab.name
-        );
-        setContent(plantumlContent);
-      } else {
-        setContent(getDefaultPlantUMLContent(activeTab.name));
-      }
-    } catch (error) {
-      console.error('❌ Failed to refresh PlantUML from canvas:', error);
-      setContent(getDefaultPlantUMLContent(activeTab.name));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [activeTab, getNodes, getEdges]);
+  // DEPRECATED: Manual refresh function - not currently used
+  // Kept for potential future use
+  // const refreshFromCanvas = useCallback(async () => {
+  //   if (!activeTab) return;
+  //   setIsLoading(true);
+  //   try {
+  //     const currentNodes = getNodes();
+  //     const currentEdges = getEdges();
+  //     if (currentNodes.length > 0) {
+  //       const plantumlContent = flowToPlantUML(currentNodes, currentEdges, activeTab.name);
+  //       setContent(plantumlContent);
+  //     } else {
+  //       setContent(getDefaultPlantUMLContent(activeTab.name));
+  //     }
+  //   } catch (error) {
+  //     console.error('❌ Failed to refresh PlantUML from canvas:', error);
+  //     setContent(getDefaultPlantUMLContent(activeTab.name));
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [activeTab, getNodes, getEdges]);
 
   const getDefaultPlantUMLContent = (workflowName: string) => {
     return `@startuml ${workflowName}
@@ -454,9 +428,11 @@ title ${workflowName}
     }
   }, [activeTab, content, saveTab]);
 
-  const handleUpdate = useCallback(() => {
-    onUpdate?.(content);
-  }, [content, onUpdate]);
+  // DEPRECATED: Handle update callback - not currently used
+  // Kept for potential future use
+  // const handleUpdate = useCallback(() => {
+  //   onUpdate?.(content);
+  // }, [content, onUpdate]);
 
   // Show loading state while tabs are loading
   if (tabsLoading) {

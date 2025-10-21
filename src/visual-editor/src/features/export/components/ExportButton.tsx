@@ -1,13 +1,12 @@
-import React from 'react';
+import { useReactFlow } from '@xyflow/react';
 import { Download } from 'lucide-react';
 import { Button } from '../../../shared/components';
-import { PlantUMLExporter } from '../../../utils/export';
-import { useReactFlow } from '@xyflow/react';
 import { cn } from '../../../utils';
+import { PlantUMLExporter } from '../../../utils/export';
 
 interface ExportButtonProps {
   className?: string;
-  variant?: 'default' | 'outline' | 'ghost';
+  variant?: 'primary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
 }
 

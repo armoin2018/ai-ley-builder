@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  deserializeWorkflow,
-  type SerializedWorkflow,
-  serializeWorkflow,
-} from '../utils/serialization';
+  autoLoadLatestPUML,
+  exportWorkflowToPUML,
+} from '../../../utils/export';
 import {
   type WorkflowMetadata,
   workflowStorage,
 } from '../services/workflowStorage';
 import {
-  autoLoadLatestPUML,
-  exportWorkflowToPUML,
-} from '../../../utils/export';
+  deserializeWorkflow,
+  type SerializedWorkflow,
+  serializeWorkflow,
+} from '../utils/serialization';
 
 export interface WorkflowState {
   currentWorkflow: SerializedWorkflow | null;
@@ -296,8 +296,8 @@ export function useWorkflow(): UseWorkflowReturn {
         currentWorkflow: pumlWorkflow,
         isModified: false,
         isLoading: false,
-        lastSaved: pumlWorkflow.metadata?.createdAt
-          ? new Date(pumlWorkflow.metadata.createdAt)
+        lastSaved: pumlWorkflow.createdAt
+          ? new Date(pumlWorkflow.createdAt)
           : new Date(),
       }));
 

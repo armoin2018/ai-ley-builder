@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import {
   Activity,
   Calendar,
@@ -13,15 +12,14 @@ import {
   Search,
   Share,
   Star,
-  Tag,
   Trash2,
-  User,
 } from 'lucide-react';
-import { Badge, Button, Input } from '../../../shared/components';
-import { cn } from '../../../utils';
+import { useEffect, useState } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
 import { FlowStoreService } from '../../../services/flowStoreService';
+import { Badge, Button, Input } from '../../../shared/components';
 import type { FlowStoreItem } from '../../../types/settings';
+import { cn } from '../../../utils';
 
 interface FlowStoreManagerProps {
   isOpen: boolean;
@@ -330,23 +328,22 @@ export function FlowStoreManager({
                   </p>
 
                   <div className="flex flex-wrap gap-1 mb-3">
-                    <Badge variant="outline" size="sm">
+                    <Badge variant="outline" className="text-xs">
                       {flow.category}
                     </Badge>
                     <Badge
                       variant="secondary"
-                      size="sm"
-                      className={getComplexityColor(flow.complexity)}
+                      className={`text-xs ${getComplexityColor(flow.complexity)}`}
                     >
                       {flow.complexity}
                     </Badge>
                     {flow.tags.slice(0, 1).map(tag => (
-                      <Badge key={tag} variant="secondary" size="sm">
+                      <Badge key={tag} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>
                     ))}
                     {flow.tags.length > 1 && (
-                      <Badge variant="secondary" size="sm">
+                      <Badge variant="secondary" className="text-xs">
                         +{flow.tags.length - 1}
                       </Badge>
                     )}

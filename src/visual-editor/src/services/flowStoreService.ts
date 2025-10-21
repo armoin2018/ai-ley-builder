@@ -304,7 +304,7 @@ export class FlowStoreService {
     }
 
     // Convert GitHub files to FlowStoreItems
-    const flows: FlowStoreItem[] = await Promise.all(
+    const flows: (FlowStoreItem | null)[] = await Promise.all(
       files
         .filter(
           file =>

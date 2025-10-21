@@ -1,4 +1,4 @@
-import React from 'react';
+// React import removed
 import {
   Columns,
   Grid2X2,

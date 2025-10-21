@@ -1,20 +1,18 @@
 import { ExecutionPanel } from '@features/execution/components/ExecutionPanel';
 import {
-    DraggableLayoutEngine,
-    LayoutProvider,
-    LayoutQuickToggles,
-    LayoutTemplateSelector
+  DraggableLayoutEngine,
+  LayoutProvider,
+  LayoutQuickToggles,
+  LayoutTemplateSelector,
 } from '@features/layout';
 import {
-    useTabState,
-    useWorkflowTabsContext,
-    WorkflowTabs,
-    WorkflowTabsProvider
+  useTabState,
+  useWorkflowTabsContext,
+  WorkflowTabs,
+  WorkflowTabsProvider,
 } from '@features/tabs';
 import { CommandPalette, QuickActions, StatusBar } from '@features/ui-advanced';
-import {
-    Header
-} from '@features/ui-common/components';
+import { Header } from '@features/ui-common/components';
 import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { WorkflowControls } from '@features/workflow';
 import { Button, ThemeProvider } from '@shared/components';
@@ -28,6 +26,7 @@ import { ChatPanel } from './features/chat/components/ChatPanel';
 import { FileEditorTabs } from './features/file-editor';
 import { Settings } from './features/settings';
 import { FlowStoreManager, NodeStoreManager } from './features/store';
+import { PerformanceDashboard, ProfilerWrapper } from './performance';
 import { PromptService } from './services/promptService';
 import { flowToPlantUML, parsePlantUMLToFlow } from './utils/plantuml-parser';
 
@@ -40,6 +39,7 @@ function AppContent() {
   const [showFileEditor, setShowFileEditor] = useState(false);
   const [showNodeStore, setShowNodeStore] = useState(false);
   const [showFlowStore, setShowFlowStore] = useState(false);
+  const [showPerformance, setShowPerformance] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   const { getNodes, getEdges, setNodes, setEdges, setViewport } =
     useReactFlow();
@@ -93,6 +93,9 @@ function AppContent() {
       case 'flow-store':
         setShowFlowStore(true);
         break;
+      case 'performance':
+        setShowPerformance(true);
+        break;
       default:
         console.log('Quick action:', action);
     }
@@ -103,10 +106,12 @@ function AppContent() {
     if (activeTab) {
       const newView = sourceView ? 'source' : 'visual';
       tabState.switchView(newView);
-      
+
       // When switching to source view, trigger PlantUML refresh
       if (sourceView) {
-        console.log('🔄 Switching to source view, will trigger PlantUML refresh');
+        console.log(
+          '🔄 Switching to source view, will trigger PlantUML refresh'
+        );
         // Wait a moment for the SourceEditor to mount, then trigger refresh
         setTimeout(() => {
           setLastSaved(new Date());
@@ -352,6 +357,15 @@ function AppContent() {
       action: () => setShowFlowStore(!showFlowStore),
       keywords: ['flow', 'store', 'workflow', 'template', 'download'],
     },
+    {
+      id: 'performance',
+      title: 'Performance Dashboard',
+      description: 'View application performance metrics and profiling data',
+      category: 'Tools',
+      shortcut: '⌘⇧M',
+      action: () => setShowPerformance(!showPerformance),
+      keywords: ['performance', 'metrics', 'profiling', 'monitoring'],
+    },
     // Add prompt commands dynamically from PromptService
     ...PromptService.getCommandPaletteEntries(),
   ];
@@ -468,6 +482,11 @@ function AppContent() {
         onImportFlow={handleImportFlow}
       />
 
+      <PerformanceDashboard
+        isOpen={showPerformance}
+        onClose={() => setShowPerformance(false)}
+      />
+
       <StatusBar
         nodeCount={nodes.length}
         connectionCount={edges.length}
@@ -487,11 +506,13 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="visual-editor-theme">
-      <ReactFlowProvider>
-        <WorkflowTabsProvider>
-          <AppContent />
-        </WorkflowTabsProvider>
-      </ReactFlowProvider>
+      <ProfilerWrapper id="App" enabled={true}>
+        <ReactFlowProvider>
+          <WorkflowTabsProvider>
+            <AppContent />
+          </WorkflowTabsProvider>
+        </ReactFlowProvider>
+      </ProfilerWrapper>
     </ThemeProvider>
   );
 }

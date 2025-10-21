@@ -1,4 +1,4 @@
-import React from 'react';
+// React import removed
 import { Folder, Save } from 'lucide-react';
 import { Input, Label } from '../../../shared/components';
 import { useSettings } from '../../../hooks/useSettings';

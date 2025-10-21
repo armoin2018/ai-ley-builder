@@ -68,3 +68,39 @@ global.console = {
   // warn: vi.fn(),
   // error: vi.fn(),
 };
+
+// ============================================================================
+// Integration Test Setup
+// ============================================================================
+
+// Mock IntersectionObserver for React Flow
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+  root: null,
+  rootMargin: '',
+  thresholds: [],
+  takeRecords: vi.fn(() => []),
+}));
+
+// Mock getBoundingClientRect for React Flow
+Element.prototype.getBoundingClientRect = vi.fn(() => ({
+  width: 1000,
+  height: 800,
+  top: 0,
+  left: 0,
+  bottom: 800,
+  right: 1000,
+  x: 0,
+  y: 0,
+  toJSON: () => ({}),
+}));
+
+// Mock requestAnimationFrame for React Flow animations
+global.requestAnimationFrame = vi.fn(cb => {
+  setTimeout(cb, 0);
+  return 0;
+});
+
+global.cancelAnimationFrame = vi.fn();

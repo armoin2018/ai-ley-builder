@@ -436,12 +436,10 @@ export const ollamaNodeExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const model = properties.model || 'llama2';
-    const temperature = properties.temperature || 0.7;
-    const maxTokens = properties.maxTokens || 1000;
 
     const prompt = inputs.prompt || '';
     const contextInput = inputs.context || '';
@@ -458,12 +456,10 @@ export const llamacppNodeExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const modelPath = properties.modelPath || 'models/llama-2-7b-chat.gguf';
-    const temperature = properties.temperature || 0.7;
-    const maxTokens = properties.maxTokens || 1000;
 
     const prompt = inputs.prompt || '';
     const contextInput = inputs.context || '';
@@ -480,7 +476,7 @@ export const claudeCodeCliExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const task = properties.task || 'ask';
@@ -502,15 +498,13 @@ export const githubCopilotCliExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const command = properties.command || 'suggest';
     const language = properties.language || 'auto';
-    const format = properties.format || 'text';
 
     const prompt = inputs.prompt || '';
-    const codeContext = inputs.code || '';
 
     // In a real implementation, this would call GitHub Copilot CLI
     // Example: gh copilot suggest "write a function to sort an array"
@@ -530,7 +524,7 @@ export const geminiCodeCliExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const mode = properties.mode || 'chat';
@@ -539,7 +533,6 @@ export const geminiCodeCliExecutor: NodeExecutor = {
     const maxTokens = properties.maxTokens || 2048;
 
     const prompt = inputs.prompt || '';
-    const codeContext = inputs.code || '';
 
     // In a real implementation, this would call Gemini Code CLI
     // Example: gemini code --mode=analyze "explain this function"
@@ -566,12 +559,10 @@ export const openaiNodeExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const model = properties.model || 'gpt-4';
-    const temperature = properties.temperature || 0.7;
-    const maxTokens = properties.maxTokens || 4096;
     const apiKey = properties.apiKey;
 
     const prompt = inputs.prompt || '';
@@ -596,12 +587,10 @@ export const anthropicNodeExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const model = properties.model || 'claude-3-sonnet-20240229';
-    const temperature = properties.temperature || 0.7;
-    const maxTokens = properties.maxTokens || 4096;
     const apiKey = properties.apiKey;
 
     const prompt = inputs.prompt || '';
@@ -629,13 +618,10 @@ export const shellScriptExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const script = inputs.script || properties.script || '';
-    const workingDirectory = properties.workingDirectory;
-    const timeout = properties.timeout || 30;
-    const environment = properties.environment || {};
 
     const inputData = inputs.input;
 
@@ -655,13 +641,10 @@ export const pythonScriptExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const script = inputs.script || properties.script || '';
-    const pythonPath = properties.pythonPath || 'python3';
-    const timeout = properties.timeout || 30;
-    const requirements = properties.requirements || [];
 
     const inputData = inputs.input;
 
@@ -681,12 +664,10 @@ export const phpScriptExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const script = inputs.script || properties.script || '';
-    const phpPath = properties.phpPath || 'php';
-    const timeout = properties.timeout || 30;
 
     const inputData = inputs.input;
 
@@ -706,13 +687,10 @@ export const nodejsScriptExecutor: NodeExecutor = {
   execute: async (
     node: any,
     inputs: Record<string, any>,
-    context: ExecutionContext
+    _context: ExecutionContext
   ) => {
     const properties = node.data?.properties || {};
     const script = inputs.script || properties.script || '';
-    const nodePath = properties.nodePath || 'node';
-    const timeout = properties.timeout || 30;
-    const modules = properties.modules || [];
 
     const inputData = inputs.input;
 

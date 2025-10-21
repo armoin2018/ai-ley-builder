@@ -1,4 +1,4 @@
-import { type NodeProps, useReactFlow } from '@xyflow/react';
+import { type NodeProps, Position, useReactFlow } from '@xyflow/react';
 import { Badge } from '../../../../shared/components';
 import { BaseNode, type BaseNodeData } from './BaseNode';
 
@@ -53,6 +53,9 @@ export function CommandPromptFileNode(props: NodeProps) {
     <BaseNode
       {...props}
       variant="command"
+      // R19: Flexible connection points - inputs from top OR left, outputs to bottom OR right
+      inputPositions={[Position.Top, Position.Left]}
+      outputPositions={[Position.Bottom, Position.Right]}
       onLabelChange={handleLabelChange}
       onDescriptionChange={handleDescriptionChange}
     >

@@ -187,7 +187,7 @@ export function WorkflowControls({ className }: WorkflowControlsProps) {
 
       {/* Deploy Button - saves all and restarts running tasks */}
       <Button
-        variant="default"
+        variant="primary"
         size="sm"
         onClick={handleDeploy}
         disabled={isSaving || isLoading}

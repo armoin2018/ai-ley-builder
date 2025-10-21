@@ -727,77 +727,123 @@ export function flowToPlantUML(
 
       // Add node-type specific execution details
       switch (nodeType) {
-        case 'command-prompt-file':
-          const fileName = node.data.fileName || 'prompt.md';
-          const content = node.data.content || '';
-          const variables = node.data.variables || [];
+        case 'command-prompt-file': {
+          const fileName =
+            ((node.data.properties as Record<string, unknown>)
+              ?.fileName as string) || 'prompt.md';
+          const variables =
+            ((node.data.properties as Record<string, unknown>)
+              ?.variables as string[]) || [];
           lines.push(`  **Execution:** Load file "${fileName}"`);
           if (variables.length > 0) {
             lines.push(`  **Variables:** ${JSON.stringify(variables)}`);
           }
           break;
+        }
 
-        case 'custom-prompt':
-          const promptText = node.data.promptText || '';
-          const promptVars = node.data.variables || [];
+        case 'custom-prompt': {
+          const promptVars =
+            ((node.data.properties as Record<string, unknown>)
+              ?.variables as string[]) || [];
           lines.push(`  **Execution:** Execute custom prompt`);
           if (promptVars.length > 0) {
             lines.push(`  **Variables:** ${JSON.stringify(promptVars)}`);
           }
           break;
+        }
 
-        case 'conditional':
-          const condition = node.data.condition || '';
-          const trueLabel = node.data.trueLabel || 'True';
-          const falseLabel = node.data.falseLabel || 'False';
+        case 'conditional': {
+          const condition =
+            ((node.data.properties as Record<string, unknown>)
+              ?.condition as string) || '';
+          const trueLabel =
+            ((node.data.properties as Record<string, unknown>)
+              ?.trueLabel as string) || 'True';
+          const falseLabel =
+            ((node.data.properties as Record<string, unknown>)
+              ?.falseLabel as string) || 'False';
           lines.push(`  **Execution:** Evaluate condition "${condition}"`);
           lines.push(`  **True Path:** ${trueLabel}`);
           lines.push(`  **False Path:** ${falseLabel}`);
           break;
+        }
 
-        case 'loop':
-          const loopType = node.data.loopType || 'for';
-          const maxIterations = node.data.maxIterations || 10;
-          const loopCondition = node.data.condition || '';
+        case 'loop': {
+          const loopType =
+            ((node.data.properties as Record<string, unknown>)
+              ?.loopType as string) || 'for';
+          const maxIterations =
+            ((node.data.properties as Record<string, unknown>)
+              ?.maxIterations as number) || 10;
+          const loopCondition =
+            ((node.data.properties as Record<string, unknown>)
+              ?.condition as string) || '';
           lines.push(`  **Execution:** ${loopType} loop`);
           lines.push(`  **Max Iterations:** ${maxIterations}`);
           if (loopCondition) {
             lines.push(`  **Condition:** ${loopCondition}`);
           }
           break;
+        }
 
-        case 'output-formatter':
-          const outputType = node.data.outputType || 'text';
-          const format = node.data.format || 'structured';
+        case 'output-formatter': {
+          const outputType =
+            ((node.data.properties as Record<string, unknown>)
+              ?.outputType as string) || 'text';
+          const format =
+            ((node.data.properties as Record<string, unknown>)
+              ?.format as string) || 'structured';
           lines.push(`  **Execution:** Format output as ${outputType}`);
           lines.push(`  **Format:** ${format}`);
           break;
+        }
 
-        case 'persona':
-          const personaType = node.data.personaType || 'Expert Assistant';
-          const tone = node.data.tone || 'professional';
-          const expertise = node.data.expertise || '';
+        case 'persona': {
+          const personaType =
+            ((node.data.properties as Record<string, unknown>)
+              ?.personaType as string) || 'Expert Assistant';
+          const tone =
+            ((node.data.properties as Record<string, unknown>)
+              ?.tone as string) || 'professional';
+          const expertise =
+            ((node.data.properties as Record<string, unknown>)
+              ?.expertise as string) || '';
           lines.push(`  **Execution:** Apply persona "${personaType}"`);
           lines.push(`  **Tone:** ${tone}`);
           if (expertise) {
             lines.push(`  **Expertise:** ${expertise}`);
           }
           break;
+        }
 
-        case 'instruction':
-          const instructionText = node.data.instructionText || '';
-          const priority = node.data.priority || 'medium';
+        case 'instruction': {
+          const priority =
+            ((node.data.properties as Record<string, unknown>)
+              ?.priority as string) || 'medium';
           lines.push(`  **Execution:** Follow instruction`);
           lines.push(`  **Priority:** ${priority}`);
           break;
-        case 'injector':
-          const triggerType = node.data.properties?.triggerType || 'manual';
-          const interval = node.data.properties?.interval || 60;
+        }
+
+        case 'injector': {
+          const triggerType =
+            ((node.data.properties as Record<string, unknown>)
+              ?.triggerType as string) || 'manual';
+          const interval =
+            ((node.data.properties as Record<string, unknown>)
+              ?.interval as number) || 60;
           const cronExpression =
-            node.data.properties?.cronExpression || '0 * * * * *';
-          const autoStart = node.data.properties?.autoStart || false;
-          const payload = node.data.properties?.payload || '{}';
-          const payloadType = node.data.properties?.payloadType || 'json';
+            ((node.data.properties as Record<string, unknown>)
+              ?.cronExpression as string) || '0 * * * * *';
+          const autoStart =
+            ((node.data.properties as Record<string, unknown>)
+              ?.autoStart as boolean) || false;
+          const payload =
+            ((node.data.properties as Record<string, unknown>)
+              ?.payload as string) || '{}';
+          const payloadType =
+            ((node.data.properties as Record<string, unknown>)
+              ?.payloadType as string) || 'json';
           lines.push(`  **Execution:** ${triggerType} trigger`);
           if (triggerType === 'interval') {
             lines.push(`  **Interval:** ${interval} seconds`);
@@ -813,6 +859,7 @@ export function flowToPlantUML(
             lines.push(`  **Payload:** ${payloadPreview}`);
           }
           break;
+        }
       }
 
       lines.push(`end note`);

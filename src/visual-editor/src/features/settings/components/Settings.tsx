@@ -206,7 +206,7 @@ export function Settings({ isOpen, onClose }: SettingsProps) {
             </Button>
 
             <Button
-              variant="default"
+              variant="primary"
               size="sm"
               onClick={handleSave}
               disabled={isLoading || !hasUnsavedChanges}

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { AICliToolSelector } from './AICliToolSelector';
-import { AIApiSelector } from './AIApiSelector';
 import { Bot, Globe, Terminal } from 'lucide-react';
-import { Button } from '../../shared/components';
-import { cn } from '../../utils';
-import type { AICliResponse } from '../../services/aiCliService';
+import { useState } from 'react';
 import type { AIApiResponse } from '../../services/aiApiService';
+import type { AICliResponse } from '../../services/aiCliService';
+import { Button } from '../../shared/components';
+import { AIApiSelector } from './AIApiSelector';
+import { AICliToolSelector } from './AICliToolSelector';
 
 export function AIDemo() {
   const [activeTab, setActiveTab] = useState<'cli' | 'api'>('cli');
@@ -48,7 +47,7 @@ export function AIDemo() {
       <div className="flex justify-center">
         <div className="flex p-1 bg-slate-100 rounded-lg">
           <Button
-            variant={activeTab === 'cli' ? 'default' : 'ghost'}
+            variant={activeTab === 'cli' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('cli')}
             className="flex items-center gap-2"
@@ -57,7 +56,7 @@ export function AIDemo() {
             AI CLI Tools
           </Button>
           <Button
-            variant={activeTab === 'api' ? 'default' : 'ghost'}
+            variant={activeTab === 'api' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('api')}
             className="flex items-center gap-2"

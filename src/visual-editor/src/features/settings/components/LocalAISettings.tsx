@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import { Edit2, Plus, Settings, Terminal, Trash2 } from 'lucide-react';
-import { Button, Input, Label } from '../../../shared/components';
+import { useState } from 'react';
 import { useSettings } from '../../../hooks/useSettings';
+import { Button, Input, Label } from '../../../shared/components';
 import type { LocalAITool } from '../../../types/settings';
 
 export function LocalAISettings() {
@@ -344,7 +344,7 @@ export function LocalAISettings() {
                 Cancel
               </Button>
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={handleSaveTool}
                 disabled={

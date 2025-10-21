@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import {
   Bookmark,
   ChevronDown,
@@ -7,14 +6,15 @@ import {
   Settings,
   Trash2,
 } from 'lucide-react';
-import { cn } from '../../../utils';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../../../shared/components';
+import { cn } from '../../../utils';
 import { useLayout } from '../context/LayoutContext';
+import { type NamedView, namedViewsService } from '../services/namedViews';
 import {
   getTemplatesByCategory,
   LAYOUT_TEMPLATES,
 } from '../templates/layoutTemplates';
-import { type NamedView, namedViewsService } from '../services/namedViews';
 import type { LayoutTemplate } from '../types/layout';
 
 interface LayoutTemplateSelectorProps {
@@ -177,7 +177,7 @@ export function LayoutTemplateSelector({
             />
             <div className="flex gap-2">
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={handleSaveView}
                 disabled={!saveViewName.trim()}
@@ -344,7 +344,7 @@ export function LayoutTemplateSelector({
                 />
                 <div className="flex gap-2">
                   <Button
-                    variant="default"
+                    variant="primary"
                     size="sm"
                     onClick={handleSaveView}
                     disabled={!saveViewName.trim()}
@@ -438,7 +438,7 @@ export function LayoutQuickToggles({ className }: { className?: string }) {
       {quickTemplates.map(template => (
         <Button
           key={template.id}
-          variant={activeTemplate === template.id ? 'default' : 'ghost'}
+          variant={activeTemplate === template.id ? 'primary' : 'ghost'}
           size="sm"
           onClick={() => handleTemplateSelect(template)}
           title={template.description}

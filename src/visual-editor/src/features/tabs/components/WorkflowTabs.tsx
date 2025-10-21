@@ -1,24 +1,22 @@
 import { useReactFlow } from '@xyflow/react';
 import {
-    Code,
-    Download,
-    Edit2,
-    Eye,
-    Layout,
-    MoreVertical,
-    Play,
-    Plus,
-    Save,
-    Upload,
-    X,
+  Code,
+  Download,
+  Edit2,
+  Eye,
+  Layout,
+  MoreVertical,
+  Play,
+  Plus,
+  Save,
+  Upload,
+  X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../../../shared/components';
 import { cn } from '../../../utils';
-import {
-    parsePlantUMLToFlow
-} from '../../../utils/plantuml-parser';
+import { parsePlantUMLToFlow } from '../../../utils/plantuml-parser';
 import { useTabState } from '../hooks/useTabState';
 import type { WorkflowTab } from '../types/tab';
 import { useWorkflowTabsContext } from './WorkflowTabsProvider';
@@ -29,10 +27,20 @@ interface WorkflowTabsProps {
   isSourceView?: boolean;
 }
 
+/**
+ * WorkflowTabs Component
+ *
+ * @remarks
+ * The `isSourceView` parameter is intentionally unused. It's preserved for API compatibility
+ * and future features. TASK-002 integration made this parameter redundant as view state is
+ * now managed centrally, but we maintain it in the interface to avoid breaking changes.
+ *
+ * @param isSourceView - Unused parameter maintained for API compatibility
+ */
 export function WorkflowTabs({
   className,
   onViewModeChange,
-  isSourceView = false,
+  isSourceView = false, // Intentionally unused - maintained for API compatibility
 }: WorkflowTabsProps) {
   const { getNodes, getEdges, setNodes, setEdges, setViewport } =
     useReactFlow();
@@ -60,10 +68,19 @@ export function WorkflowTabs({
 
   // Initialize useTabState hook for active tab (single source of truth)
   const tabId = activeTabId || 'no-tab';
-  const tabState = useTabState(tabId, getNodes, getEdges, setNodes, setEdges, setViewport);
-  
+  const tabState = useTabState(
+    tabId,
+    getNodes,
+    getEdges,
+    setNodes,
+    setEdges,
+    setViewport
+  );
+
   // Derive source view state from hook (remove duplicate internalSourceView state)
-  const internalSourceView = activeTabId ? tabState.state.activeView === 'source' : false;
+  const internalSourceView = activeTabId
+    ? tabState.state.activeView === 'source'
+    : false;
 
   const dropdownButtonRefs = useRef<{
     [key: string]: HTMLButtonElement | null;
@@ -118,7 +135,7 @@ export function WorkflowTabs({
         // useWorkflowTabs saves file metadata (owns tab collection)
         await saveTab(tabId);
         console.log(`✅ Workflow tab save completed for: ${tab.name}`);
-        
+
         // useTabState marks content as saved (owns content state)
         tabState.markSaved();
         console.log(`✅ Tab state marked as saved for: ${tab.name}`);
@@ -168,8 +185,20 @@ export function WorkflowTabs({
     [closeTab]
   );
 
+  /**
+   * Toggle view mode for a specific tab
+   *
+   * @remarks
+   * The `tabId` parameter is intentionally unused in the current implementation.
+   * The function uses `activeTabId` from state instead, but the parameter is preserved
+   * for API compatibility and potential future features where we might need to toggle
+   * views for non-active tabs.
+   *
+   * @param tabId - Unused parameter maintained for API compatibility
+   */
   const handleToggleViewForTab = useCallback(
     async (tabId: string) => {
+      // Intentionally unused - uses activeTabId from state instead
       if (!activeTabId) {
         console.warn('No active tab found for view toggle');
         return;
@@ -183,8 +212,9 @@ export function WorkflowTabs({
 
       try {
         // Determine new view mode
-        const newView = tabState.state.activeView === 'source' ? 'visual' : 'source';
-        
+        const newView =
+          tabState.state.activeView === 'source' ? 'visual' : 'source';
+
         console.log('🎯 Toggling view for active tab:', {
           tabId: activeTabId,
           tabName: currentActiveTab.name,
@@ -203,7 +233,6 @@ export function WorkflowTabs({
 
         // Notify parent component (UI coordination responsibility)
         onViewModeChange?.(newView === 'source');
-
       } catch (error) {
         console.error('❌ Failed to toggle view:', error);
         alert(
