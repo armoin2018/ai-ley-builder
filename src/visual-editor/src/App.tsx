@@ -12,10 +12,13 @@ import {
   WorkflowTabsProvider,
 } from '@features/tabs';
 import { CommandPalette, QuickActions, StatusBar } from '@features/ui-advanced';
-import { Header } from '@features/ui-common/components';
+import {
+  ConversionToast,
+  Header,
+} from '@features/ui-common/components';
 import { ValidationPanel } from '@features/validation/components/ValidationPanel';
 import { WorkflowControls } from '@features/workflow';
-import { Button, ThemeProvider } from '@shared/components';
+import { Button, ThemeProvider, ThemeToggle } from '@shared/components';
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -28,6 +31,11 @@ import { Settings } from './features/settings';
 import { FlowStoreManager, NodeStoreManager } from './features/store';
 import { PerformanceDashboard, ProfilerWrapper } from './performance';
 import { PromptService } from './services/promptService';
+import {
+  formatValidationResult,
+  validateConversion,
+  type ValidationResult,
+} from './utils/conversion-validator';
 import { flowToPlantUML, parsePlantUMLToFlow } from './utils/plantuml-parser';
 
 function AppContent() {
@@ -41,6 +49,8 @@ function AppContent() {
   const [showFlowStore, setShowFlowStore] = useState(false);
   const [showPerformance, setShowPerformance] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
+  const [conversionValidationResult, setConversionValidationResult] =
+    useState<ValidationResult | null>(null);
   const { getNodes, getEdges, setNodes, setEdges, setViewport } =
     useReactFlow();
   const { activeTab } = useWorkflowTabsContext();
@@ -61,6 +71,35 @@ function AppContent() {
 
   const nodes = getNodes();
   const edges = getEdges();
+
+  // Restore visual state when switching to visual view or changing tabs
+  useEffect(() => {
+    if (!isSourceView && activeTab && tabState.state) {
+      const { visualState } = tabState.state;
+      
+      // Only restore if we have saved visual state and it's different from current
+      if (visualState.nodes.length > 0 || visualState.edges.length > 0) {
+        const currentNodes = getNodes();
+        const currentEdges = getEdges();
+        
+        // Check if state is different (to avoid unnecessary updates)
+        const nodesDifferent = JSON.stringify(currentNodes.map(n => ({ id: n.id, position: n.position }))) 
+          !== JSON.stringify(visualState.nodes.map(n => ({ id: n.id, position: n.position })));
+        
+        if (nodesDifferent) {
+          console.log('🔄 Restoring visual state from tab state', {
+            nodes: visualState.nodes.length,
+            edges: visualState.edges.length
+          });
+          setNodes(visualState.nodes);
+          setEdges(visualState.edges);
+          if (visualState.viewport) {
+            setViewport(visualState.viewport);
+          }
+        }
+      }
+    }
+  }, [isSourceView, activeTab?.id, tabState.state?.visualState, setNodes, setEdges, setViewport, getNodes, getEdges]);
 
   const handleNodeSelect = (nodeId: string) => {
     // This would typically focus on the node in the canvas
@@ -104,6 +143,24 @@ function AppContent() {
   const handleViewModeChange = (sourceView: boolean) => {
     // Use tabState hook to switch views (single source of truth)
     if (activeTab) {
+      // CRITICAL: Get current nodes/edges before view switch to ensure latest state is captured
+      const currentNodes = getNodes();
+      const currentEdges = getEdges();
+
+      console.log('🔄 View mode change requested:', {
+        from: isSourceView ? 'source' : 'visual',
+        to: sourceView ? 'source' : 'visual',
+        currentNodesCount: currentNodes.length,
+        currentEdgesCount: currentEdges.length,
+        tabName: activeTab.name,
+      });
+
+      // If switching to source view, explicitly update visual state first
+      if (sourceView && !isSourceView) {
+        console.log('📸 Capturing current visual state before switching to source');
+        tabState.updateVisualState(currentNodes, currentEdges);
+      }
+
       const newView = sourceView ? 'source' : 'visual';
       tabState.switchView(newView);
 
@@ -117,6 +174,80 @@ function AppContent() {
           setLastSaved(new Date());
           console.log('⚡ Triggered PlantUML refresh');
         }, 100);
+      } else {
+        // Switching from source to visual - validate conversion
+        console.log('🔍 Validating visual-to-text-to-visual conversion...');
+
+        // Get the PlantUML content that was generated
+        const plantumlContent = flowToPlantUML(
+          currentNodes,
+          currentEdges,
+          activeTab.name
+        );
+
+        // Parse it back to nodes/edges
+        const {
+          nodes: convertedNodes,
+          edges: convertedEdges,
+          errors: parseErrors,
+          warnings: parseWarnings,
+        } = parsePlantUMLToFlow(plantumlContent);
+
+        // Log parse errors/warnings if any
+        if (parseErrors && parseErrors.length > 0) {
+          console.error('❌ PlantUML parsing errors:', parseErrors);
+          parseErrors.forEach(err => {
+            console.error(`  Line ${err.line}: ${err.message}`);
+          });
+        }
+
+        if (parseWarnings && parseWarnings.length > 0) {
+          console.warn('⚠️ PlantUML parsing warnings:', parseWarnings);
+          parseWarnings.forEach(warn => {
+            console.warn(`  Line ${warn.line}: ${warn.message}`);
+          });
+        }
+
+        // Validate the round-trip conversion
+        const validationResult = validateConversion(
+          currentNodes,
+          currentEdges,
+          convertedNodes,
+          convertedEdges
+        );
+
+        // Log detailed validation results
+        console.log('📊 Validation Result:', validationResult);
+
+        // Show user-friendly message
+        const message = formatValidationResult(validationResult);
+        console.log(message);
+
+        // Set the validation result to show toast notification
+        setConversionValidationResult(validationResult);
+
+        // If there are issues, warn the user
+        if (!validationResult.valid) {
+          const errorCount = validationResult.issues.filter(
+            i => i.type === 'error'
+          ).length;
+          const warningCount = validationResult.issues.filter(
+            i => i.type === 'warning'
+          ).length;
+
+          console.warn(
+            `⚠️ Conversion validation found ${errorCount} error(s) and ${warningCount} warning(s)`
+          );
+
+          // Log first few issues for debugging
+          validationResult.issues.slice(0, 5).forEach(issue => {
+            console.warn(`  [${issue.type}] ${issue.message}`, issue.details);
+          });
+        } else {
+          console.log(
+            `✅ Conversion validated: ${validationResult.summary.nodesMatched}/${validationResult.summary.nodesTotal} nodes, ${validationResult.summary.edgesMatched}/${validationResult.summary.edgesTotal} edges`
+          );
+        }
       }
     }
   };
@@ -180,7 +311,10 @@ function AppContent() {
               activeTab.name
             );
 
-            // Store updated PlantUML content in localStorage for the active tab
+            // REMOVED: Don't call updateVisualState/updateSourceState here as it creates a loop
+            // The tabState is already tracking nodes/edges changes through other mechanisms
+            
+            // Only store in localStorage for legacy support and external tools
             if (activeTab.path) {
               localStorage.setItem(
                 `puml-content-${activeTab.path}`,
@@ -378,6 +512,7 @@ function AppContent() {
           <div className="flex items-center justify-between w-full">
             <h1 className="text-lg font-semibold">AI-LEY Visual Flow Editor</h1>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <LayoutQuickToggles />
               <LayoutTemplateSelector />
               <QuickActions onAction={handleQuickAction} />
@@ -498,7 +633,13 @@ function AppContent() {
       />
 
       <ChatPanel />
-      {/* Fixed JSX structure */}
+
+      {/* Conversion validation toast notification */}
+      <ConversionToast
+        validationResult={conversionValidationResult}
+        onClose={() => setConversionValidationResult(null)}
+        autoCloseDuration={5000}
+      />
     </LayoutProvider>
   );
 }

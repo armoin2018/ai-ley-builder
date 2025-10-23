@@ -18,6 +18,7 @@ export * from './RichTextEditor';
 // Theme Provider
 export * from '../hooks';
 export * from './ThemeProvider';
+export * from './ThemeToggle';
 
 // For now, re-export the TestComponent
 export { TestComponent } from '@components/TestComponent';

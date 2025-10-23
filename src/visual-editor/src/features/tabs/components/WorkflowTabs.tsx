@@ -1,16 +1,16 @@
 import { useReactFlow } from '@xyflow/react';
 import {
-  Code,
-  Download,
-  Edit2,
-  Eye,
-  Layout,
-  MoreVertical,
-  Play,
-  Plus,
-  Save,
-  Upload,
-  X,
+    Code,
+    Download,
+    Edit2,
+    Eye,
+    Layout,
+    MoreVertical,
+    Play,
+    Plus,
+    Save,
+    Upload,
+    X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -499,17 +499,17 @@ export function WorkflowTabs({
                   onChange={e => setEditingName(e.target.value)}
                   onBlur={handleSaveRename}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 min-w-0 px-1 py-0.5 text-sm bg-white border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 min-w-0 px-1 py-0.5 text-sm bg-white dark:bg-input border border-blue-300 dark:border-blue-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-foreground"
                   autoFocus
                   onClick={e => e.stopPropagation()}
                 />
               ) : (
                 <span
                   className={cn(
-                    'flex-1 min-w-0 truncate text-sm cursor-pointer hover:bg-slate-100 px-1 py-0.5 rounded',
+                    'flex-1 min-w-0 truncate text-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-accent px-1 py-0.5 rounded',
                     {
-                      'font-medium text-slate-900': activeTabId === tab.id,
-                      'text-slate-600': activeTabId !== tab.id,
+                      'font-medium text-slate-900 dark:text-slate-100': activeTabId === tab.id,
+                      'text-slate-600 dark:text-slate-400': activeTabId !== tab.id,
                     }
                   )}
                   title={`${tab.name} (click to rename)`}
@@ -600,7 +600,7 @@ export function WorkflowTabs({
         dropdownPosition &&
         createPortal(
           <div
-            className="bg-white border border-slate-200 rounded-md shadow-lg min-w-48 fixed"
+            className="bg-white dark:bg-card border border-slate-200 dark:border-border rounded-md shadow-lg min-w-48 fixed"
             style={{
               top: dropdownPosition.top,
               right: dropdownPosition.right,
@@ -612,7 +612,7 @@ export function WorkflowTabs({
               onClick={() =>
                 handleRename(tabs.find(t => t.id === dropdownTabId)!)
               }
-              className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2"
+              className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-accent flex items-center gap-2 dark:text-foreground"
             >
               <Edit2 className="w-4 h-4" />
               Rename

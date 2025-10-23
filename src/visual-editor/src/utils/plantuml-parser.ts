@@ -3,6 +3,20 @@ import type { Edge, Node } from '@xyflow/react';
 export interface ParsedFlow {
   nodes: Node[];
   edges: Edge[];
+  errors?: ParseError[];
+  warnings?: ParseWarning[];
+}
+
+export interface ParseError {
+  line: number;
+  message: string;
+  context?: string;
+}
+
+export interface ParseWarning {
+  line: number;
+  message: string;
+  context?: string;
 }
 
 // Default properties for each node type based on validation requirements
@@ -98,6 +112,33 @@ function getDefaultPropertiesForNodeType(
   }
 }
 
+/**
+ * Helper function to create a node with full metadata restoration
+ * This ensures round-trip conversion preserves all node data
+ */
+function createNodeWithMetadata(
+  baseNode: Partial<Node>,
+  metadata: Record<string, unknown> | null,
+  autoPosition: { x: number; y: number }
+): Node {
+  const node: Node = {
+    id: (metadata?.id as string) || baseNode.id || `node_${Date.now()}`,
+    type: (metadata?.type as string) || baseNode.type || 'default',
+    position: (metadata?.position as { x: number; y: number }) || autoPosition,
+    data: metadata?.data || baseNode.data || {},
+  };
+
+  // Restore optional metadata fields
+  if (metadata?.width) node.width = metadata.width as number;
+  if (metadata?.height) node.height = metadata.height as number;
+  if (metadata?.selected !== undefined)
+    node.selected = metadata.selected as boolean;
+  if (metadata?.dragging !== undefined)
+    node.dragging = metadata.dragging as boolean;
+
+  return node;
+}
+
 export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
   console.log('🔍 parsePlantUMLToFlow - Starting to parse PlantUML content');
   console.log('📄 Content length:', plantumlContent.length);
@@ -108,9 +149,33 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
 
   const nodes: Node[] = [];
   const edges: Edge[] = [];
+  const errors: ParseError[] = [];
+  const warnings: ParseWarning[] = [];
   const lines = plantumlContent.split('\n').map(line => line.trim());
 
   console.log(`📋 Split into ${lines.length} lines`);
+
+  // Handle empty content gracefully
+  if (!plantumlContent || plantumlContent.trim().length === 0) {
+    warnings.push({
+      line: 0,
+      message: 'Empty PlantUML content - using default template',
+    });
+    // Return a default starter node
+    return {
+      nodes: [
+        {
+          id: 'start_node',
+          type: 'input',
+          position: { x: 100, y: 100 },
+          data: { label: 'Start', shape: 'rectangle' },
+        },
+      ],
+      edges: [],
+      errors,
+      warnings,
+    };
+  }
 
   let nodeCounter = 0;
   let edgeCounter = 0;
@@ -120,13 +185,14 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const lineNumber = i + 1;
 
     // Skip empty lines
     if (!line) {
       continue;
     }
 
-    // Parse AI-LEY metadata comments
+    // Parse AI-LEY metadata comments with error handling
     if (line.startsWith("'@node-meta ")) {
       try {
         const metadataJson = line.substring("'@node-meta ".length);
@@ -134,6 +200,11 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         console.log('🔧 Found node metadata:', currentNodeMetadata);
         continue;
       } catch (error) {
+        errors.push({
+          line: lineNumber,
+          message: 'Invalid node metadata JSON',
+          context: line,
+        });
         console.warn('⚠️ Invalid node metadata JSON:', line);
         currentNodeMetadata = null;
         continue;
@@ -181,7 +252,7 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
       const defaultProps = getDefaultPropertiesForNodeType(nodeType);
 
       // Merge metadata with default properties
-      const nodeData = {
+      const nodeData = currentNodeMetadata?.data || {
         label: activityName,
         alias,
         shape: 'activity',
@@ -189,12 +260,8 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         properties: {
           ...defaultProps,
           // Override with metadata properties if present
-          ...(currentNodeMetadata?.properties || {}),
+          ...(currentNodeMetadata?.data?.properties || {}),
         },
-        // Override with other metadata if present (position, etc.)
-        ...(currentNodeMetadata
-          ? { ...currentNodeMetadata, properties: undefined }
-          : {}),
       };
 
       // Use metadata position or calculate grid position
@@ -203,12 +270,23 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
         y: Math.floor((nodeCounter - 1) / 4) * 150,
       };
 
-      nodes.push({
-        id: nodeId,
+      // Create node with full metadata restoration
+      const node: Node = {
+        id: currentNodeMetadata?.id || nodeId,
         type: nodeType,
         position,
         data: nodeData,
-      });
+      };
+
+      // Restore optional metadata fields
+      if (currentNodeMetadata?.width) node.width = currentNodeMetadata.width;
+      if (currentNodeMetadata?.height) node.height = currentNodeMetadata.height;
+      if (currentNodeMetadata?.selected !== undefined)
+        node.selected = currentNodeMetadata.selected;
+      if (currentNodeMetadata?.dragging !== undefined)
+        node.dragging = currentNodeMetadata.dragging;
+
+      nodes.push(node);
 
       // Reset metadata after use
       currentNodeMetadata = null;
@@ -487,7 +565,22 @@ export function parsePlantUMLToFlow(plantumlContent: string): ParsedFlow {
     );
   }
 
-  return { nodes, edges };
+  // Log parsing summary
+  if (errors.length > 0) {
+    console.warn(`⚠️ Parsing completed with ${errors.length} error(s)`);
+    errors.forEach(err => {
+      console.warn(`  Line ${err.line}: ${err.message}`);
+    });
+  }
+
+  if (warnings.length > 0) {
+    console.warn(`ℹ️ Parsing completed with ${warnings.length} warning(s)`);
+    warnings.forEach(warn => {
+      console.warn(`  Line ${warn.line}: ${warn.message}`);
+    });
+  }
+
+  return { nodes, edges, errors, warnings };
 }
 
 function createImplicitActivityConnections(
@@ -632,6 +725,55 @@ function getEdgeType(arrow: string): string {
     default:
       return 'default';
   }
+}
+
+/**
+ * Detect circular references in the workflow graph
+ * Returns true if a cycle is detected
+ */
+function detectCycles(nodes: Node[], edges: Edge[]): boolean {
+  const adjacencyList = new Map<string, string[]>();
+
+  // Build adjacency list
+  nodes.forEach(node => adjacencyList.set(node.id, []));
+  edges.forEach(edge => {
+    const neighbors = adjacencyList.get(edge.source) || [];
+    neighbors.push(edge.target);
+    adjacencyList.set(edge.source, neighbors);
+  });
+
+  const visited = new Set<string>();
+  const recursionStack = new Set<string>();
+
+  function hasCycleDFS(nodeId: string): boolean {
+    visited.add(nodeId);
+    recursionStack.add(nodeId);
+
+    const neighbors = adjacencyList.get(nodeId) || [];
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        if (hasCycleDFS(neighbor)) {
+          return true;
+        }
+      } else if (recursionStack.has(neighbor)) {
+        return true; // Cycle detected
+      }
+    }
+
+    recursionStack.delete(nodeId);
+    return false;
+  }
+
+  // Check all nodes
+  for (const node of nodes) {
+    if (!visited.has(node.id)) {
+      if (hasCycleDFS(node.id)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 export function flowToPlantUML(

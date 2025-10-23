@@ -1,14 +1,15 @@
+import { useReactFlow, type Node as FlowNode } from '@xyflow/react';
 import {
-  Bug,
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  Database,
-  Download,
-  Info,
-  Play,
-  Settings,
-  Upload,
+    Bug,
+    Calendar,
+    ChevronDown,
+    ChevronRight,
+    Database,
+    Download,
+    Info,
+    Play,
+    Settings,
+    Upload,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Button } from '../../../shared/components';
@@ -92,12 +93,117 @@ function DatastoresTab() {
 }
 
 function InformationTab() {
+  const { getNodes } = useReactFlow();
+  const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
+
+  // Track selected node
+  useEffect(() => {
+    const checkInterval = setInterval(() => {
+      const nodes = getNodes();
+      const selected = nodes.find((node: FlowNode) => node.selected);
+      if (selected && selected.id !== selectedNode?.id) {
+        setSelectedNode(selected);
+      } else if (!selected && selectedNode) {
+        setSelectedNode(null);
+      }
+    }, 500); // Increased from 100ms to 500ms to reduce overhead
+
+    return () => clearInterval(checkInterval);
+  }, [getNodes, selectedNode]);
+
+  if (!selectedNode) {
+    return (
+      <div className="p-4 space-y-4">
+        <div>
+          <h3 className="font-medium text-slate-700 dark:text-slate-300 mb-2">
+            Node Information
+          </h3>
+          <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <div>Select a node to view details</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const nodeType = selectedNode.type || 'default';
+  const nodeData = selectedNode.data || {};
+  const properties = nodeData.properties || {};
+
+  console.log('📋 InformationTab - Selected node data:', {
+    nodeId: selectedNode.id,
+    nodeType,
+    hasData: !!nodeData,
+    hasProperties: !!properties,
+    propertiesKeys: Object.keys(properties),
+    rawData: nodeData,
+  });
+
   return (
     <div className="p-4 space-y-4">
       <div>
-        <h3 className="font-medium text-slate-700 mb-2">Node Information</h3>
-        <div className="space-y-2 text-sm text-slate-600">
-          <div>Select a node to view details</div>
+        <h3 className="font-medium text-slate-700 dark:text-slate-300 mb-2">
+          Node Information
+        </h3>
+        <div className="space-y-3 text-sm">
+          <div>
+            <label className="font-medium text-slate-600 dark:text-slate-400">
+              ID:
+            </label>
+            <div className="text-slate-900 dark:text-slate-100 font-mono text-xs mt-1">
+              {selectedNode.id}
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium text-slate-600 dark:text-slate-400">
+              Type:
+            </label>
+            <div className="text-slate-900 dark:text-slate-100 mt-1">
+              {nodeType}
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium text-slate-600 dark:text-slate-400">
+              Label:
+            </label>
+            <div className="text-slate-900 dark:text-slate-100 mt-1">
+              {String(nodeData.label || 'N/A')}
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium text-slate-600 dark:text-slate-400">
+              Position:
+            </label>
+            <div className="text-slate-900 dark:text-slate-100 font-mono text-xs mt-1">
+              X: {Math.round(selectedNode.position.x)}, Y:{' '}
+              {Math.round(selectedNode.position.y)}
+            </div>
+          </div>
+
+          {Object.keys(properties).length > 0 && (
+            <div>
+              <label className="font-medium text-slate-600 dark:text-slate-400 mb-2 block">
+                Properties:
+              </label>
+              <div className="space-y-2 bg-slate-50 dark:bg-slate-800 rounded p-3">
+                {Object.entries(properties).map(([key, value]) => (
+                  <div key={key}>
+                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {key}:
+                    </div>
+                    <div className="text-xs text-slate-900 dark:text-slate-100 mt-1 break-all">
+                      {typeof value === 'object'
+                        ? JSON.stringify(value, null, 2)
+                        : String(value)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -442,9 +548,9 @@ export function TabbedRightPanel({ className }: TabbedRightPanelProps) {
   const activeTabConfig = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className={cn('flex flex-col h-full bg-white', className)}>
+    <div className={cn('flex flex-col h-full bg-white dark:bg-card', className)}>
       {/* Tab Headers */}
-      <div className="flex border-b border-slate-200 bg-slate-50">
+      <div className="flex border-b border-slate-200 dark:border-border bg-slate-50 dark:bg-secondary">
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
@@ -454,8 +560,8 @@ export function TabbedRightPanel({ className }: TabbedRightPanelProps) {
               className={cn(
                 'flex-1 flex items-center justify-center gap-1 px-2 py-2 text-xs font-medium border-b-2 transition-colors',
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-700 bg-white'
-                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                  ? 'border-blue-500 text-blue-700 dark:text-blue-400 bg-white dark:bg-card'
+                  : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-accent'
               )}
               title={tab.label}
             >

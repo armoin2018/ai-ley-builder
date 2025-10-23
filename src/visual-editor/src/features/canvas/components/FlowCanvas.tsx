@@ -1,20 +1,20 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  addEdge,
-  Background,
-  type Connection,
-  ConnectionLineType,
-  ConnectionMode,
-  type Edge,
-  MiniMap,
-  type Node,
-  ReactFlow,
-  type ReactFlowInstance,
-  ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
+    addEdge,
+    Background,
+    type Connection,
+    ConnectionLineType,
+    ConnectionMode,
+    type Edge,
+    MiniMap,
+    type Node,
+    ReactFlow,
+    type ReactFlowInstance,
+    ReactFlowProvider,
+    useEdgesState,
+    useNodesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { NodeType } from '../../../types/nodes';
 import { cn } from '../../../utils';
@@ -125,19 +125,19 @@ const getDefaultNodeProperties = (nodeType: NodeType) => {
 };
 
 // Import custom node components
-import { CommandPromptFileNode } from './nodes/CommandPromptFileNode';
-import { LogicConditionNode } from './nodes/LogicConditionNode';
-import { OutputTypeNode } from './nodes/OutputTypeNode';
-import { LoopNode } from './nodes/LoopNode';
-import { CustomPromptTextNode } from './nodes/CustomPromptTextNode';
-import { PersonaNode } from './nodes/PersonaNode';
-import { InstructionNode } from './nodes/InstructionNode';
-import { ShellScriptNode } from './nodes/ShellScriptNode';
-import { PythonScriptNode } from './nodes/PythonScriptNode';
-import { PhpScriptNode } from './nodes/PhpScriptNode';
-import { NodejsScriptNode } from './nodes/NodejsScriptNode';
 import { CanvasControls } from './CanvasControls';
+import { CommandPromptFileNode } from './nodes/CommandPromptFileNode';
+import { CustomPromptTextNode } from './nodes/CustomPromptTextNode';
 import { InjectorNode } from './nodes/InjectorNode';
+import { InstructionNode } from './nodes/InstructionNode';
+import { LogicConditionNode } from './nodes/LogicConditionNode';
+import { LoopNode } from './nodes/LoopNode';
+import { NodejsScriptNode } from './nodes/NodejsScriptNode';
+import { OutputTypeNode } from './nodes/OutputTypeNode';
+import { PersonaNode } from './nodes/PersonaNode';
+import { PhpScriptNode } from './nodes/PhpScriptNode';
+import { PythonScriptNode } from './nodes/PythonScriptNode';
+import { ShellScriptNode } from './nodes/ShellScriptNode';
 
 // Node type mapping
 const nodeTypes = {
@@ -518,22 +518,22 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         <Background
           gap={[20, 20]}
           size={2}
-          className="bg-white"
+          className="bg-white dark:bg-background"
           color="#f1f5f9"
           style={{
-            backgroundColor: '#ffffff',
+            backgroundColor: 'var(--background)',
             backgroundImage: `
-              radial-gradient(circle at 1px 1px, #f1f5f9 1px, transparent 0),
-              linear-gradient(90deg, rgba(241, 245, 249, 0.5) 1px, transparent 0),
-              linear-gradient(rgba(241, 245, 249, 0.5) 1px, transparent 0)
+              radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0),
+              linear-gradient(90deg, var(--border) 1px, transparent 0),
+              linear-gradient(var(--border) 1px, transparent 0)
             `,
             backgroundSize: '20px 20px, 20px 20px, 20px 20px',
           }}
         />
         <CanvasControls />
         <MiniMap
-          className="bg-white border border-slate-200 shadow-lg rounded-lg overflow-hidden"
-          style={{ backgroundColor: '#f8fafc' }}
+          className="bg-white dark:bg-card border border-slate-200 dark:border-border shadow-lg rounded-lg overflow-hidden"
+          style={{ backgroundColor: 'var(--muted)' }}
           maskColor="rgba(240, 240, 240, 0.6)"
           nodeStrokeWidth={2}
           nodeColor="#94a3b8"
@@ -547,8 +547,8 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
       {/* Drag Over Overlay */}
       {isDragOver && (
         <div className="absolute inset-0 bg-blue-100/30 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center z-50 pointer-events-none animate-pulse">
-          <div className="bg-white/95 backdrop-blur-sm px-6 py-4 rounded-xl shadow-xl border border-blue-300 transform scale-105 transition-all duration-200">
-            <div className="flex items-center gap-3 text-blue-700">
+          <div className="bg-white/95 dark:bg-card/95 backdrop-blur-sm px-6 py-4 rounded-xl shadow-xl border border-blue-300 dark:border-blue-600 transform scale-105 transition-all duration-200">
+            <div className="flex items-center gap-3 text-blue-700 dark:text-blue-400">
               <svg
                 width="24"
                 height="24"

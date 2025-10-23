@@ -217,7 +217,7 @@ export function SourceEditor({
     };
 
     loadContent();
-  }, [activeTab?.id, refreshTrigger]); // Re-run when tab changes or when refresh is triggered
+  }, [activeTab?.id, refreshTrigger, effectiveTabState?.state.sourceState]); // Re-run when tab changes, refresh is triggered, or sourceState updates
 
   // Debug: Log when refreshTrigger changes
   useEffect(() => {
@@ -336,6 +336,11 @@ title ${workflowName}
     (newContent: string) => {
       setContent(newContent);
 
+      // Update tab state to mark as modified
+      if (effectiveTabState) {
+        effectiveTabState.updateSourceState(newContent);
+      }
+
       // Automatically update the visual flow when PlantUML content changes
       // Use debounced update to avoid too frequent updates while typing
       if (onUpdate) {
@@ -365,7 +370,7 @@ title ${workflowName}
         }, 800); // Increased to 800ms for better stability
       }
     },
-    [onUpdate]
+    [onUpdate, effectiveTabState]
   );
 
   const handleSave = useCallback(async () => {
@@ -380,6 +385,8 @@ title ${workflowName}
       if (effectiveTabState) {
         console.log('✅ Saving content through tab state hook');
         effectiveTabState.updateSourceState(content);
+        // Mark as saved after updating content
+        effectiveTabState.markSaved();
       } else {
         // Fallback: Direct localStorage (during migration only)
         console.warn('Tab state hook not available, using fallback storage');

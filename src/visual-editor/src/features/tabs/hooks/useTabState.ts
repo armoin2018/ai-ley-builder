@@ -235,6 +235,7 @@ export function useTabState(
       setState(prev => {
         // If already in the requested view, no change needed
         if (newView === prev.activeView) {
+          console.log(`✓ Already in ${newView} view, no switch needed`);
           return prev;
         }
 
@@ -242,10 +243,34 @@ export function useTabState(
           // Converting visual to source
           const nodes = getNodes();
           const edges = getEdges();
+
+          console.log('🔄 Converting visual to source:', {
+            nodesCount: nodes.length,
+            edgesCount: edges.length,
+            tabName: prev.name,
+            sampleNode: nodes[0]
+              ? {
+                  id: nodes[0].id,
+                  type: nodes[0].type,
+                  position: nodes[0].position,
+                }
+              : null,
+          });
+
           const plantuml = flowToPlantUML(nodes, edges, prev.name);
+
+          console.log('✅ Generated PlantUML:', {
+            length: plantuml.length,
+            preview: `${plantuml.substring(0, 150)}...`,
+          });
 
           return {
             ...prev,
+            visualState: {
+              ...prev.visualState,
+              nodes, // Save current node positions before switching
+              edges,
+            },
             sourceState: plantuml,
             activeView: 'source',
             saved: false,
@@ -255,11 +280,30 @@ export function useTabState(
         } else {
           // Converting source to visual
           try {
+            console.log('🔄 Converting source to visual:', {
+              sourceLength: prev.sourceState.length,
+              sourcePreview: `${prev.sourceState.substring(0, 150)}...`,
+            });
+
             const { nodes, edges } = parsePlantUMLToFlow(prev.sourceState);
+
+            console.log('✅ Parsed PlantUML to nodes/edges:', {
+              nodesCount: nodes.length,
+              edgesCount: edges.length,
+              sampleNode: nodes[0]
+                ? {
+                    id: nodes[0].id,
+                    type: nodes[0].type,
+                    position: nodes[0].position,
+                  }
+                : null,
+            });
 
             // Update React Flow immediately
             setNodes(nodes);
             setEdges(edges);
+
+            console.log('✅ Updated React Flow canvas with parsed nodes/edges');
 
             return {
               ...prev,
